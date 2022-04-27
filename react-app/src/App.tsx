@@ -1,9 +1,12 @@
 import React from 'react';
 import AppRouter from './navigation/AppRouter'
+import AppProviders from './providers/AppProviders';
 
 const App: React.FC = () => {
   return (
-    <AppRouter/>
+    <AppProviders>
+      <AppRouter/>
+    </AppProviders>
   );
 }
 

@@ -1,9 +1,10 @@
 import React from 'react';
+import LocalizedText from '../Localized/LocalizedText';
 
 const HomeScreen: React.FC = () => {
 	return (
 		<div>
-			<h1>Hello World</h1>
+			<LocalizedText messageID='App.title'/>
 		</div>
 	)
 }
