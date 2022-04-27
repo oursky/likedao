@@ -7,6 +7,7 @@
 
 ## Requirements
 
+- Golang 1.18
 - Node 16
 - Yarn 1.22.17
 
@@ -31,7 +32,10 @@ Then visit http://localhost:3000
 
 Please visit [here](./react-app/README.md#development) for more information
 
+### GraphQL Server
+
+Please visit [here](./graphql-server/README.md#development) for more information
+
 ## Deployment
 
-TODO 
-
+TODO
