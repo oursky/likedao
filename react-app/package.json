@@ -8,7 +8,6 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1",
-    "tailwindcss": "^3.0.24",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
@@ -19,13 +18,30 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0"
+    "@types/react-dom": "^18.0.0",
+    "@oursky/eslint-plugin": "^8.0.0",
+    "@oursky/stylelint-oursky": "^3.0.0",
+    "autoprefixer": "^10.4.5",
+    "eslint": "^8.14.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-tailwindcss": "^3.5.0",
+    "json-sort-cli": "^2.0.13",
+    "postcss": "^8.4.12",
+    "prettier": "^2.6.2",
+    "stylelint": "^14.8.0",
+    "stylelint-scss": "^4.2.0",
+    "tailwindcss": "^3.0.24"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "check-format": "prettier --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "stylelint": "stylelint --max-warnings 0 'src/**/*.{css,scss}'",
+    "typecheck": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
