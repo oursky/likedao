@@ -1,46 +1,52 @@
-# Getting Started with Create React App
+# LikeDAO SPA
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Requirements
 
-## Available Scripts
+- NodeJS v16.15.0
+- Yarn v1.22.17
 
-In the project directory, you can run:
+These can be installed via `asdf install` if asdf is installed
 
-### `yarn start`
+## Quick Start
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```
+make vendor
+make dev
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Visit http://localhost:3000
 
-### `yarn test`
+## Development
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Component folder structure
 
-### `yarn build`
+- Usually, a normal screen will have
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+- src/
+  - components/
+    - SomeScreen/
+      - SomeScreen.graphql <-- GraphQL queries/mutations used in SomeScreen
+      - SomeScreen.module.scss <-- styles
+      - SomeScreen.tsx <-- the React Component
+      - SomeScreenAPI.ts <-- some hooks to encapsulate graphql api call/pagination setup/use cases
+      - SomeScreenModel.ts <-- models that shared with others
+      - SomeComponentOnlyThatUsedInSomeScreen/
+        - SomeComponentOnlyThatUsedInSomeScreen.module.scss
+        - SomeComponentOnlyThatUsedInSomeScreen.tsx
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Graphql
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Write your operation in the `.graphql` file and run `make codegen`. This will help you generate the necessary types and gql string for the operation
 
-### `yarn eject`
+- Use `useGraphQLQuery` / `useLazyGraphQLQuery` / `useGraphQLMutation` because the request state modeling is better then the default that comes with apollo
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- You can use the apollo client directly (not necessarily use hooks) if you think it is more proper to have imperative graphql call.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### i18n
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Add you translation key & string in the [translation files](./src/i18n/translations)
+1. Translation key is in the format of `screenName.section.view.content`
+1. Use `<LocalizedText>` or `translate` from `useIntl()`
+1. Sort the translation by `make sort-translations`
