@@ -30,3 +30,9 @@ go.work
 /Godeps/
 
 # End of https://www.toptal.com/developers/gitignore/api/go
+
+pkg/generated
+pkg/dataloaders/*_gen.go
+pkg/models/*_gen.go
+
+graphql-serverd
