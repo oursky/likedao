@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "autoprefixer": "^10.4.5",
-    "postcss": "^8.4.12",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1",
@@ -41,7 +39,9 @@
     "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "stylelint": "stylelint --max-warnings 0 'src/**/*.{css,scss}'",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "sort-translations": "jsonsort --indentationCount 2 'src/i18n/translations/*.json'",
+    "check-sort-translations": "jsonsort --ci --indentationCount 2 'src/i18n/translations/*.json'"
   },
   "eslintConfig": {
     "extends": [
