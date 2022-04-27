@@ -1,0 +1,9 @@
+"""
+A type denoting an exact moment in time.
+"""
+scalar DateTime
+
+"""
+A type denoting a date.
+"""
+scalar Date

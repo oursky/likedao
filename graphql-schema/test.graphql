@@ -1,0 +1,18 @@
+type Test {
+  id: ID!
+  string: String!
+  int: Int!
+}
+
+input CreateTest {
+  string: String!
+  int: Int!
+}
+
+extend type Query {
+  queryTestByID(id: ID!): Test
+}
+
+extend type Mutation {
+  createTest(input: CreateTest!): ID!
+}

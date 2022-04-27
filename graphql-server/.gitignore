@@ -34,5 +34,4 @@ go.work
 pkg/generated
 pkg/dataloaders/*_gen.go
 pkg/models/*_gen.go
-
-graphql-serverd
+bin
