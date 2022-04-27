@@ -12,6 +12,10 @@ build:
 	go build -o bin/graphql-server cmd/graphql-server/main.go
 	go build -o bin/migrator cmd/migration/main.go
 
+.PHONY: lint
+lint:
+	golangci-lint run -v --timeout 10m ./cmd/... ./pkg/... ./migrations/...
+
 .PHONY: codegen
 codegen:
 	rm -f pkg/models/*_gen.go
@@ -20,6 +24,9 @@ codegen:
 	go generate ./pkg/dataloaders/...
 	rm -f pkg/generated/graphql/*.go
 	go generate ./pkg/resolvers/...
+
+.PHONY: ci
+ci: vendor codegen lint test
 
 RUN_IN_DOCKER := docker-compose --env-file ../.env run --rm graphql-server
 .PHONY: migration-new
