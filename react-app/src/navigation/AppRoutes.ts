@@ -1,5 +1,6 @@
 const AppRoutes = Object.freeze({
-	Home: "/",
-  });
-  
-  export default AppRoutes;
+  Home: "/",
+  Dummy: "/dummy",
+});
+
+export default AppRoutes;

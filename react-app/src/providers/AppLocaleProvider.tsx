@@ -11,7 +11,7 @@ import {
 } from "../i18n/LocaleModel";
 
 interface AppLocaleProviderProps {
-	children?: ReactNode
+  children?: ReactNode;
 }
 
 const AppLocaleProvider: React.FC<AppLocaleProviderProps> = (props) => {

@@ -1,13 +1,13 @@
-import React from 'react';
-import AppRouter from './navigation/AppRouter'
-import AppProviders from './providers/AppProviders';
+import React from "react";
+import AppRouter from "./navigation/AppRouter";
+import AppProviders from "./providers/AppProviders";
 
 const App: React.FC = () => {
   return (
     <AppProviders>
-      <AppRouter/>
+      <AppRouter />
     </AppProviders>
   );
-}
+};
 
 export default App;
