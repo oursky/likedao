@@ -1,0 +1,4 @@
+[submodule "bdjuno/bdjuno"]
+	path = bdjuno/bdjuno
+	url = git@github.com:forbole/bdjuno.git
+	branch = chains/likecoin/mainnet
