@@ -15,6 +15,21 @@ services:
     volumes:
       - server-db_data:/var/lib/postgresql/data
       - ./graphql-server/initdb.d/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+  bdjuno-db:
+    image: postgres:12.4
+    ports:
+      - "6432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DATABASE_NAME: bdjuno
+      DATABASE_USER: bdjuno
+      DATABASE_PASSWORD: bdjuno
+      DATABASE_SCHEMA: bdjuno
+    volumes:
+      - ./bdjuno/bdjuno/database/schema/:/var/src/schemas:ro
+      - bdjuno-db_data:/var/lib/postgresql/data
+      - ./bdjuno/initdb.d/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
   graphql-server:
     depends_on:
       - server-db
@@ -30,4 +45,6 @@ services:
 
 volumes:
   server-db_data:
+    driver: local
+  bdjuno-db_data:
     driver: local
