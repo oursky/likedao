@@ -1,6 +1,11 @@
 .PHONY: ci
 ci: vendor check-format check-sort-translations lint typecheck
 
+.PHONY: setup
+setup:
+	cp -p ./config/config.debug.js ./config/config.debug.js.$$(date +%Y%m%d%H%M%S).bak || true
+	cp ./config/config.template.js ./config/config.debug.js
+
 .PHONY: vendor
 vendor:
 	yarn
@@ -36,4 +41,5 @@ typecheck:
 
 .PHONY: dev
 dev:
+	cp ./config/config.debug.js ./public/config.js
 	yarn start

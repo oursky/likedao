@@ -10,6 +10,7 @@ These can be installed via `asdf install` if asdf is installed
 ## Quick Start
 
 ```
+make setup
 make vendor
 make dev
 ```
