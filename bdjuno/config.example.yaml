@@ -11,7 +11,7 @@ chain:
         - slashing
         - staking
         - distribution
-        - iscn
+        # - iscn
 node:
     type: remote
     config:
