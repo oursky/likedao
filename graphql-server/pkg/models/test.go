@@ -7,6 +7,6 @@ type Test struct {
 
 	Base
 
-	String string
-	Int    int
+	String string `bun:"string,notnull"`
+	Int    int    `bun:"int,notnull"`
 }
