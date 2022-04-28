@@ -42,6 +42,16 @@ services:
       - ./graphql-server:/usr/src/app
     ports:
       - "8080:8080"
+  bdjuno:
+    depends_on:
+      - bdjuno-db
+    build:
+      context: ./bdjuno/bdjuno
+      dockerfile: ./Dockerfile
+    restart: always
+    command: bdjuno start --home /bdjuno/.bdjuno
+    volumes:
+      - ./bdjuno/.bdjuno:/bdjuno/.bdjuno
 
 volumes:
   server-db_data:
