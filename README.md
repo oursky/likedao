@@ -36,6 +36,10 @@ Please visit [here](./react-app/README.md#development) for more information
 
 Please visit [here](./graphql-server/README.md#development) for more information
 
+### BDJuno
+
+Please visit [here](./bdjuno/README.md#development) for more information
+
 ## Deployment
 
 TODO
