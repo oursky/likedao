@@ -5,18 +5,29 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
+	pkgContext "github.com/oursky/likedao/pkg/context"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 )
 
 func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTest) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	res, err := pkgContext.GetMutatorsFromCtx(ctx).Test.CreateTest(input.String, input.Int)
+
+	if err != nil {
+		return "", err
+	}
+
+	return res.ID, nil
 }
 
-func (r *queryResolver) Test(ctx context.Context) (*models.Test, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.Test, error) {
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Test.QueryTestByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // Mutation returns graphql1.MutationResolver implementation.
