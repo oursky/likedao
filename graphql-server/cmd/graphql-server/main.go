@@ -9,6 +9,7 @@ import (
 	"github.com/oursky/likedao/pkg/database"
 	"github.com/oursky/likedao/pkg/handlers"
 	"github.com/oursky/likedao/pkg/logging"
+	"github.com/oursky/likedao/pkg/middlewares"
 )
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	router.Use(middlewares.Services(db))
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

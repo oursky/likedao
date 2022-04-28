@@ -18,11 +18,11 @@ const (
 )
 
 type QueryContext struct {
-	Test queries.TestQuery
+	Test queries.ITestQuery
 }
 
 type MutatorContext struct {
-	Test mutators.TestMutator
+	Test mutators.ITestMutator
 }
 
 type DataLoaderContext struct{}
