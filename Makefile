@@ -27,6 +27,12 @@ docker-build-react-app:
 		-f react-app/Dockerfile \
 		. 
 
-.PHONY: docker-build
-docker-build: docker-build-react-app
+.PHONY: docker-build-graphql-server
+docker-build-graphql-server:
+	docker build \
+		-t $(DOCKER_REGISTRY)/likedao-graphql-server:$(BUILD_TAG) \
+		-f graphql-server/Dockerfile \
+		.
 
+.PHONY: docker-build
+docker-build: docker-build-react-app docker-build-graphql-server
