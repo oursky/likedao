@@ -16,17 +16,17 @@ import (
 
 func main() {
 	config := config.LoadConfigFromEnv()
-	db, err := database.GetDB(config.Database)
+	serverDB, err := database.GetDB(config.ServerDatabase)
 	if err != nil {
 		panic(err)
 	}
 
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	serverDB.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 
 	app := &cli.App{
 		Name: "bun",
 		Commands: []*cli.Command{
-			newDBCommand(migrate.NewMigrator(db, migrations.Migrations)),
+			newDBCommand(migrate.NewMigrator(serverDB, migrations.Migrations)),
 		},
 	}
 	if err := app.Run(os.Args); err != nil {

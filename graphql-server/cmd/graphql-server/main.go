@@ -20,19 +20,23 @@ func main() {
 
 	logging.ConfigureLogger(config.Log)
 
-	db, err := database.GetDB(config.Database)
+	serverDB, err := database.GetDB(config.ServerDatabase)
+	if err != nil {
+		panic(err)
+	}
+	chainDB, err := database.GetDB(config.ChainDatabase)
 	if err != nil {
 		panic(err)
 	}
 
-	router.Use(middlewares.Services(db))
+	router.Use(middlewares.Services(serverDB, chainDB))
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
-	router.POST("/graphql", handlers.GraphqlHandler(db))
+	router.POST("/graphql", handlers.GraphqlHandler(serverDB, chainDB))
 	if gin.Mode() == gin.DebugMode {
 		router.GET("/graphql", handlers.GraphqlPlaygroundHandler())
 	}

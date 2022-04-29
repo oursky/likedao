@@ -13,7 +13,7 @@ func init() {
 
 	Migrations.MustRegister(func(ctx context.Context, db *bun.DB) error {
 		values := FormatValues{
-			"schema": config.Database.Schema,
+			"schema": config.ServerDatabase.Schema,
 		}
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 			_, err := tx.Exec(Format(`

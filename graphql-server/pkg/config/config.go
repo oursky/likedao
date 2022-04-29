@@ -17,23 +17,39 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	Database DatabaseConfig
-	Log      LogConfig
+	ChainDatabase  DatabaseConfig
+	ServerDatabase DatabaseConfig
+	Log            LogConfig
 }
 
 func LoadConfigFromEnv() Config {
-	databasePoolSizeStr := os.Getenv("DATABASE_POOL_SIZE")
-	if databasePoolSizeStr == "" {
-		databasePoolSizeStr = "5"
+	serverDatabasePoolSizeStr := os.Getenv("SERVER_DATABASE_POOL_SIZE")
+	if serverDatabasePoolSizeStr == "" {
+		serverDatabasePoolSizeStr = "5"
 	}
-	databasePoolSize, err := strconv.Atoi(databasePoolSizeStr)
+	serverDatabasePoolSize, err := strconv.Atoi(serverDatabasePoolSizeStr)
 	if err != nil {
-		databasePoolSize = 5
+		serverDatabasePoolSize = 5
 	}
-	databaseConfig := DatabaseConfig{
-		URL:      os.Getenv("DATABASE_URL"),
-		Schema:   os.Getenv("DATABASE_SCHEMA"),
-		PoolSize: databasePoolSize,
+	serverDatabaseConfig := DatabaseConfig{
+		URL:      os.Getenv("SERVER_DATABASE_URL"),
+		Schema:   os.Getenv("SERVER_DATABASE_SCHEMA"),
+		PoolSize: serverDatabasePoolSize,
+		Verbose:  os.Getenv("SERVER_DATABASE_VERBOSE") == "1",
+	}
+
+	chainDatabasePoolSizeStr := os.Getenv("BDJUNO_DATABASE_POOL_SIZE")
+	if chainDatabasePoolSizeStr == "" {
+		chainDatabasePoolSizeStr = "5"
+	}
+	chainDatabasePoolSize, err := strconv.Atoi(chainDatabasePoolSizeStr)
+	if err != nil {
+		chainDatabasePoolSize = 5
+	}
+	chainDatabaseConfig := DatabaseConfig{
+		URL:      os.Getenv("BDJUNO_DATABASE_URL"),
+		Schema:   os.Getenv("BDJUNO_DATABASE_SCHEMA"),
+		PoolSize: chainDatabasePoolSize,
 		Verbose:  os.Getenv("DATABASE_VERBOSE") == "1",
 	}
 
@@ -48,7 +64,8 @@ func LoadConfigFromEnv() Config {
 	}
 
 	return Config{
-		Database: databaseConfig,
-		Log:      logConfig,
+		ServerDatabase: serverDatabaseConfig,
+		ChainDatabase:  chainDatabaseConfig,
+		Log:            logConfig,
 	}
 }

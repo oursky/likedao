@@ -41,8 +41,8 @@ func (GraphQLOperationLogger) InterceptResponse(ctx context.Context, next gql.Re
 	return next(ctx)
 }
 
-func GraphqlHandler(db *bun.DB) gin.HandlerFunc {
-	c := graphql.Config{Resolvers: &resolvers.Resolver{DB: db}}
+func GraphqlHandler(serverDB *bun.DB, chainDB *bun.DB) gin.HandlerFunc {
+	c := graphql.Config{Resolvers: &resolvers.Resolver{ServerDB: serverDB, ChainDB: chainDB}}
 
 	h := handler.NewDefaultServer(graphql.NewExecutableSchema(c))
 	h.Use(GraphQLOperationLogger{})
