@@ -43,3 +43,25 @@ docker-build-bdjuno:
 
 .PHONY: docker-build
 docker-build: docker-build-react-app docker-build-graphql-server docker-build-bdjuno
+
+.PHONY: docker-push-react-app
+docker-push-react-app:
+	docker push $(DOCKER_REGISTRY)/likedao-react-app:$(BUILD_TAG)
+
+.PHONY: docker-push-graphql-server
+docker-push-graphql-server:
+	docker push $(DOCKER_REGISTRY)/likedao-graphql-server:$(BUILD_TAG)
+
+.PHONY: docker-push-bdjuno
+docker-push-bdjuno:
+	docker push $(DOCKER_REGISTRY)/likedao-bdjuno:$(BUILD_TAG)
+
+.PHONY: docker-push
+docker-push: docker-push-react-app docker-push-graphql-server docker-push-bdjuno
+
+.PHONY: docker-pull
+docker-pull:
+	docker pull $(DOCKER_REGISTRY)/likedao-react-app:$(BUILD_TAG)
+	docker pull $(DOCKER_REGISTRY)/likedao-graphql-server:$(BUILD_TAG)
+	docker pull $(DOCKER_REGISTRY)/likedao-bdjuno:$(BUILD_TAG)
+
