@@ -1,0 +1,42 @@
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migration
+  annotations:
+    "helm.sh/hook": "pre-upgrade,post-install"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - name: database-migration
+          image: {{ .Values.graphqlServer.imageName }}:{{ .Values.buildTag }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - /usr/likedao/bin/migrator db init;
+              /usr/likedao/bin/migrator db migrate;
+            
+          env:
+            - name: SERVER_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-migration-config
+                  key: SERVER_DATABASE_URL
+            - name: SERVER_DATABASE_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: database-migration-config
+                  key: SERVER_DATABASE_SCHEMA
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: database-migration-config
+type: Opaque
+data:
+  SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}
+  SERVER_DATABASE_SCHEMA: {{ .Values.graphqlServer.serverDatabase.schema | b64enc }}
