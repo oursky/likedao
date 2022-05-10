@@ -1,0 +1,26 @@
+graphqlServer:
+  imageName: ghcr.io/oursky/likedao-graphql-server
+  sentry:
+    dsn: dsn
+    environment: graphql-server
+  serverDatabase:
+    url: postgres://likedao:likedao@server-db/likedao?sslmode=disable
+    schema: likedao
+    poolSize: 5
+  bdjunoDatabase:
+    url: postgres://likedao:likedao@bdjuno-db/bdjuno?sslmode=disable
+    schema: bdjuno
+    poolSize: 5
+  host: api.likedao.example.com
+reactApp:
+  imageName: ghcr.io/oursky/likedao-react-app
+  host: likedao.example.com
+bdjuno:
+  imageName: ghcr.io/oursky/likedao-bdjuno
+  resources:
+    limits:
+      cpu: 2
+      memory: 1792Mi
+    requests:
+      cpu: 2
+      memory: 1792Mi
