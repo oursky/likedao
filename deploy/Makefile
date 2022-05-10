@@ -14,10 +14,15 @@ GENESIS_URL ?=
 download-genesis:
 	curl -o ./likedao/static/genesis.json ${GENESIS_URL}
 
-.PHONY: install
-install: .checkenv download-genesis
-	helm install $(APP_NAME) $(APP_NAME) --namespace $(NAMESPACE) --values $(VALUES) --set buildTag=$(BUILD_TAG)
+.PHONY: make-deployment-assets
+make-deployment-assets:
+	cp -p ./likedao/static/bdjuno.config.yaml ./likedao/static/bdjuno.config.yaml.$$(date +%Y%m%d%H%M%S).bak 2>/dev/null || true
+	cp ./likedao/static/bdjuno.config.sample.yaml ./likedao/static/bdjuno.conf.yaml
+	cp -p ./likedao/static/react-app.config.js ./likedao/static/react-app.config.js.$$(date +%Y%m%d%H%M%S).bak 2>/dev/null || true
+	cp ./likedao/static/react-app.config.sample.js ./likedao/static/react-app.config.js
+	cp -p ./likedao/static/react-app.nginx.conf ./likedao/static/react-app.nginx.conf.$$(date +%Y%m%d%H%M%S).bak 2>/dev/null || true
+	cp ./likedao/static/react-app.nginx.sample.conf ./likedao/static/react-app.nginx.conf
 
-.PHONY: upgrade
-install: .checkenv download-genesis
-	helm upgrade $(APP_NAME) $(APP_NAME) --namespace $(NAMESPACE) --values $(VALUES) --set buildTag=$(BUILD_TAG)
+.PHONY: deploy
+deploy: .checkenv download-genesis
+	helm upgrade $(APP_NAME) $(APP_NAME) --namespace $(NAMESPACE) --values $(VALUES) --set buildTag=$(BUILD_TAG) --install
