@@ -1,0 +1,35 @@
+name: Build Images and Deploy
+on:
+  push:
+    branches:
+      - master
+      - staging
+      # - production TODO: Review if this is needed
+env:
+  DOCKER_VERSION: 20.10.14
+  DEPLOYMENT_WEBHOOK: ${{ secrets.DEPLOYMENT_WEBHOOK }}
+jobs:
+  build-and-push-images:
+    name: Build And Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Login to ghcr.io
+        run: |-
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u oursky --password-stdin
+      - name: Build Images
+        run: make docker-build
+      - name: Push Images
+        run: make docker-push
+      - name: Invoke Deployment Webhook
+        if: "${{ env.DEPLOYMENT_WEBHOOK != '' }}"
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.DEPLOYMENT_WEBHOOK_KEY }}" \
+          --request POST \
+          --data '{"event_type": "deployment", "client_payload": {"ref": "$GITHUB_REF"}}' \
+          $DEPLOYMENT_WEBHOOK
