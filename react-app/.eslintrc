@@ -1,0 +1,53 @@
+{
+	"root": true,
+	"env": {
+	  "browser": true,
+	  "es6": true,
+	  "jest": true,
+	  "node": true
+	},
+	"plugins": ["@oursky", "import", "tailwindcss", "@typescript-eslint"],
+	"parser": "@typescript-eslint/parser",
+	"overrides": [{
+		"files": ["*.ts", "*.tsx"],
+		"extends": [
+			// You should always include these two.
+			"plugin:@oursky/eslint",
+			"plugin:@oursky/oursky",
+			// Include this if you are using TypeScript.
+			"plugin:@oursky/typescript",
+			"plugin:@oursky/tsdoc",
+			// Include these two if your project is React.
+			"plugin:@oursky/react",
+			"plugin:@oursky/react-hooks",
+			// Imports
+			"plugin:import/recommended",
+			"plugin:import/typescript",
+			// Tailwind
+			"plugin:tailwindcss/recommended"
+		  ],
+		  "parserOptions": {
+			  "project": ["./tsconfig.json"]
+		  },
+		  "rules": {
+			"no-use-before-define": "off",
+			"@typescript-eslint/no-use-before-define": ["error"],
+			"import/order": [
+			  "error",
+			  {
+				"pathGroups": [
+				  {
+					"pattern": "react",
+					"group": "builtin",
+					"position": "before"
+				  }
+				],
+				"pathGroupsExcludedImportTypes": ["react"]
+			  }
+			]
+		  }
+	}],
+	"ignorePatterns": [
+	  "src/generated"
+	]
+  }
