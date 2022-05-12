@@ -43,6 +43,24 @@ spec:
             - name: react-app-config
               mountPath: /usr/share/config/config.js
               subPath: config.js
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 1
       volumes:
         - name: react-app-nginx-conf
           configMap:
