@@ -2,6 +2,7 @@
 setup:
 	cp -p .env .env.$$(date +%Y%m%d%H%M%S).bak || true
 	cp .env.example .env
+	make -C react-app setup
 	make codegen
 	docker-compose build
 	docker-compose up -d server-db
