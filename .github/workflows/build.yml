@@ -29,3 +29,15 @@ jobs:
         run: make docker-build-${{matrix.target}}
       - name: Push Images
         run: make docker-push-${{matrix.target}}
+  invoke-deployment-webhook:
+    name: Invoke Deployment Webhook
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-image
+    steps:
+      - if: "${{ env.DEPLOYMENT_WEBHOOK != '' }}"
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.DEPLOYMENT_WEBHOOK_KEY }}" \
+          --request POST \
+          --data '{"event_type": "deployment", "client_payload": {"branch": "${{ github.ref_name }}"}}' \
+          $DEPLOYMENT_WEBHOOK       
