@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  server-db:
+    image: postgres:12.10
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DATABASE_NAME: likedao
+      DATABASE_USER: likedao
+      DATABASE_PASSWORD: likedao
+      DATABASE_SCHEMA: likedao
+    volumes:
+      - server-db_data:/var/lib/postgresql/data
+      - ./graphql-server/initdb.d/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+  graphql-server:
+    depends_on:
+      - server-db
+    build:
+      context: ./graphql-server
+      dockerfile: ./Dockerfile.dev
+    env_file:
+      - .env
+    volumes:
+      - ./graphql-server:/usr/src/app
+    ports:
+      - "8080:8080"
+
+volumes:
+  server-db_data:
+    driver: local

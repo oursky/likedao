@@ -2,7 +2,7 @@
 ci: vendor check-format check-sort-translations lint typecheck
 
 .PHONY: setup
-setup:
+setup: vendor
 	cp -p ./config/config.debug.js ./config/config.debug.js.$$(date +%Y%m%d%H%M%S).bak || true
 	cp ./config/config.template.js ./config/config.debug.js
 
