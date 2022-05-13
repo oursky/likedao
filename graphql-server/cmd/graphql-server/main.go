@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/database"
@@ -17,6 +21,22 @@ func main() {
 	log.Printf("Using config: %v", config)
 
 	router := gin.Default()
+
+	if config.Log.Sentry != nil {
+		sentryClientOption := sentry.ClientOptions{
+			Dsn:         config.Log.Sentry.DSN,
+			Environment: config.Log.Sentry.Environment,
+		}
+
+		if err := sentry.Init(sentryClientOption); err != nil {
+			panic(fmt.Sprintf("Failed to initialize sentry: %v\n", err))
+		}
+		router.Use(sentrygin.New(sentrygin.Options{Repanic: true}))
+
+		// Flush buffered events before the program terminates.
+		// Set the timeout to the maximum duration the program can afford to wait.
+		defer sentry.Flush(2 * time.Second)
+	}
 
 	logging.ConfigureLogger(config.Log)
 
