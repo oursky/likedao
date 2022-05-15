@@ -30,6 +30,18 @@ func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.T
 	return res, nil
 }
 
+func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []string) ([]*models.Test, error) {
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(ids)
+
+	for _, err := range errs {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return res, nil
+}
+
 // Mutation returns graphql1.MutationResolver implementation.
 func (r *Resolver) Mutation() graphql1.MutationResolver { return &mutationResolver{r} }
 
