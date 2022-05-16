@@ -22,7 +22,7 @@ func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTe
 }
 
 func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.Test, error) {
-	res, err := pkgContext.GetQueriesFromCtx(ctx).Test.QueryTestByID(id)
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id)
 	if err != nil {
 		return nil, err
 	}
