@@ -21,8 +21,8 @@ func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTe
 	return res, nil
 }
 
-func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.Test, error) {
-	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id)
+func (r *queryResolver) QueryTestByID(ctx context.Context, id models.NodeID) (*models.Test, error) {
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +30,9 @@ func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.T
 	return res, nil
 }
 
-func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []string) ([]*models.Test, error) {
-	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(ids)
+func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []models.NodeID) ([]*models.Test, error) {
+	objIds := models.ExtractObjectIDs(ids)
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(objIds)
 
 	for _, err := range errs {
 		if err != nil {
