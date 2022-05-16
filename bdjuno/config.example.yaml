@@ -1,5 +1,7 @@
 chain:
-    bech32_prefix: like
+    bech32_prefix:
+        - cosmos
+        - like
     modules:
         - modules
         - messages
