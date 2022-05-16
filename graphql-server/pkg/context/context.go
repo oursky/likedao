@@ -18,7 +18,8 @@ const (
 )
 
 type QueryContext struct {
-	Test queries.ITestQuery
+	Test  queries.ITestQuery
+	Block queries.IBlockQuery
 }
 
 type MutatorContext struct {
@@ -38,7 +39,8 @@ func NewRequestContext(
 	chainDB *bun.DB,
 ) context.Context {
 	queries := QueryContext{
-		Test: queries.NewTestQuery(ctx, serverDB),
+		Test:  queries.NewTestQuery(ctx, serverDB),
+		Block: queries.NewBlockQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
 		Test: mutators.NewTestMutator(ctx, serverDB),
