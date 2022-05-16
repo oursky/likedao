@@ -1,0 +1,12 @@
+type Block {
+  height: Int!
+  hash: String!
+  numOfTxs: Int!
+  totalGas: Int!
+  proposerAddress: String!
+  timestamp: DateTime!
+}
+
+extend type Query {
+  getLatestBlock: Block
+}
