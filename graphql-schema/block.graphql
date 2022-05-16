@@ -1,4 +1,5 @@
-type Block {
+type Block implements Node {
+  id: ID!
   height: Int!
   hash: String!
   numOfTxs: Int!

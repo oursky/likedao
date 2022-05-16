@@ -50,11 +50,7 @@ models:
     model: github.com/99designs/gqlgen/graphql.String
     
   ID:
-    model:
-      - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
+    model: github.com/oursky/likedao/pkg/models.NodeID
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int
@@ -63,6 +59,12 @@ models:
 
   Test:
     model: github.com/oursky/likedao/pkg/models.Test
+    fields:
+      id:
+        fieldName: NodeID
 
   Block:
     model: github.com/oursky/likedao/pkg/models.Block
+    fields:
+      id:
+        fieldName: NodeID

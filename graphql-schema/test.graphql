@@ -1,4 +1,4 @@
-type Test {
+type Test implements Node {
   id: ID!
   string: String!
   int: Int!
