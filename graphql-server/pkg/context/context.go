@@ -18,7 +18,8 @@ const (
 )
 
 type QueryContext struct {
-	Test queries.ITestQuery
+	Test  queries.ITestQuery
+	Block queries.IBlockQuery
 }
 
 type MutatorContext struct {
@@ -27,22 +28,34 @@ type MutatorContext struct {
 
 type DataLoaderContext struct{}
 
+type DatabaseContext struct {
+	ServerDatabase *bun.DB
+	ChainDatabase  *bun.DB
+}
+
 func NewRequestContext(
 	ctx context.Context,
-	db *bun.DB,
+	serverDB *bun.DB,
+	chainDB *bun.DB,
 ) context.Context {
 	queries := QueryContext{
-		Test: queries.NewTestQuery(ctx, db),
+		Test:  queries.NewTestQuery(ctx, serverDB),
+		Block: queries.NewBlockQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
-		Test: mutators.NewTestMutator(ctx, db),
+		Test: mutators.NewTestMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{}
+
+	databases := DatabaseContext{
+		ServerDatabase: serverDB,
+		ChainDatabase:  chainDB,
+	}
 
 	ctx = context.WithValue(ctx, queryContextKey, queries)
 	ctx = context.WithValue(ctx, mutatorContextKey, mutators)
 	ctx = context.WithValue(ctx, dataLoaderContextKey, dataLoaders)
-	ctx = context.WithValue(ctx, dbContextKey, db)
+	ctx = context.WithValue(ctx, dbContextKey, databases)
 
 	return ctx
 }
@@ -59,6 +72,6 @@ func GetDataLoadersFromCtx(ctx context.Context) DataLoaderContext {
 	return ctx.Value(dataLoaderContextKey).(DataLoaderContext)
 }
 
-func GetDBFromCtx(ctx context.Context) *bun.DB {
-	return ctx.Value(dbContextKey).(*bun.DB)
+func GetDBFromCtx(ctx context.Context) DatabaseContext {
+	return ctx.Value(dbContextKey).(DatabaseContext)
 }

@@ -44,6 +44,11 @@ autobind:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
+  DateTime:
+    model: github.com/99designs/gqlgen/graphql.Time
+  Date:
+    model: github.com/99designs/gqlgen/graphql.String
+    
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
@@ -58,3 +63,6 @@ models:
 
   Test:
     model: github.com/oursky/likedao/pkg/models.Test
+
+  Block:
+    model: github.com/oursky/likedao/pkg/models.Block

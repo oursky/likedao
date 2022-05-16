@@ -7,10 +7,11 @@ import (
 )
 
 func Services(
-	db *bun.DB,
+	serverDB *bun.DB,
+	chainDB *bun.DB,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := pkgContext.NewRequestContext(c.Request.Context(), db)
+		ctx := pkgContext.NewRequestContext(c.Request.Context(), serverDB, chainDB)
 		c.Request = c.Request.WithContext(ctx)
 	}
 }
