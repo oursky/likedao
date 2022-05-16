@@ -11,14 +11,14 @@ import (
 	"github.com/oursky/likedao/pkg/models"
 )
 
-func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTest) (string, error) {
+func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTest) (*models.Test, error) {
 	res, err := pkgContext.GetMutatorsFromCtx(ctx).Test.CreateTest(input.String, input.Int)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return res.ID, nil
+	return res, nil
 }
 
 func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.Test, error) {
