@@ -3,7 +3,7 @@ import cn from "classnames";
 import * as Sentry from "@sentry/react";
 import { Link } from "react-router-dom";
 import AppRoutes from "../../navigation/AppRoutes";
-import LocalizedText from "../Localized/LocalizedText";
+import LocalizedText from "../common/Localized/LocalizedText";
 import { Locale } from "../../i18n/LocaleModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
 

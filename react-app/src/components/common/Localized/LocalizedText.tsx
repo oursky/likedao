@@ -4,7 +4,7 @@ import {
   MessageID,
   MessageArgs,
   MessageComponents,
-} from "../../i18n/LocaleModel";
+} from "../../../i18n/LocaleModel";
 
 interface Props {
   messageID: MessageID;
