@@ -3,5 +3,6 @@
   "AppSideBar.navigation.overview": "Overview",
   "AppSideBar.navigation.portfolio": "Portfolio",
   "AppSideBar.navigation.proposals": "Proposals",
-  "AppSideBar.navigation.validators": "Validators"
+  "AppSideBar.navigation.validators": "Validators",
+  "AppSideBar.title": "DAO land"
 }
