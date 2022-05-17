@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bdjuno
+  labels:
+    app: bdjuno
+spec:
+  selector:
+    matchLabels:
+      app: bdjuno
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bdjuno
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: bdjuno
+          image: {{ .Values.bdjuno.imageName }}:{{ .Values.buildTag }}
+          command: ["bdjuno", "start", "--home", "/bdjuno/.bdjuno"]
+          volumeMounts:
+            - name: bdjuno-config
+              mountPath: /bdjuno/.bdjuno/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: bdjuno-config
+          configMap:
+            name: bdjuno-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bdjuno-config
+data:
+  config.yaml: |-
+{{ .Files.Get "static/bdjuno.config.yaml" | indent 4 }}

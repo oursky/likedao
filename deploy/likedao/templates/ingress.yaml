@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: likedao
+  name: likedao
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 500m
+    kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+    - host: {{ .Values.reactApp.host }}
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /
+            backend:
+              service:
+                name: react-app
+                port:
+                  number: 80
+    - host: {{ .Values.graphqlServer.host }}
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /
+            backend:
+              service:
+                name: graphql-server
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - {{ .Values.reactApp.host }}
+        - {{ .Values.graphqlServer.host }}
+      secretName: likedao-tls

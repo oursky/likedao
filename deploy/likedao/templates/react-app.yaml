@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: react-app
+  name: react-app
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: react-app
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app
+  labels:
+    app: react-app
+spec:
+  selector:
+    matchLabels:
+      app: react-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: react-app
+          image: {{ .Values.reactApp.imageName }}:{{ .Values.buildTag }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: react-app-nginx-conf
+              mountPath: /etc/nginx/conf.d/nginx.conf
+              subPath: nginx.conf
+            - name: react-app-config
+              mountPath: /usr/share/config/config.js
+              subPath: config.js
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 1
+      volumes:
+        - name: react-app-nginx-conf
+          configMap:
+            name: react-app-nginx-conf
+        - name: react-app-config
+          configMap:
+            name: react-app-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-nginx-conf
+data:
+  nginx.conf: |-
+{{ .Files.Get "static/react-app.nginx.conf" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-config
+data:
+  config.js: |-
+{{ .Files.Get "static/react-app.config.js" | indent 4 }}
