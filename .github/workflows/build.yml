@@ -1,0 +1,43 @@
+name: Build Images and Deploy
+on:
+  push:
+    branches:
+      - master
+      - staging
+      # - production TODO: Review if this is needed
+env:
+  DOCKER_VERSION: 20.10.14
+  DEPLOYMENT_WEBHOOK: ${{ secrets.DEPLOYMENT_WEBHOOK }}
+jobs:
+  build-and-push-image:
+    name: Build And Push ${{ matrix.target }} Image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [react-app, graphql-server, bdjuno]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Login to ghcr.io
+        run: |-
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u oursky --password-stdin
+      - name: Build Images
+        run: make docker-build-${{matrix.target}}
+      - name: Push Images
+        run: make docker-push-${{matrix.target}}
+  invoke-deployment-webhook:
+    name: Invoke Deployment Webhook
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-image
+    steps:
+      - if: "${{ env.DEPLOYMENT_WEBHOOK != '' }}"
+        run: |
+          curl -H "Authorization: Bearer ${{ secrets.DEPLOYMENT_WEBHOOK_KEY }}" \
+          --request POST \
+          --data '{"event_type": "deployment", "client_payload": {"branch": "${{ github.ref_name }}"}}' \
+          $DEPLOYMENT_WEBHOOK       
