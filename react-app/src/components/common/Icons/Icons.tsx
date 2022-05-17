@@ -3,12 +3,16 @@ import { ReactComponent as HomeIcon } from "../../../assets/ic-home.svg";
 import { ReactComponent as PieChartIcon } from "../../../assets/ic-piechart.svg";
 import { ReactComponent as ValidatorIcon } from "../../../assets/ic-validator.svg";
 import { ReactComponent as VoteIcon } from "../../../assets/ic-vote.svg";
+import { ReactComponent as MenuIcon } from "../../../assets/ic-menu.svg";
+import { ReactComponent as XIcon } from "../../../assets/ic-x.svg";
 
 enum IconType {
   Home = "Home",
   PieChart = "PieChart",
   Validator = "Validator",
   Vote = "Vote",
+  Menu = "Menu",
+  X = "X",
 }
 
 function getIcon(icon: IconType) {
@@ -21,6 +25,10 @@ function getIcon(icon: IconType) {
       return ValidatorIcon;
     case IconType.Vote:
       return VoteIcon;
+    case IconType.Menu:
+      return MenuIcon;
+    case IconType.X:
+      return XIcon;
     default:
       return null;
   }
