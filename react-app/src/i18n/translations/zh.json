@@ -1,3 +1,7 @@
 {
-  "App.title": "你好世界"
+  "App.title": "你好世界",
+  "AppSideBar.navigation.overview": "Overview",
+  "AppSideBar.navigation.portfolio": "Portfolio",
+  "AppSideBar.navigation.proposals": "Proposals",
+  "AppSideBar.navigation.validators": "Validators"
 }

@@ -1,3 +1,7 @@
 {
-  "App.title": "Hello World"
+  "App.title": "Hello World",
+  "AppSideBar.navigation.overview": "Overview",
+  "AppSideBar.navigation.portfolio": "Portfolio",
+  "AppSideBar.navigation.proposals": "Proposals",
+  "AppSideBar.navigation.validators": "Validators"
 }
