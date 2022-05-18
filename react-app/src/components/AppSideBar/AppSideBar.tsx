@@ -8,6 +8,7 @@ import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
 import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
 import LocalizedText from "../common/Localized/LocalizedText";
+import AppButton from "../common/Buttons/AppButton";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -97,9 +98,22 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onClick={toggleMobileMenuMenu}
             />
           </div>
-          {/* TODO: Handle login dialog  */}
-          <div className={cn("py-2", "h-[92px]", "bg-pink-400", "sm:block")}>
-            Login
+          <div className={cn("flex", "flex-col", "gap-y-6")}>
+            <h3
+              className={cn(
+                "text-base",
+                "leading-6",
+                "font-medium",
+                "text-black"
+              )}
+            >
+              <LocalizedText messageID="ConnectWallet.description" />
+            </h3>
+            <AppButton
+              size="regular"
+              type="primary"
+              messageID="ConnectWallet.connect"
+            />
           </div>
           <div className={cn("hidden", "sm:flex", "flex-col", "gap-y-6")}>
             <Divider />

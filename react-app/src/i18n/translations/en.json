@@ -4,5 +4,7 @@
   "AppSideBar.navigation.portfolio": "Portfolio",
   "AppSideBar.navigation.proposals": "Proposals",
   "AppSideBar.navigation.validators": "Validators",
-  "AppSideBar.title": "DAO land"
+  "AppSideBar.title": "DAO land",
+  "ConnectWallet.connect": "Connect to wallet",
+  "ConnectWallet.description": "Connect wallet to get started"
 }
