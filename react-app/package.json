@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@headlessui/react": "^1.6.1",
     "@oursky/react-messageformat": "^2.0.2",
     "@sentry/react": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
