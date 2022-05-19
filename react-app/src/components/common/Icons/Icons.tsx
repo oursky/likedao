@@ -5,6 +5,7 @@ import { ReactComponent as ValidatorIcon } from "../../../assets/ic-validator.sv
 import { ReactComponent as VoteIcon } from "../../../assets/ic-vote.svg";
 import { ReactComponent as MenuIcon } from "../../../assets/ic-menu.svg";
 import { ReactComponent as XIcon } from "../../../assets/ic-x.svg";
+import { ReactComponent as ChevronRightIcon } from "../../../assets/ic-chevron-right.svg";
 
 enum IconType {
   Home = "Home",
@@ -13,6 +14,7 @@ enum IconType {
   Vote = "Vote",
   Menu = "Menu",
   X = "X",
+  ChevronRight = "ChevronRight",
 }
 
 function getIcon(icon: IconType) {
@@ -29,6 +31,8 @@ function getIcon(icon: IconType) {
       return MenuIcon;
     case IconType.X:
       return XIcon;
+    case IconType.ChevronRight:
+      return ChevronRightIcon;
     default:
       return null;
   }
