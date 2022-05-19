@@ -3,6 +3,7 @@ package context
 import (
 	"context"
 
+	"github.com/oursky/likedao/pkg/dataloaders"
 	"github.com/oursky/likedao/pkg/mutators"
 	"github.com/oursky/likedao/pkg/queries"
 	"github.com/uptrace/bun"
@@ -26,7 +27,9 @@ type MutatorContext struct {
 	Test mutators.ITestMutator
 }
 
-type DataLoaderContext struct{}
+type DataLoaderContext struct {
+	Test dataloaders.TestDataloader
+}
 
 type DatabaseContext struct {
 	ServerDatabase *bun.DB
@@ -45,7 +48,9 @@ func NewRequestContext(
 	mutators := MutatorContext{
 		Test: mutators.NewTestMutator(ctx, serverDB),
 	}
-	dataLoaders := DataLoaderContext{}
+	dataLoaders := DataLoaderContext{
+		Test: dataloaders.NewTestDataloader(queries.Test),
+	}
 
 	databases := DatabaseContext{
 		ServerDatabase: serverDB,

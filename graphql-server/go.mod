@@ -13,6 +13,7 @@ require (
 	github.com/uptrace/bun/extra/bundebug v1.1.4
 	github.com/vektah/gqlparser/v2 v2.4.2
 	github.com/getsentry/sentry-go v0.13.0
+	github.com/cychiuae/go-dataloader v1.0.1
 )
 
 require (
