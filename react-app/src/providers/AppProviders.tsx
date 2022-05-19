@@ -1,5 +1,6 @@
 import React from "react";
 import AppLocaleProvider from "./AppLocaleProvider";
+import WalletProvider from "./WalletProvider";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -7,7 +8,12 @@ interface AppProvidersProps {
 
 const AppProviders: React.FC<AppProvidersProps> = (props) => {
   const { children } = props;
-  return <AppLocaleProvider>{children}</AppLocaleProvider>;
+
+  return (
+    <AppLocaleProvider>
+      <WalletProvider>{children}</WalletProvider>
+    </AppLocaleProvider>
+  );
 };
 
 export default AppProviders;
