@@ -12,27 +12,34 @@ import LocalizedText from "../common/Localized/LocalizedText";
 interface ConnectWalletModalProps {
   isOpened: boolean;
   onClose: () => void;
+  onKeplrConnect: () => void;
+  onWalletConnectConnect: () => void;
 }
 
 const ConnectWalletModal: React.FC<ConnectWalletModalProps> = (props) => {
-  const { isOpened, onClose } = props;
+  const {
+    isOpened,
+    onClose,
+    onKeplrConnect: onKeplrConnect_,
+    onWalletConnectConnect: onWalletConnectConnect_,
+  } = props;
 
   const onKeplrConnect = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      // TODO: Handle connection
+      onKeplrConnect_();
     },
-    []
+    [onKeplrConnect_]
   );
 
   const onWalletConnectConnect = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      // TODO: Handle connection
+      onWalletConnectConnect_();
     },
-    []
+    [onWalletConnectConnect_]
   );
 
   return (

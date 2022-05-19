@@ -12,5 +12,6 @@
   "ConnectWallet.connectModal.walletConnect": "WallectConnect",
   "ConnectWallet.description": "Connect wallet to get started",
   "ConnectWallet.disconnected.connect": "Connect to wallet",
-  "ConnectWallet.disconnected.description": "Connect wallet to get started"
+  "ConnectWallet.disconnected.description": "Connect wallet to get started",
+  "ConnectWallet.prompt.failed": "Failed to connect to wallet, Please try again"
 }
