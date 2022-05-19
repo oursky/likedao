@@ -1,1 +1,3 @@
-window.appConfig = {};
+window.appConfig = {
+  sentry: null,
+};

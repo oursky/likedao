@@ -6,7 +6,8 @@ import (
 )
 
 type LogConfig struct {
-	Level string
+	Level  string
+	Sentry *SentryConfig
 }
 
 type DatabaseConfig struct {
@@ -14,6 +15,12 @@ type DatabaseConfig struct {
 	Schema   string
 	PoolSize int
 	Verbose  bool
+}
+
+type SentryConfig struct {
+	DSN          string
+	Environment  string
+	IgnoreErrors []string
 }
 
 type Config struct {
@@ -60,6 +67,19 @@ func LoadConfigFromEnv() Config {
 				level = "warn"
 			}
 			return level
+		}(),
+		Sentry: func() *SentryConfig {
+			if sentryDsn := os.Getenv("GRAPHQL_SENTRY_DSN"); sentryDsn != "" {
+				sentryEnv := os.Getenv("GRAPHQL_SENTRY_ENVIRONMENT")
+				if sentryEnv == "" {
+					sentryEnv = "graphql-server"
+				}
+				return &SentryConfig{
+					DSN:         sentryDsn,
+					Environment: sentryEnv,
+				}
+			}
+			return nil
 		}(),
 	}
 

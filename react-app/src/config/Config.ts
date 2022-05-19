@@ -1,6 +1,15 @@
-export interface IConfig {}
+import * as Sentry from "@sentry/react";
 
-const defaultConfig: IConfig = {};
+export interface IConfig {
+  sentry: Pick<
+    Sentry.BrowserOptions,
+    "dsn" | "environment" | "ignoreErrors"
+  > | null;
+}
+
+const defaultConfig: IConfig = {
+  sentry: null,
+};
 
 const appConfig = window.appConfig;
 

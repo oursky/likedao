@@ -1,7 +1,21 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
 import App from "./App";
+import Config from "./config/Config";
+
+if (Config.sentry != null) {
+  const { dsn, environment, ignoreErrors } = Config.sentry;
+  Sentry.init({
+    dsn,
+    ignoreErrors,
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 0,
+    environment: environment ?? "react-app",
+  });
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
