@@ -9,4 +9,4 @@ RUN go mod download
 
 COPY ./ .
 
-CMD CompileDaemon -build="go build -o graphql-server ./cmd/graphql-server/main.go" -command="./graphql-server"
+CMD CompileDaemon -build="go build -o bin/graphql-server ./cmd/graphql-server/main.go" -command="./bin/graphql-server"
