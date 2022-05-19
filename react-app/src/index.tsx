@@ -1,10 +1,13 @@
 import React from "react";
+import { Buffer } from "buffer";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
 import App from "./App";
 import Config from "./config/Config";
+
+window.Buffer = Buffer;
 
 if (Config.sentry != null) {
   const { dsn, environment, ignoreErrors } = Config.sentry;
