@@ -7,6 +7,7 @@ import { ReactComponent as MenuIcon } from "../../../assets/ic-menu.svg";
 import { ReactComponent as XIcon } from "../../../assets/ic-x.svg";
 import { ReactComponent as ChevronRightIcon } from "../../../assets/ic-chevron-right.svg";
 import { ReactComponent as DropDownIcon } from "../../../assets/ic-dropdown.svg";
+import { ReactComponent as CopyIcon } from "../../../assets/ic-copy.svg";
 
 enum IconType {
   Home = "Home",
@@ -17,6 +18,7 @@ enum IconType {
   X = "X",
   ChevronRight = "ChevronRight",
   DropDown = "DropDown",
+  Copy = "Copy",
 }
 
 function getIcon(icon: IconType) {
@@ -37,6 +39,8 @@ function getIcon(icon: IconType) {
       return ChevronRightIcon;
     case IconType.DropDown:
       return DropDownIcon;
+    case IconType.Copy:
+      return CopyIcon;
     default:
       return null;
   }

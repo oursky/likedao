@@ -109,7 +109,10 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onConnect={wallet.openConnectWalletModal}
             />
           ) : (
-            <UserInfoPanel className={cn("order-3")} userInfo={userInfo} />
+            <div className={cn("order-3", "flex", "flex-col", "gap-y-6")}>
+              <Divider />
+              <UserInfoPanel className={cn("order-3")} userInfo={userInfo} />
+            </div>
           )}
           <div
             className={cn(
