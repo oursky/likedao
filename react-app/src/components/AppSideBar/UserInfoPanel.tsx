@@ -72,7 +72,7 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
 
       <CopyableText
         className={cn(
-          "text-[11px]",
+          "text-2xs",
           "leading-6",
           "font-medium",
           "text-likecoin-green"
