@@ -14,6 +14,7 @@ import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
 import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
+import { AddressBar } from "./AddressBar";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -99,7 +100,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           "sm:flex-row"
         )}
       >
-        <div className={cn("flex-0", "flex", "flex-col", "gap-y-6", "sm:w-72")}>
+        <div className={cn("flex-0", "flex", "flex-col", "sm:w-72")}>
           <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
             <Header chainHealth={chainHealth} />
             <IconButton
@@ -111,7 +112,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           </div>
           {wallet.status !== ConnectionStatus.Connected ? (
             <LoginPanel
-              className={cn("order-2")}
+              className={cn("order-2", "my-6")}
               onConnect={wallet.openConnectWalletModal}
             />
           ) : (
@@ -141,11 +142,18 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               "sm:flex",
               "flex-col",
               "gap-y-4",
+              "mb-6",
               wallet.status === ConnectionStatus.Connected
                 ? "order-2"
                 : "order-3"
             )}
           >
+            {wallet.status === ConnectionStatus.Connected && (
+              <AddressBar
+                address={userInfo?.address ?? ""}
+                onDisconnect={wallet.disconnect}
+              />
+            )}
             <Divider />
             <AppNavigationMenu
               activeRoute={location.pathname}
@@ -186,6 +194,10 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                   onClickReceive={onReceive}
                   onClickReward={onCollectReward}
                   onClickReinvest={onReinvest}
+                />
+                <AddressBar
+                  address={userInfo?.address ?? ""}
+                  onDisconnect={wallet.disconnect}
                 />
               </div>
             )}
