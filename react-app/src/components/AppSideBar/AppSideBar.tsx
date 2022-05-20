@@ -56,6 +56,12 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
     }
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
+  // TODO: Handle shortcuts
+  const onSend = useCallback(() => {}, []);
+  const onReceive = useCallback(() => {}, []);
+  const onCollectReward = useCallback(() => {}, []);
+  const onReinvest = useCallback(() => {}, []);
+
   useEffect(() => {
     if (wallet.status !== ConnectionStatus.Connected) return;
     cosmosAPI
@@ -109,9 +115,24 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onConnect={wallet.openConnectWalletModal}
             />
           ) : (
-            <div className={cn("order-3", "flex", "flex-col", "gap-y-6")}>
+            <div
+              className={cn(
+                "order-3",
+                "flex-col",
+                "gap-y-6",
+                "hidden",
+                "sm:flex"
+              )}
+            >
               <Divider />
-              <UserInfoPanel className={cn("order-3")} userInfo={userInfo} />
+              <UserInfoPanel
+                className={cn("order-3")}
+                userInfo={userInfo}
+                onClickSend={onSend}
+                onClickReceive={onReceive}
+                onClickReward={onCollectReward}
+                onClickReinvest={onReinvest}
+              />
             </div>
           )}
           <div
@@ -159,7 +180,13 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
             {wallet.status === ConnectionStatus.Connected && (
               <div className={cn("flex", "flex-col", "gap-y-6")}>
                 <Divider />
-                <UserInfoPanel userInfo={userInfo} />
+                <UserInfoPanel
+                  userInfo={userInfo}
+                  onClickSend={onSend}
+                  onClickReceive={onReceive}
+                  onClickReward={onCollectReward}
+                  onClickReinvest={onReinvest}
+                />
               </div>
             )}
           </div>

@@ -7,6 +7,8 @@ import { ParsedCoin } from "../../api/cosmosAPI";
 import { convertToReadableBalance } from "../../utils/coin";
 import CopyableText from "../common/CopyableText/CopyableText";
 import { useLocale } from "../../providers/AppLocaleProvider";
+import { IconType } from "../common/Icons/Icons";
+import { ShortcutButton } from "./ShotcutButton";
 
 export interface UserInfo {
   balance: ParsedCoin;
@@ -16,9 +18,20 @@ export interface UserInfo {
 interface UserInfoPanelProps {
   className?: string;
   userInfo: UserInfo | null;
+  onClickSend: () => void;
+  onClickReceive: () => void;
+  onClickReward: () => void;
+  onClickReinvest: () => void;
 }
 const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
-  const { userInfo, className } = props;
+  const {
+    userInfo,
+    className,
+    onClickSend,
+    onClickReceive,
+    onClickReward,
+    onClickReinvest,
+  } = props;
   const { coinDenom, coinDecimals } = Config.chainInfo.currency;
   const { translate } = useLocale();
 
@@ -67,6 +80,33 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
         text={userInfo?.address ?? ""}
         onCopied={onAddressCopied}
       />
+
+      <div className={cn("flex", "flex-row", "gap-x-3")}>
+        <ShortcutButton
+          className={cn("flex-1")}
+          icon={IconType.Send}
+          labelId="UserInfoPanel.shortcuts.send"
+          onClick={onClickSend}
+        />
+        <ShortcutButton
+          className={cn("flex-1")}
+          icon={IconType.Add}
+          labelId="UserInfoPanel.shortcuts.receive"
+          onClick={onClickReceive}
+        />
+        <ShortcutButton
+          className={cn("flex-1")}
+          icon={IconType.Gift}
+          labelId="UserInfoPanel.shortcuts.rewards"
+          onClick={onClickReward}
+        />
+        <ShortcutButton
+          className={cn("flex-1")}
+          icon={IconType.Reinvest}
+          labelId="UserInfoPanel.shortcuts.reinvest"
+          onClick={onClickReinvest}
+        />
+      </div>
     </div>
   );
 };
