@@ -1,4 +1,5 @@
 static/bdjuno.config.yaml
 static/react-app.config.js
 static/react-app.nginx.conf 
+static/react-app.keplr.js
 static/genesis.json

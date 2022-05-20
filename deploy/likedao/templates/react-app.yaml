@@ -43,6 +43,9 @@ spec:
             - name: react-app-config-{{ .Values.deploymentTag }}
               mountPath: /usr/share/config/config.js
               subPath: config.js
+            - name: react-app-keplr
+              mountPath: /usr/share/config/keplr.js
+              subPath: keplr.js
           readinessProbe:
             httpGet:
               path: /ping
@@ -68,6 +71,9 @@ spec:
         - name: react-app-config-{{ .Values.deploymentTag }}
           configMap:
             name: react-app-config-{{ .Values.deploymentTag }}
+        - name: react-app-keplr-{{ .Values.deploymentTag }}
+          configMap:
+            name: react-app-keplr-{{ .Values.deploymentTag }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -84,3 +90,11 @@ metadata:
 data:
   config.js: |-
 {{ .Files.Get "static/react-app.config.js" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-keplr-{{ .Values.deploymentTag }}
+data:
+  keplr.js: |-
+{{ .Files.Get "static/react-app.keplr.js" | indent 4 }} 

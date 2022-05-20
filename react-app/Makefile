@@ -5,6 +5,8 @@ ci: vendor codegen check-format check-sort-translations lint typecheck
 setup: vendor
 	cp -p ./config/config.debug.js ./config/config.debug.js.$$(date +%Y%m%d%H%M%S).bak || true
 	cp ./config/config.template.js ./config/config.debug.js
+	cp -p ./config/keplr.debug.js ./config/keplr.debug.js.$$(date +%Y%m%d%H%M%S).bak || true
+	cp ./config/keplr.template.js ./config/keplr.debug.js
 
 .PHONY: vendor
 vendor:
@@ -46,4 +48,5 @@ codegen:
 .PHONY: dev
 dev:
 	cp ./config/config.debug.js ./public/config.js
+	cp ./config/keplr.debug.js ./public/keplr.js
 	yarn start

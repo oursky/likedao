@@ -27,3 +27,5 @@ config/config.*.js
 public/config.js
 
 src/generated/**
+config/keplr.*.js
+public/keplr.js
