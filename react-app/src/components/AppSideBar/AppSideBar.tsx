@@ -6,14 +6,12 @@ import { IconType } from "../common/Icons/Icons";
 import Divider from "../common/Divider/Divider";
 import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
-import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
-import LocalizedText from "../common/Localized/LocalizedText";
-import AppButton from "../common/Buttons/AppButton";
 import { useWallet } from "../../providers/WalletProvider";
-import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
 import { isRequestStateLoaded } from "../../models/RequestState";
 import { ChainHealth, ChainStatus } from "../../generated/graphql";
 import { useChainHealthQuery } from "./AppSideBarAPI";
+import { Header } from "./Header";
+import { LoginPanel } from "./LoginPanel";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -81,32 +79,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
       >
         <div className={cn("flex-0", "flex", "flex-col", "gap-y-6", "sm:w-72")}>
           <div className={cn("flex", "flex-row", "sm:flex-col")}>
-            <div
-              className={cn(
-                "flex-1",
-                "flex",
-                "flex-row",
-                "gap-x-4",
-                "items-center",
-                "sm:items-start",
-                "sm:flex-col",
-                "sm:gap-y-4",
-                "sm:gap-x-0"
-              )}
-            >
-              <LikeLogo height={48} width={48} />
-              <h1
-                className={cn(
-                  "text-base",
-                  "leading-5",
-                  "font-normal",
-                  "text-likecoin-green"
-                )}
-              >
-                <LocalizedText messageID="AppSideBar.title" />
-              </h1>
-              <ChainSwitcher chainHealth={chainHealth} />
-            </div>
+            <Header chainHealth={chainHealth} />
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
               size={24}
@@ -115,24 +88,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
             />
           </div>
           {!wallet.isConnected ? (
-            <div className={cn("flex", "flex-col", "gap-y-6")}>
-              <h3
-                className={cn(
-                  "text-base",
-                  "leading-6",
-                  "font-medium",
-                  "text-black"
-                )}
-              >
-                <LocalizedText messageID="ConnectWallet.disconnected.description" />
-              </h3>
-              <AppButton
-                size="regular"
-                type="primary"
-                messageID="ConnectWallet.disconnected.connect"
-                onClick={wallet.openConnectWalletModal}
-              />
-            </div>
+            <LoginPanel onConnect={wallet.openConnectWalletModal} />
           ) : // Handle connected panel
           null}
           <div className={cn("hidden", "sm:flex", "flex-col", "gap-y-6")}>
