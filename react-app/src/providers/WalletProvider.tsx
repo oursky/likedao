@@ -32,6 +32,7 @@ interface ConnectedWalletContextValue {
   provider: SigningStargateClient;
   account: AccountData;
   refreshAccounts: () => Promise<void>;
+  disconnect: () => void;
 }
 
 type WalletContextValue =
@@ -95,6 +96,22 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
 
   const connectToWalletConnect = useCallback(() => {}, []);
 
+  const disconnect = useCallback(() => {
+    if (activeWallet) {
+      activeWallet
+        .disconnect()
+        .catch((err) => {
+          console.error(
+            "Failed to disconnect wallet, discarding anyway = ",
+            err
+          );
+        })
+        .finally(() => {
+          setActiveWallet(null);
+        });
+    }
+  }, [activeWallet]);
+
   const contextValue = useMemo((): WalletContextValue => {
     if (walletStatus === ConnectionStatus.Connecting) {
       return {
@@ -115,6 +132,7 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       provider: activeWallet.provider,
       account: account!,
       refreshAccounts,
+      disconnect,
     };
   }, [
     account,
@@ -122,6 +140,7 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     walletStatus,
     openConnectWalletModal,
     refreshAccounts,
+    disconnect,
   ]);
 
   return (
