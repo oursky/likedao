@@ -6,6 +6,9 @@ import { BaseWallet } from "./baseWallet";
 export class KeplrWallet extends BaseWallet {
   static async connect(chainInfo: ChainInfo): Promise<KeplrWallet> {
     const keplrClient = window.keplr;
+
+    await keplrClient.experimentalSuggestChain(window.keplrChainInfo);
+
     await keplrClient.enable(chainInfo.chainId);
 
     const offlineSigner = window.getOfflineSigner(
