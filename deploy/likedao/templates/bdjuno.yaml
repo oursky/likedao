@@ -1,18 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bdjuno
+  name: bdjuno-{{ .Values.deploymentTag }}
   labels:
-    app: bdjuno
+    app: bdjuno-{{ .Values.deploymentTag }}
+    app.kubernetes.io/name: bdjuno-{{ .Values.deploymentTag }}
+    app.kubernetes.io/instance: bdjuno-{{ .Values.deploymentTag }}
 spec:
   selector:
     matchLabels:
-      app: bdjuno
+      app: bdjuno-{{ .Values.deploymentTag }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: bdjuno
+        app: bdjuno-{{ .Values.deploymentTag }}
     spec:
       restartPolicy: Always
       containers:
@@ -20,18 +22,18 @@ spec:
           image: {{ .Values.bdjuno.imageName }}:{{ .Values.buildTag }}
           command: ["bdjuno", "start", "--home", "/bdjuno/.bdjuno"]
           volumeMounts:
-            - name: bdjuno-config
+            - name: bdjuno-config-{{ .Values.deploymentTag }}
               mountPath: /bdjuno/.bdjuno/config.yaml
               subPath: config.yaml
       volumes:
-        - name: bdjuno-config
+        - name: bdjuno-config-{{ .Values.deploymentTag }}
           configMap:
-            name: bdjuno-config
+            name: bdjuno-config-{{ .Values.deploymentTag }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: bdjuno-config
+  name: bdjuno-config-{{ .Values.deploymentTag }}
 data:
   config.yaml: |-
 {{ .Files.Get "static/bdjuno.config.yaml" | indent 4 }}

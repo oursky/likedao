@@ -2,8 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    app: likedao
-  name: likedao
+    app: likedao-{{ .Values.deploymentTag }}
+  name: likedao-{{ .Values.deploymentTag }}
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 500m
     kubernetes.io/tls-acme: "true"

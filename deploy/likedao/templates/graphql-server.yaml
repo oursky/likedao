@@ -2,33 +2,35 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: graphql-server
-  name: graphql-server
+    app: graphql-server-{{ .Values.deploymentTag }}
+    app.kubernetes.io/name: graphql-server-{{ .Values.deploymentTag }}
+    app.kubernetes.io/instance: graphql-server-{{ .Values.deploymentTag }}
+  name: graphql-server-{{ .Values.deploymentTag }}
 spec:
   ports:
     - port: 80
       protocol: TCP
       targetPort: 8080
   selector:
-    app: graphql-server
+    app: graphql-server-{{ .Values.deploymentTag }}
   sessionAffinity: None
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: graphql-server
+  name: graphql-server-{{ .Values.deploymentTag }}
   labels:
-    app: graphql-server
+    app: graphql-server-{{ .Values.deploymentTag }}
 spec:
   selector:
     matchLabels:
-      app: graphql-server
+      app: graphql-server-{{ .Values.deploymentTag }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: graphql-server
+        app: graphql-server-{{ .Values.deploymentTag }}
     spec:
       restartPolicy: Always
       containers:
@@ -43,32 +45,32 @@ spec:
             - name: GRAPHQL_SENTRY_DSN
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: GRAPHQL_SENTRY_DSN
             - name: GRAPHQL_SENTRY_ENVIRONMENT
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: GRAPHQL_SENTRY_ENVIRONMENT
             - name: SERVER_DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: SERVER_DATABASE_URL
             - name: BDJUNO_DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: BDJUNO_DATABASE_URL
             - name: SERVER_DATABASE_SCHEMA
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: SERVER_DATABASE_SCHEMA
             - name: BDJUNO_DATABASE_SCHEMA
               valueFrom:
                 secretKeyRef:
-                  name: graphql-server-config
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: BDJUNO_DATABASE_SCHEMA
             - name: SERVER_DATABASE_POOL_SIZE
               value: {{ .Values.graphqlServer.serverDatabase.poolSize | quote }}
@@ -96,7 +98,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: graphql-server-config
+  name: graphql-server-config-{{ .Values.deploymentTag }}
 type: Opaque
 data:
   SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}

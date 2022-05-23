@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: database-migration
+  name: database-migration-{{ .Values.deploymentTag }}
   annotations:
     "helm.sh/hook": "pre-upgrade,post-install"
     "helm.sh/hook-delete-policy": before-hook-creation
@@ -23,19 +23,19 @@ spec:
             - name: SERVER_DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: database-migration-config
+                  name: database-migration-config-{{ .Values.deploymentTag }}
                   key: SERVER_DATABASE_URL
             - name: SERVER_DATABASE_SCHEMA
               valueFrom:
                 secretKeyRef:
-                  name: database-migration-config
+                  name: database-migration-config-{{ .Values.deploymentTag }}
                   key: SERVER_DATABASE_SCHEMA
       restartPolicy: OnFailure
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: database-migration-config
+  name: database-migration-config-{{ .Values.deploymentTag }}
 type: Opaque
 data:
   SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}
