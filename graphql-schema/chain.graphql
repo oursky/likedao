@@ -1,0 +1,14 @@
+enum ChainStatus {
+  Online
+  Congested
+  Offline
+}
+
+type ChainHealth {
+  height: Int!
+  status: ChainStatus!
+}
+
+extend type Query {
+  chainHealth: ChainHealth!
+}
