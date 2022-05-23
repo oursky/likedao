@@ -16,3 +16,9 @@ type Block struct {
 	ProposerAddress string    `bun:"proposer_address,notnull"`
 	Timestamp       time.Time `bun:"timestamp,notnull"`
 }
+
+func (b Block) IsNode() {}
+
+func (b Block) NodeID() NodeID {
+	return GetNodeID(b)
+}

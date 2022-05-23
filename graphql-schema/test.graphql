@@ -1,4 +1,4 @@
-type Test {
+type Test implements Node {
   id: ID!
   string: String!
   int: Int!
@@ -15,5 +15,5 @@ extend type Query {
 }
 
 extend type Mutation {
-  createTest(input: CreateTest!): ID!
+  createTest(input: CreateTest!): Test!
 }

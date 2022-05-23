@@ -17,7 +17,14 @@ func (r *queryResolver) GetLatestBlock(ctx context.Context) (*models.Block, erro
 		return nil, err
 	}
 	return res, nil
+}
 
+func (r *queryResolver) QueryBlockByHash(ctx context.Context, hash models.NodeID) (*models.Block, error) {
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryBlockByHash(hash.ID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // Query returns graphql1.QueryResolver implementation.

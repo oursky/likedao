@@ -11,18 +11,9 @@ import (
 	"github.com/oursky/likedao/pkg/models"
 )
 
-func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTest) (string, error) {
+func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTest) (*models.Test, error) {
 	res, err := pkgContext.GetMutatorsFromCtx(ctx).Test.CreateTest(input.String, input.Int)
 
-	if err != nil {
-		return "", err
-	}
-
-	return res.ID, nil
-}
-
-func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.Test, error) {
-	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +21,18 @@ func (r *queryResolver) QueryTestByID(ctx context.Context, id string) (*models.T
 	return res, nil
 }
 
-func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []string) ([]*models.Test, error) {
-	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(ids)
+func (r *queryResolver) QueryTestByID(ctx context.Context, id models.NodeID) (*models.Test, error) {
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []models.NodeID) ([]*models.Test, error) {
+	objIds := models.ExtractObjectIDs(ids)
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(objIds)
 
 	for _, err := range errs {
 		if err != nil {

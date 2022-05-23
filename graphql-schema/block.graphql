@@ -1,4 +1,5 @@
-type Block {
+type Block implements Node {
+  id: ID!
   height: Int!
   hash: String!
   numOfTxs: Int!
@@ -9,4 +10,5 @@ type Block {
 
 extend type Query {
   getLatestBlock: Block
+  queryBlockByHash(hash: ID!): Block
 }

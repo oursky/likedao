@@ -10,3 +10,9 @@ type Test struct {
 	String string `bun:"string,notnull"`
 	Int    int    `bun:"int,notnull"`
 }
+
+func (t Test) IsNode() {}
+
+func (t Test) NodeID() NodeID {
+	return GetNodeID(t)
+}
