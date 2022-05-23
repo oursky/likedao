@@ -8,6 +8,8 @@ import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
 import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
 import LocalizedText from "../common/Localized/LocalizedText";
+import AppButton from "../common/Buttons/AppButton";
+import { useWallet } from "../../providers/WalletProvider";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -16,6 +18,7 @@ interface AppSideBarProps {
 const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
   const location = useLocation();
+  const wallet = useWallet();
   const [isMenuActive, setIsMenuActive] = useState(false);
 
   const openMobileMenu = useCallback(() => {
@@ -97,10 +100,27 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onClick={toggleMobileMenuMenu}
             />
           </div>
-          {/* TODO: Handle login dialog  */}
-          <div className={cn("py-2", "h-[92px]", "bg-pink-400", "sm:block")}>
-            Login
-          </div>
+          {!wallet.isConnected ? (
+            <div className={cn("flex", "flex-col", "gap-y-6")}>
+              <h3
+                className={cn(
+                  "text-base",
+                  "leading-6",
+                  "font-medium",
+                  "text-black"
+                )}
+              >
+                <LocalizedText messageID="ConnectWallet.disconnected.description" />
+              </h3>
+              <AppButton
+                size="regular"
+                type="primary"
+                messageID="ConnectWallet.disconnected.connect"
+                onClick={wallet.openConnectWalletModal}
+              />
+            </div>
+          ) : // Handle connected panel
+          null}
           <div className={cn("hidden", "sm:flex", "flex-col", "gap-y-6")}>
             <Divider />
             <AppNavigationMenu

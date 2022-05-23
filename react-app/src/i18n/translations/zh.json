@@ -4,5 +4,13 @@
   "AppSideBar.navigation.portfolio": "Portfolio",
   "AppSideBar.navigation.proposals": "Proposals",
   "AppSideBar.navigation.validators": "Validators",
-  "AppSideBar.title": "DAO land"
+  "AppSideBar.title": "DAO land",
+  "ConnectWallet.connectModal.description": "LikeCoin is a decentralized publishing infrastructure. It provides a comprehensive metadata framework to facilitate content registration, licensing, and monetization for all media types.",
+  "ConnectWallet.connectModal.keplrWallet": "Keplr Wallet",
+  "ConnectWallet.connectModal.noWallet": "Continue without address",
+  "ConnectWallet.connectModal.title": "Welcome 👋",
+  "ConnectWallet.connectModal.walletConnect": "WallectConnect",
+  "ConnectWallet.description": "Connect wallet to get started",
+  "ConnectWallet.disconnected.connect": "Connect to wallet",
+  "ConnectWallet.disconnected.description": "Connect wallet to get started"
 }
