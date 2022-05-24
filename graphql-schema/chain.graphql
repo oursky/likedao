@@ -9,6 +9,18 @@ type ChainHealth {
   status: ChainStatus!
 }
 
+type Coin {
+  denom: String!
+  amount: BigInt!
+}
+
+type CommunityStatus {
+  communityPool: [Coin!]!
+  bondedRatio: BigFloat!
+  inflation: BigFloat!
+}
+
 extend type Query {
   chainHealth: ChainHealth!
+  communityStatus: CommunityStatus!
 }

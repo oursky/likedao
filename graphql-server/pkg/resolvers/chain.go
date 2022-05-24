@@ -43,3 +43,7 @@ func (r *queryResolver) ChainHealth(ctx context.Context) (*models.ChainHealth, e
 		Height: currentBlock.Height,
 	}, nil
 }
+
+func (r *queryResolver) CommunityStatus(ctx context.Context) (*models.CommunityStatus, error) {
+	panic(fmt.Errorf("not implemented"))
+}
