@@ -3,6 +3,7 @@ package context
 import (
 	"context"
 
+	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/dataloaders"
 	"github.com/oursky/likedao/pkg/mutators"
 	"github.com/oursky/likedao/pkg/queries"
@@ -16,6 +17,7 @@ const (
 	mutatorContextKey    contextKey = "mutatorContextKey"
 	dataLoaderContextKey contextKey = "dataLoaderContextKey"
 	dbContextKey         contextKey = "dbContextKey"
+	configContextKey     contextKey = "configContextKey"
 )
 
 type QueryContext struct {
@@ -45,6 +47,7 @@ func NewRequestContext(
 	ctx context.Context,
 	serverDB *bun.DB,
 	chainDB *bun.DB,
+	config config.Config,
 ) context.Context {
 	queries := QueryContext{
 		Test:          queries.NewTestQuery(ctx, serverDB),
@@ -71,6 +74,7 @@ func NewRequestContext(
 	ctx = context.WithValue(ctx, mutatorContextKey, mutators)
 	ctx = context.WithValue(ctx, dataLoaderContextKey, dataLoaders)
 	ctx = context.WithValue(ctx, dbContextKey, databases)
+	ctx = context.WithValue(ctx, configContextKey, config)
 
 	return ctx
 }
@@ -89,4 +93,8 @@ func GetDataLoadersFromCtx(ctx context.Context) DataLoaderContext {
 
 func GetDBFromCtx(ctx context.Context) DatabaseContext {
 	return ctx.Value(dbContextKey).(DatabaseContext)
+}
+
+func GetConfigFromCtx(ctx context.Context) config.Config {
+	return ctx.Value(configContextKey).(config.Config)
 }
