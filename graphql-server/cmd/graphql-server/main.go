@@ -8,6 +8,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/database"
@@ -39,6 +40,8 @@ func main() {
 	}
 
 	logging.ConfigureLogger(config.Log)
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = config.Cors.AllowOrigins
 
 	serverDB, err := database.GetDB(config.ServerDatabase)
 	if err != nil {
@@ -49,6 +52,7 @@ func main() {
 		panic(err)
 	}
 
+	router.Use(cors.New(corsConfig))
 	router.Use(middlewares.Services(serverDB, chainDB))
 
 	router.GET("/ping", func(c *gin.Context) {
