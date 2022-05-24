@@ -19,9 +19,13 @@ const (
 )
 
 type QueryContext struct {
-	Test  queries.ITestQuery
-	Block queries.IBlockQuery
-	Chain queries.IChainQuery
+	Test          queries.ITestQuery
+	Block         queries.IBlockQuery
+	Chain         queries.IChainQuery
+	CommunityPool queries.ICommunityPoolQuery
+	Inflation     queries.IInflationQuery
+	StakingPool   queries.IStakingPoolQuery
+	Supply        queries.ISupplyQuery
 }
 
 type MutatorContext struct {
@@ -43,9 +47,13 @@ func NewRequestContext(
 	chainDB *bun.DB,
 ) context.Context {
 	queries := QueryContext{
-		Test:  queries.NewTestQuery(ctx, serverDB),
-		Block: queries.NewBlockQuery(ctx, chainDB),
-		Chain: queries.NewChainQuery(ctx, chainDB),
+		Test:          queries.NewTestQuery(ctx, serverDB),
+		Block:         queries.NewBlockQuery(ctx, chainDB),
+		Chain:         queries.NewChainQuery(ctx, chainDB),
+		CommunityPool: queries.NewCommunityPoolQuery(ctx, chainDB),
+		Inflation:     queries.NewInflationQuery(ctx, chainDB),
+		StakingPool:   queries.NewStakingPoolQuery(ctx, chainDB),
+		Supply:        queries.NewSupplyQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
 		Test: mutators.NewTestMutator(ctx, serverDB),
