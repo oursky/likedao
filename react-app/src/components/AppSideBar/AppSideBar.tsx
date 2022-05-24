@@ -10,6 +10,7 @@ import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
 import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
 import { useWallet } from "../../providers/WalletProvider";
+import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -88,10 +89,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               >
                 <LocalizedText messageID="AppSideBar.title" />
               </h1>
-              {/* TODO: Implement chain switcher */}
-              <div className={cn("h-5", "bg-pink-400", "text-sm")}>
-                Chain Switcher
-              </div>
+              <ChainSwitcher />
             </div>
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
