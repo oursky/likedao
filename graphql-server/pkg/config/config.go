@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+type ChainConfig struct {
+	CoinDenom string
+}
+
 type LogConfig struct {
 	Level  string
 	Sentry *SentryConfig
@@ -33,6 +37,7 @@ type Config struct {
 	ServerDatabase DatabaseConfig
 	Cors           CorsConfig
 	Log            LogConfig
+	Chain          ChainConfig
 }
 
 func LoadConfigFromEnv() Config {
@@ -99,10 +104,19 @@ func LoadConfigFromEnv() Config {
 		}(),
 	}
 
+	coinDenom := os.Getenv("CHAIN_COIN_DENOM")
+	if coinDenom == "" {
+		coinDenom = "nanolike"
+	}
+	chainConfig := ChainConfig{
+		CoinDenom: coinDenom,
+	}
+
 	return Config{
 		ServerDatabase: serverDatabaseConfig,
 		ChainDatabase:  chainDatabaseConfig,
 		Cors:           corsConfig,
 		Log:            logConfig,
+		Chain:          chainConfig,
 	}
 }
