@@ -9,7 +9,7 @@ const ChainSwitcher: React.FC = () => {
 
   return (
     <Menu as="div" className={cn("relative", "inline-block", "text-left")}>
-      <div>
+      <div className={cn("flex", "items-center")}>
         <Menu.Button
           className={cn(
             "inline-flex",
@@ -18,7 +18,7 @@ const ChainSwitcher: React.FC = () => {
             "rounded-md"
           )}
         >
-          Dropdown
+          {/* Display chain status */}
         </Menu.Button>
       </div>
       <Transition

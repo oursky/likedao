@@ -12,6 +12,10 @@ module.exports = {
             from: "#D7EFE7",
             to: "#EFE7B8",
           },
+          "vote-color": {
+            yes: "#6DCDBC",
+            no: "#C72F2F",
+          },
         },
       },
     },
