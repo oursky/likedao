@@ -1,8 +1,12 @@
 import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import cn from "classnames";
+import Config from "../../config/Config";
+import { ChainSwitcherItem } from "./ChainSwitcherItem";
 
 const ChainSwitcher: React.FC = () => {
+  const { chainInfo, chainLinks } = Config;
+
   return (
     <Menu as="div" className={cn("relative", "inline-block", "text-left")}>
       <div>
@@ -31,13 +35,18 @@ const ChainSwitcher: React.FC = () => {
             "absolute mt-2 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg right-0 sm:left-0 sm:right-auto"
           )}
         >
-          <div className={cn("px-1", "py-1")}>
-            <Menu.Item>
-              <p>Test item</p>
-            </Menu.Item>
-            <Menu.Item>
-              <p>Test item 2 </p>
-            </Menu.Item>
+          <div className={cn("flex", "flex-col", "py-1")}>
+            {chainLinks.map((chain, index) => (
+              <Menu.Item key={`${chain.chainId}${index}`}>
+                {({ active }) => (
+                  <ChainSwitcherItem
+                    isActive={active || chain.chainId === chainInfo.chainId}
+                    chainId={chain.chainId}
+                    href={chain.link}
+                  />
+                )}
+              </Menu.Item>
+            ))}
           </div>
         </Menu.Items>
       </Transition>
