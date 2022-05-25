@@ -1,32 +1,71 @@
 package errors
 
 import (
-	"context"
-
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/vektah/gqlparser/v2/gqlerror"
+	"errors"
+	"fmt"
 )
 
-type ErrorCode string
-
-const (
-	InternalError ErrorCode = "INTERNAL_ERROR"
+var (
+	ErrInternalError     = errors.New("Internal error")
+	ErrInvalidNodeID     = errors.New("Invalid node ID")
+	ErrValidationFailure = errors.New("Failed to validate values")
+	ErrNotFound          = errors.New("Not found")
 )
 
-var defaultErrorMessage = map[ErrorCode]string{
-	InternalError: "Internal server error",
+type ServerError struct {
+	parent  error
+	message string
 }
 
-func (c ErrorCode) NewErrorWithDefaultMessage(ctx context.Context) *gqlerror.Error {
-	return c.NewError(ctx, defaultErrorMessage[c])
+type Causer interface {
+	Cause() error
 }
 
-func (c ErrorCode) NewError(ctx context.Context, msg string) *gqlerror.Error {
-	return &gqlerror.Error{
-		Path:    graphql.GetPath(ctx),
-		Message: msg,
-		Extensions: map[string]interface{}{
-			"code": string(c),
-		},
+func (e *ServerError) Error() string {
+	return fmt.Sprintf("%s: %s", e.message, e.parent.Error())
+}
+
+func (e *ServerError) Cause() error {
+	return e.parent
+}
+
+func (e *ServerError) Is(target error) bool {
+	if e == target {
+		return true
 	}
+
+	w := e.Cause()
+	for {
+		if w == target {
+			return true
+		}
+
+		x, ok := w.(Causer)
+		if ok {
+			w = x.Cause()
+		}
+		if x == nil {
+			return false
+		}
+	}
+}
+
+func (e *ServerError) Unwrap() error {
+	return e.parent
+}
+
+func Wrap(err error, description string) error {
+	if err == nil {
+		return nil
+	}
+
+	return &ServerError{
+		parent:  err,
+		message: description,
+	}
+}
+
+func Wrapf(err error, format string, args ...interface{}) error {
+	desc := fmt.Sprintf(format, args...)
+	return Wrap(err, desc)
 }

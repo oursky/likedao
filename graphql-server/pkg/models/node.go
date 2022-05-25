@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -9,11 +8,8 @@ import (
 
 	graphql "github.com/99designs/gqlgen/graphql"
 	gqlerrcode "github.com/99designs/gqlgen/graphql/errcode"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-)
-
-var (
-	ErrInvalidNodeID = errors.New("Invalid node ID")
 )
 
 type NodeID struct {
@@ -28,7 +24,7 @@ func (nodeID NodeID) String() string {
 func ParseNodeID(nodeID string) (NodeID, error) {
 	parts := strings.Split(nodeID, "_")
 	if len(parts) != 2 {
-		return NodeID{}, ErrInvalidNodeID
+		return NodeID{}, servererrors.ErrInvalidNodeID
 	}
 	return NodeID{
 		EntityType: parts[0],
