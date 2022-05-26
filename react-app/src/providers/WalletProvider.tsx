@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { AccountData } from "@cosmjs/proto-signing";
 import { toast } from "react-toastify";
@@ -8,11 +8,19 @@ import { WalletConnectWallet } from "../clients/walletConnectClient";
 import ConnectWalletModal from "../components/ConnectWalletModal/ConnectWalletModal";
 import Config from "../config/Config";
 import { useLocale } from "./AppLocaleProvider";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+
+const AUTO_CONNECT_WALLET_TYPE_KEY = "LS/AutoConnectWalletType";
 
 export enum ConnectionStatus {
   Idle = "idle",
   Connecting = "connecting",
   Connected = "connected",
+}
+
+export enum AutoConnectWalletType {
+  Keplr = "keplr",
+  // WalletConnect doesn't support auto reconnect
 }
 
 interface WalletProviderProps {
@@ -47,6 +55,9 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
   const { children } = props;
   const { translate } = useLocale();
   const chainInfo = Config.chainInfo;
+
+  const [autoConnectWalletType, setAutoConnectWalletType] =
+    useLocalStorage<string>(AUTO_CONNECT_WALLET_TYPE_KEY);
 
   const [isConnectWalletModalActive, setIsConnectWalletModalActive] =
     useState<boolean>(false);
@@ -87,9 +98,10 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         })
         .finally(() => {
           setActiveWallet(null);
+          setAutoConnectWalletType(null);
         });
     }
-  }, [activeWallet]);
+  }, [activeWallet, setAutoConnectWalletType]);
 
   const connectToKeplr = useCallback(() => {
     setWalletStatus(ConnectionStatus.Connecting);
@@ -102,14 +114,16 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       .then((accounts: readonly AccountData[]) => {
         const [account] = accounts;
         setAccount(account);
+        setAutoConnectWalletType(AutoConnectWalletType.Keplr);
         setWalletStatus(ConnectionStatus.Connected);
       })
       .catch((err) => {
         console.error("Failed to connect to Keplr = ", err);
         toast.error(translate("ConnectWallet.prompt.failed"));
         setWalletStatus(ConnectionStatus.Idle);
+        setAutoConnectWalletType(null);
       });
-  }, [chainInfo, translate, closeConnectWalletModal]);
+  }, [chainInfo, setAutoConnectWalletType, translate, closeConnectWalletModal]);
 
   const connectToWalletConnect = useCallback(() => {
     setWalletStatus(ConnectionStatus.Connecting);
@@ -132,6 +146,17 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         setWalletStatus(ConnectionStatus.Idle);
       });
   }, [chainInfo, translate, closeConnectWalletModal, disconnect]);
+
+  useEffect(() => {
+    if (!!activeWallet || walletStatus !== ConnectionStatus.Idle) return;
+    switch (autoConnectWalletType) {
+      case AutoConnectWalletType.Keplr:
+        connectToKeplr();
+        break;
+      default:
+        break;
+    }
+  }, [activeWallet, autoConnectWalletType, connectToKeplr, walletStatus]);
 
   const contextValue = useMemo((): WalletContextValue => {
     if (walletStatus === ConnectionStatus.Connecting) {
