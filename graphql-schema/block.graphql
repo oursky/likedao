@@ -9,6 +9,6 @@ type Block implements Node {
 }
 
 extend type Query {
-  getLatestBlock: Block
-  queryBlockByHash(hash: ID!): Block
+  latestBlock: Block
+  blockByID(id: ID!): Block
 }

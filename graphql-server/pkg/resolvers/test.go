@@ -30,7 +30,7 @@ func (r *queryResolver) QueryTestByID(ctx context.Context, id models.NodeID) (*m
 	return res, nil
 }
 
-func (r *queryResolver) QueryTestsByIds(ctx context.Context, ids []models.NodeID) ([]*models.Test, error) {
+func (r *queryResolver) QueryTestsByIDs(ctx context.Context, ids []models.NodeID) ([]*models.Test, error) {
 	objIds := models.ExtractObjectIDs(ids)
 	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Test.LoadAll(objIds)
 

@@ -11,7 +11,7 @@ import (
 	"github.com/oursky/likedao/pkg/models"
 )
 
-func (r *queryResolver) GetLatestBlock(ctx context.Context) (*models.Block, error) {
+func (r *queryResolver) LatestBlock(ctx context.Context) (*models.Block, error) {
 	res, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryLatestBlock()
 	if err != nil {
 		return nil, err
@@ -19,8 +19,8 @@ func (r *queryResolver) GetLatestBlock(ctx context.Context) (*models.Block, erro
 	return res, nil
 }
 
-func (r *queryResolver) QueryBlockByHash(ctx context.Context, hash models.NodeID) (*models.Block, error) {
-	res, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryBlockByHash(hash.ID)
+func (r *queryResolver) BlockByID(ctx context.Context, id models.NodeID) (*models.Block, error) {
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryBlockByHash(id.ID)
 	if err != nil {
 		return nil, err
 	}
