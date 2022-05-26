@@ -20,10 +20,23 @@ func (r *queryResolver) LatestBlock(ctx context.Context) (*models.Block, error) 
 }
 
 func (r *queryResolver) BlockByID(ctx context.Context, id models.NodeID) (*models.Block, error) {
-	res, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryBlockByHash(id.ID)
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Block.Load(id.ID)
 	if err != nil {
 		return nil, err
 	}
+	return res, nil
+}
+
+func (r *queryResolver) BlocksByIDs(ctx context.Context, ids []models.NodeID) ([]*models.Block, error) {
+	blockHashes := models.ExtractObjectIDs(ids)
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Block.LoadAll(blockHashes)
+
+	for _, err := range errs {
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return res, nil
 }
 

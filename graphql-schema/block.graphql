@@ -11,4 +11,5 @@ type Block implements Node {
 extend type Query {
   latestBlock: Block
   blockByID(id: ID!): Block
+  blocksByIDs(ids: [ID!]!): [Block]
 }
