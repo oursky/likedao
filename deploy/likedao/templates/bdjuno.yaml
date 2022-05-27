@@ -17,6 +17,13 @@ spec:
         app: bdjuno-{{ .Values.deploymentTag }}
     spec:
       restartPolicy: Always
+      initContainers:
+        - name: genesis-init
+          image: busybox:1.28
+          command: ['wget', '-O', '/.bdjuno/genesis.json', {{ .Values.bdjuno.genesisUrl }}]
+          volumeMounts:
+            - name: bdjuno-home
+              mountPath: "/.bdjuno"
       containers:
         - name: bdjuno
           image: {{ .Values.bdjuno.imageName }}:{{ .Values.buildTag }}
@@ -25,10 +32,15 @@ spec:
             - name: bdjuno-config-{{ .Values.deploymentTag }}
               mountPath: /bdjuno/.bdjuno/config.yaml
               subPath: config.yaml
+            - name: bdjuno-home
+              mountPath: /bdjuno/.bdjuno/genesis.json
+              subPath: genesis.json
       volumes:
         - name: bdjuno-config-{{ .Values.deploymentTag }}
           configMap:
             name: bdjuno-config-{{ .Values.deploymentTag }}
+        - name: bdjuno-home
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: ConfigMap
