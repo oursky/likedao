@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 )
 
 type LogConfig struct {
@@ -23,9 +24,14 @@ type SentryConfig struct {
 	IgnoreErrors []string
 }
 
+type CorsConfig struct {
+	AllowOrigins []string
+}
+
 type Config struct {
 	ChainDatabase  DatabaseConfig
 	ServerDatabase DatabaseConfig
+	Cors           CorsConfig
 	Log            LogConfig
 }
 
@@ -83,9 +89,20 @@ func LoadConfigFromEnv() Config {
 		}(),
 	}
 
+	corsConfig := CorsConfig{
+		AllowOrigins: func() []string {
+			allowOrigins := os.Getenv("CORS_ALLOW_ORIGINS")
+			if allowOrigins == "" {
+				return []string{}
+			}
+			return strings.Split(allowOrigins, ",")
+		}(),
+	}
+
 	return Config{
 		ServerDatabase: serverDatabaseConfig,
 		ChainDatabase:  chainDatabaseConfig,
+		Cors:           corsConfig,
 		Log:            logConfig,
 	}
 }
