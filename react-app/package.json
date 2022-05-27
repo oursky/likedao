@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.6.5",
     "@headlessui/react": "^1.6.1",
     "@oursky/react-messageformat": "^2.0.2",
     "@sentry/react": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
+    "graphql": "^16.5.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-router-dom": "^6.3.0",
@@ -15,6 +17,11 @@
     "web-vitals": "^2.1.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/fragment-matcher": "3.2.1",
+    "@graphql-codegen/typescript": "2.4.11",
+    "@graphql-codegen/typescript-document-nodes": "2.2.11",
+    "@graphql-codegen/typescript-operations": "^2.4.0",
     "@oursky/eslint-plugin": "^8.0.0",
     "@oursky/stylelint-oursky": "^3.0.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -47,7 +54,8 @@
     "stylelint": "stylelint --max-warnings 0 'src/**/*.{css,scss}'",
     "typecheck": "tsc --noEmit",
     "sort-translations": "jsonsort --indentationCount 2 'src/i18n/translations/*.json'",
-    "check-sort-translations": "jsonsort --ci --indentationCount 2 'src/i18n/translations/*.json'"
+    "check-sort-translations": "jsonsort --ci --indentationCount 2 'src/i18n/translations/*.json'",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": [

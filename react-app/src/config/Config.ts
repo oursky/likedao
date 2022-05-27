@@ -5,10 +5,16 @@ export interface IConfig {
     Sentry.BrowserOptions,
     "dsn" | "environment" | "ignoreErrors"
   > | null;
+  graphql: {
+    endpoint: string;
+  };
 }
 
 const defaultConfig: IConfig = {
   sentry: null,
+  graphql: {
+    endpoint: "http://localhost:8080/graphql",
+  },
 };
 
 const appConfig = window.appConfig;

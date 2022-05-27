@@ -19,6 +19,7 @@ setup:
 .PHONY: codegen
 codegen:
 	make -C graphql-server codegen
+	make -C react-app codegen
 
 .PHONY: docker-build-react-app
 docker-build-react-app:

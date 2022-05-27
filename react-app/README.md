@@ -11,7 +11,7 @@ These can be installed via `asdf install` if asdf is installed
 
 ```
 make setup
-make vendor
+make codegen
 make dev
 ```
 

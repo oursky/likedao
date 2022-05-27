@@ -1,5 +1,5 @@
 .PHONY: ci
-ci: vendor check-format check-sort-translations lint typecheck
+ci: vendor codegen check-format check-sort-translations lint typecheck
 
 .PHONY: setup
 setup: vendor
@@ -38,6 +38,10 @@ check-sort-translations:
 .PHONY: typecheck
 typecheck:
 	yarn typecheck
+
+.PHONY: codegen
+codegen:
+	yarn codegen
 
 .PHONY: dev
 dev:
