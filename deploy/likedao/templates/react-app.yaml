@@ -2,33 +2,33 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: react-app
-  name: react-app
+    app: react-app-{{ .Values.deploymentTag }}
+  name: react-app-{{ .Values.deploymentTag }}
 spec:
   ports:
     - port: 80
       protocol: TCP
       targetPort: 80
   selector:
-    app: react-app
+    app: react-app-{{ .Values.deploymentTag }}
   sessionAffinity: None
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: react-app
+  name: react-app-{{ .Values.deploymentTag }}
   labels:
-    app: react-app
+    app: react-app-{{ .Values.deploymentTag }}
 spec:
   selector:
     matchLabels:
-      app: react-app
+      app: react-app-{{ .Values.deploymentTag }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: react-app
+        app: react-app-{{ .Values.deploymentTag }}
     spec:
       restartPolicy: Always
       containers:
@@ -37,10 +37,10 @@ spec:
           ports:
             - containerPort: 80
           volumeMounts:
-            - name: react-app-nginx-conf
+            - name: react-app-nginx-conf-{{ .Values.deploymentTag }}
               mountPath: /etc/nginx/conf.d/nginx.conf
               subPath: nginx.conf
-            - name: react-app-config
+            - name: react-app-config-{{ .Values.deploymentTag }}
               mountPath: /usr/share/config/config.js
               subPath: config.js
           readinessProbe:
@@ -62,17 +62,17 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 1
       volumes:
-        - name: react-app-nginx-conf
+        - name: react-app-nginx-conf-{{ .Values.deploymentTag }}
           configMap:
-            name: react-app-nginx-conf
-        - name: react-app-config
+            name: react-app-nginx-conf-{{ .Values.deploymentTag }}
+        - name: react-app-config-{{ .Values.deploymentTag }}
           configMap:
-            name: react-app-config
+            name: react-app-config-{{ .Values.deploymentTag }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: react-app-nginx-conf
+  name: react-app-nginx-conf-{{ .Values.deploymentTag }}
 data:
   nginx.conf: |-
 {{ .Files.Get "static/react-app.nginx.conf" | indent 4 }}
@@ -80,7 +80,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: react-app-config
+  name: react-app-config-{{ .Values.deploymentTag }}
 data:
   config.js: |-
 {{ .Files.Get "static/react-app.config.js" | indent 4 }}

@@ -2,13 +2,17 @@ BUILD_TAG ?= git-$(shell git rev-parse --short=8 HEAD)
 APP_NAME := likedao
 NAMESPACE ?=
 VALUES ?=
-GENESIS_URL ?= 
+GENESIS_URL ?=
+CHAIN_TAG ?=
+
+DEPLOYMENT_NAME := $(APP_NAME)-$(CHAIN_TAG)
 
 .PHONY: .checkenv
 .checkenv:
 	@test $${GENESIS_URL?Please set argument GENESIS_URL}
 	@test $${NAMESPACE?Please set argument NAMESPACE}
 	@test $${VALUES?Please set argument VALUES}
+	@test $${CHAIN_TAG?Please set argument CHAIN_TAG}
 
 .PHONY: download-genesis
 download-genesis:
@@ -25,4 +29,4 @@ make-deployment-assets:
 
 .PHONY: deploy
 deploy: .checkenv download-genesis
-	helm upgrade $(APP_NAME) $(APP_NAME) --namespace $(NAMESPACE) --values $(VALUES) --set buildTag=$(BUILD_TAG) --install
+	helm upgrade $(DEPLOYMENT_NAME) $(APP_NAME) --namespace $(NAMESPACE) --values $(VALUES) --set buildTag=$(BUILD_TAG) --set deploymentTag=$(CHAIN_TAG) --install
