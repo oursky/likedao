@@ -1,5 +1,5 @@
 query testQuery {
-  getLatestBlock {
+  latestBlock {
     height
   }
 }
