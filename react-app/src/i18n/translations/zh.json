@@ -28,5 +28,15 @@
   "UserInfoPanel.shortcuts.receive": "Receive",
   "UserInfoPanel.shortcuts.reinvest": "Reinvest",
   "UserInfoPanel.shortcuts.rewards": "Rewards",
-  "UserInfoPanel.shortcuts.send": "Send"
+  "UserInfoPanel.shortcuts.send": "Send",
+  "form.validation.address.invalidAddress": "Invalid address",
+  "form.validation.address.invalidPrefix": "Invalid address prefix, please use address with prefix `{prefix}`",
+  "form.validation.amount.greaterThan": "Amount must be greater than {value}",
+  "form.validation.amount.infinite": "Amount must be finite",
+  "form.validation.minLength": "This field must be longer than {value} characters",
+  "form.validation.maxLength": "This field cannot contain more than {value} characters",
+  "form.validation.required": "This field cannot be null",
+  "transaction.broadcasting": "Broadcasting transaction...",
+  "transaction.failure": "Transaction failed",
+  "transaction.success": "Transaction broadcasted"
 }
