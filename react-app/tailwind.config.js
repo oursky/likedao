@@ -8,6 +8,8 @@ module.exports = {
       colors: {
         likecoin: {
           green: "#28646E",
+          black: "#222222",
+          darkgrey: "#666666",
           lightgreen: "#A5B6B9",
           grey: "#D8D8D8",
           darkgrey: "#666666",
