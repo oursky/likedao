@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import IconButton from "../common/Buttons/IconButton";
@@ -6,12 +6,14 @@ import { IconType } from "../common/Icons/Icons";
 import Divider from "../common/Divider/Divider";
 import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
-import { useWallet } from "../../providers/WalletProvider";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { isRequestStateLoaded } from "../../models/RequestState";
 import { ChainHealth, ChainStatus } from "../../generated/graphql";
+import { useCosmos } from "../../api/cosmosAPI";
 import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
+import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -21,9 +23,11 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
   const location = useLocation();
   const wallet = useWallet();
+  const cosmosAPI = useCosmos();
 
   const chainHealthRequestState = useChainHealthQuery();
   const [isMenuActive, setIsMenuActive] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   const chainHealth = useMemo((): ChainHealth => {
     if (isRequestStateLoaded(chainHealthRequestState)) {
@@ -52,6 +56,18 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
     }
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
+  useEffect(() => {
+    if (wallet.status !== ConnectionStatus.Connected) return;
+    cosmosAPI
+      .getBalance()
+      .then((balance) => {
+        setUserInfo({ balance, address: wallet.account.address });
+      })
+      .catch((e) => {
+        console.error("Failed to fetch user balance =", e);
+      });
+  }, [cosmosAPI, wallet]);
+
   return (
     <div
       className={cn(
@@ -78,7 +94,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
         )}
       >
         <div className={cn("flex-0", "flex", "flex-col", "gap-y-6", "sm:w-72")}>
-          <div className={cn("flex", "flex-row", "sm:flex-col")}>
+          <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
             <Header chainHealth={chainHealth} />
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
@@ -87,11 +103,25 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onClick={toggleMobileMenuMenu}
             />
           </div>
-          {!wallet.isConnected ? (
-            <LoginPanel onConnect={wallet.openConnectWalletModal} />
-          ) : // Handle connected panel
-          null}
-          <div className={cn("hidden", "sm:flex", "flex-col", "gap-y-6")}>
+          {wallet.status !== ConnectionStatus.Connected ? (
+            <LoginPanel
+              className={cn("order-2")}
+              onConnect={wallet.openConnectWalletModal}
+            />
+          ) : (
+            <UserInfoPanel className={cn("order-3")} userInfo={userInfo} />
+          )}
+          <div
+            className={cn(
+              "hidden",
+              "sm:flex",
+              "flex-col",
+              "gap-y-4",
+              wallet.status === ConnectionStatus.Connected
+                ? "order-2"
+                : "order-3"
+            )}
+          >
             <Divider />
             <AppNavigationMenu
               activeRoute={location.pathname}
@@ -123,6 +153,12 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               className={cn("pb-6")}
               onMenuItemSelect={closeMobileMenu}
             />
+            {wallet.status === ConnectionStatus.Connected && (
+              <div className={cn("flex", "flex-col", "gap-y-6")}>
+                <Divider />
+                <UserInfoPanel userInfo={userInfo} />
+              </div>
+            )}
           </div>
           <main className={cn("flex", "flex-1")}>{children}</main>
         </div>
