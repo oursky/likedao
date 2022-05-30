@@ -16,7 +16,7 @@ spec:
             path: /
             backend:
               service:
-                name: react-app
+                name: react-app-{{ .Values.deploymentTag }}
                 port:
                   number: 80
     - host: {{ .Values.graphqlServer.host }}
@@ -26,11 +26,11 @@ spec:
             path: /
             backend:
               service:
-                name: graphql-server
+                name: graphql-server-{{ .Values.deploymentTag }}
                 port:
                   number: 80
   tls:
     - hosts:
         - {{ .Values.reactApp.host }}
         - {{ .Values.graphqlServer.host }}
-      secretName: likedao-tls
+      secretName: likedao-tls-{{ .Values.deploymentTag }}

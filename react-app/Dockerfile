@@ -10,8 +10,7 @@ COPY ./graphql-schema ./
 WORKDIR /usr/src/app
 COPY ./react-app .
 
-# TODO: uncomment after setting up codegen for graphql in react-app
-# RUN make codegen
+RUN make codegen
 RUN make build
 
 FROM nginx:1.21.6-alpine

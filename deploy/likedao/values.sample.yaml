@@ -17,6 +17,7 @@ reactApp:
   host: likedao.example.com
 bdjuno:
   imageName: ghcr.io/oursky/likedao-bdjuno
+  genesisUrl: https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.json
   resources:
     limits:
       cpu: 2
