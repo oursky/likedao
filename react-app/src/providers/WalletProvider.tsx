@@ -7,8 +7,9 @@ import { BaseWallet } from "../clients/baseWallet";
 import { WalletConnectWallet } from "../clients/walletConnectClient";
 import ConnectWalletModal from "../components/ConnectWalletModal/ConnectWalletModal";
 import Config from "../config/Config";
-import { useLocale } from "./AppLocaleProvider";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useWindowEvent } from "../hooks/useWindowEvent";
+import { useLocale } from "./AppLocaleProvider";
 
 const AUTO_CONNECT_WALLET_TYPE_KEY = "LS/AutoConnectWalletType";
 
@@ -157,6 +158,13 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         break;
     }
   }, [activeWallet, autoConnectWalletType, connectToKeplr, walletStatus]);
+
+  // https://docs.keplr.app/api/#change-key-store-event
+  useWindowEvent("keplr_keystorechange", () => {
+    refreshAccounts().catch((e) => {
+      console.error("Failed to refresh accounts = ", e);
+    });
+  });
 
   const contextValue = useMemo((): WalletContextValue => {
     if (walletStatus === ConnectionStatus.Connecting) {
