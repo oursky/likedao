@@ -10,6 +10,7 @@
     "@oursky/react-messageformat": "^2.0.2",
     "@sentry/react": "^6.19.7",
     "@sentry/tracing": "^6.19.7",
+    "bignumber.js": "^9.0.2",
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
     "graphql": "^16.5.0",
