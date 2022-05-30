@@ -1,17 +1,21 @@
 import { useCallback, useMemo } from "react";
+import BigNumber from "bignumber.js";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import { newWithdrawDelegatorRewardMessage } from "../models/cosmos/distribution";
+import { convertMinimalTokenToToken } from "../utils/coin";
+import { BigNumberCoin } from "../models/coin";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IDistributionAPI {
   signWithdrawDelegationRewardsTx(memo?: string): Promise<SignedTx>;
+  getTotalDelegationRewards(): Promise<BigNumberCoin>;
 }
 
 export const useDistribution = (): IDistributionAPI => {
   const wallet = useWallet();
   const cosmos = useCosmos();
-  const chainInfo = Config.chainInfo;
+  const coinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 
   const signWithdrawDelegationRewardsTx = useCallback(
     async (memo?: string) => {
@@ -26,7 +30,7 @@ export const useDistribution = (): IDistributionAPI => {
       );
 
       const relatedRewards = rewards.rewards.filter((r) =>
-        r.reward.some((rr) => rr.denom === chainInfo.currency.coinMinimalDenom)
+        r.reward.some((rr) => rr.denom === coinMinimalDenom)
       );
 
       if (relatedRewards.length === 0) {
@@ -42,13 +46,37 @@ export const useDistribution = (): IDistributionAPI => {
 
       return cosmos.signTx(requests, memo);
     },
-    [chainInfo, cosmos, wallet]
+    [coinMinimalDenom, cosmos, wallet]
   );
+
+  const getTotalDelegationRewards = useCallback(async () => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      throw new Error("Wallet not connected");
+    }
+    const rewards = await wallet.query.distribution.delegationTotalRewards(
+      wallet.account.address
+    );
+
+    const totalRewards = rewards.total.find(
+      (r) => r.denom === coinMinimalDenom
+    );
+
+    // Default cosmos decimal places is 18
+    const rewardAmount = new BigNumber(totalRewards?.amount ?? 0).shiftedBy(
+      -18
+    );
+
+    return {
+      denom: coinMinimalDenom,
+      amount: convertMinimalTokenToToken(rewardAmount),
+    };
+  }, [coinMinimalDenom, wallet]);
 
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
+      getTotalDelegationRewards,
     }),
-    [signWithdrawDelegationRewardsTx]
+    [signWithdrawDelegationRewardsTx, getTotalDelegationRewards]
   );
 };
