@@ -6,6 +6,8 @@
   "AppSideBar.navigation.proposals": "Proposals",
   "AppSideBar.navigation.validators": "Validators",
   "AppSideBar.title": "DAO land",
+  "CollectRewardsModal.fields.amount": "Amount",
+  "CollectRewardsModal.title": "Claim Reward",
   "CommunityStatus.bondedRatio": "Bonded Ratio",
   "CommunityStatus.communityPool": "Community Pool",
   "CommunityStatus.inflation": "Inflation",
