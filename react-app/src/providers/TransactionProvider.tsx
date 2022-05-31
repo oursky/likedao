@@ -7,6 +7,7 @@ import { SendTokenFormValues } from "../components/forms/SendTokenForm/SendToken
 import SendTokenModal from "../components/TransactionModals/SendTokenModal";
 import Config from "../config/Config";
 import { useLocale } from "./AppLocaleProvider";
+import { ConnectionStatus, useWallet } from "./WalletProvider";
 
 enum TransactionModal {
   SendToken = "SendToken",
@@ -26,6 +27,7 @@ const TransactionContext = React.createContext<TransactionProviderContextValue>(
 
 const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const { children } = props;
+  const wallet = useWallet();
   const cosmosAPI = useCosmos();
   const bankAPI = useBank();
   const chainInfo = Config.chainInfo;
@@ -44,6 +46,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
   const submitSendRequest = useCallback(
     (values: SendTokenFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
       const amount = new BigNumber(values.amount).shiftedBy(
         chainInfo.currency.coinDecimals
       );
@@ -58,9 +61,8 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
             success: translate("transaction.success"),
           });
         })
-        .then((tx) => {
-          // TODO: Handle boardcasted state
-          console.log(tx);
+        .then(async () => {
+          return wallet.refreshAccounts();
         })
         .catch((e) => {
           console.error("Error signing send token tx", e);
@@ -68,7 +70,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
           closeModals();
         });
     },
-    [cosmosAPI, bankAPI, chainInfo, closeModals, translate]
+    [cosmosAPI, bankAPI, chainInfo, wallet, closeModals, translate]
   );
 
   useEffect(() => {
