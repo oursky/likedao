@@ -6,12 +6,16 @@ import { useCosmos } from "../api/cosmosAPI";
 import { SendTokenFormValues } from "../components/forms/SendTokenForm/SendTokenFormModel";
 import SendTokenModal from "../components/TransactionModals/SendTokenModal";
 import UserAddressModal from "../components/UserAddressModal/UserAddressModal";
+import { CollectRewardsFormValues } from "../components/forms/CollectRewardsForm/CollectRewardsFormModel";
+import { useDistribution } from "../api/distributionAPI";
+import CollectRewardsModal from "../components/TransactionModals/CollectRewardsModal";
 import { useLocale } from "./AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "./WalletProvider";
 
 enum TransactionModal {
   SendToken = "SendToken",
   ReceiveToken = "ReceiveToken",
+  CollectRewards = "CollectRewards",
 }
 
 interface TransactionProviderProps {
@@ -21,6 +25,7 @@ interface TransactionProviderProps {
 interface TransactionProviderContextValue {
   openSendTokenModal: () => void;
   openReceiveTokenModal: () => void;
+  openCollectRewardsModal: () => void;
 }
 
 const TransactionContext = React.createContext<TransactionProviderContextValue>(
@@ -32,10 +37,15 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const wallet = useWallet();
   const cosmosAPI = useCosmos();
   const bankAPI = useBank();
+  const distributionAPI = useDistribution();
+
   const { translate } = useLocale();
 
   const [activeModal, setActiveModal] = useState<TransactionModal | null>(null);
   const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
+  const [availableRewards, setAvailableRewards] = useState<BigNumber>(
+    new BigNumber(0)
+  );
 
   const openSendTokenModal = useCallback(() => {
     setActiveModal(TransactionModal.SendToken);
@@ -43,6 +53,10 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
   const openReceiveTokenModal = useCallback(() => {
     setActiveModal(TransactionModal.ReceiveToken);
+  }, []);
+
+  const openCollectRewardsModal = useCallback(() => {
+    setActiveModal(TransactionModal.CollectRewards);
   }, []);
 
   const closeModals = useCallback(() => {
@@ -79,23 +93,52 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
     [cosmosAPI, bankAPI, wallet, closeModals, translate]
   );
 
+  const submitCollectRewardsRequest = useCallback(
+    (_: CollectRewardsFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+      distributionAPI
+        .signWithdrawDelegationRewardsTx(undefined)
+        .then(async (tx) => {
+          setActiveModal(null);
+          // TODO: Review this loading state
+          return toast.promise(cosmosAPI.broadcastTx(tx), {
+            pending: translate("transaction.broadcasting"),
+            success: translate("transaction.success"),
+          });
+        })
+        .then(async () => {
+          return wallet.refreshAccounts();
+        })
+        .catch((e) => {
+          console.error("Error signing send token tx", e);
+          toast.error(translate("transaction.failure"));
+          closeModals();
+        });
+    },
+    [cosmosAPI, distributionAPI, wallet, closeModals, translate]
+  );
+
   useEffect(() => {
-    cosmosAPI
-      .getBalance()
-      .then((balance) => {
+    Promise.all([
+      cosmosAPI.getBalance(),
+      distributionAPI.getTotalDelegationRewards(),
+    ])
+      .then(([balance, rewards]) => {
         setUserBalance(balance.amount);
+        setAvailableRewards(rewards.amount);
       })
       .catch((err) => {
-        console.error("Failed to get balance", err);
+        console.error("Failed to get balance and rewards", err);
       });
-  }, [cosmosAPI]);
+  }, [cosmosAPI, distributionAPI]);
 
   const contextValue = useMemo((): TransactionProviderContextValue => {
     return {
       openSendTokenModal,
       openReceiveTokenModal,
+      openCollectRewardsModal,
     };
-  }, [openSendTokenModal, openReceiveTokenModal]);
+  }, [openSendTokenModal, openReceiveTokenModal, openCollectRewardsModal]);
 
   return (
     <TransactionContext.Provider value={contextValue}>
@@ -104,6 +147,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
         <SendTokenModal
           availableTokens={userBalance}
           onSubmit={submitSendRequest}
+          onClose={closeModals}
+        />
+      )}
+      {activeModal === TransactionModal.CollectRewards && (
+        <CollectRewardsModal
+          availableRewards={availableRewards}
+          onSubmit={submitCollectRewardsRequest}
           onClose={closeModals}
         />
       )}

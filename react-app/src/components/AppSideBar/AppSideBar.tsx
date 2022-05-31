@@ -60,7 +60,6 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
   // TODO: Handle shortcuts
-  const onCollectReward = useCallback(() => {}, []);
   const onReinvest = useCallback(() => {}, []);
 
   useEffect(() => {
@@ -131,7 +130,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                 userInfo={userInfo}
                 onClickSend={transaction.openSendTokenModal}
                 onClickReceive={transaction.openReceiveTokenModal}
-                onClickReward={onCollectReward}
+                onClickReward={transaction.openCollectRewardsModal}
                 onClickReinvest={onReinvest}
               />
             </div>
@@ -192,7 +191,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                   userInfo={userInfo}
                   onClickSend={transaction.openSendTokenModal}
                   onClickReceive={transaction.openReceiveTokenModal}
-                  onClickReward={onCollectReward}
+                  onClickReward={transaction.openCollectRewardsModal}
                   onClickReinvest={onReinvest}
                 />
                 <AddressBar
