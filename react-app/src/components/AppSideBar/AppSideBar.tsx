@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import IconButton from "../common/Buttons/IconButton";
@@ -11,6 +11,9 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
 import { useWallet } from "../../providers/WalletProvider";
 import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
+import { isRequestStateLoaded } from "../../models/RequestState";
+import { ChainHealth, ChainStatus } from "../../generated/graphql";
+import { useChainHealthQuery } from "./AppSideBarAPI";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -20,7 +23,20 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
   const location = useLocation();
   const wallet = useWallet();
+
+  const chainHealthRequestState = useChainHealthQuery();
   const [isMenuActive, setIsMenuActive] = useState(false);
+
+  const chainHealth = useMemo((): ChainHealth => {
+    if (isRequestStateLoaded(chainHealthRequestState)) {
+      return chainHealthRequestState.data;
+    }
+
+    return {
+      height: 0,
+      status: ChainStatus.Offline,
+    };
+  }, [chainHealthRequestState]);
 
   const openMobileMenu = useCallback(() => {
     setIsMenuActive(true);
@@ -89,7 +105,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               >
                 <LocalizedText messageID="AppSideBar.title" />
               </h1>
-              <ChainSwitcher />
+              <ChainSwitcher chainHealth={chainHealth} />
             </div>
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
