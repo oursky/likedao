@@ -69,7 +69,7 @@ const DummyScreen: React.FC = () => {
         <LocalizedText messageID="App.title" />
 
         <h1>
-          Block Height: <span>{data?.getLatestBlock?.height ?? -1}</span>
+          Block Height: <span>{data?.latestBlock?.height ?? -1}</span>
         </h1>
       </div>
       <div className={cn("flex", "flex-col", "gap-y-5")}>

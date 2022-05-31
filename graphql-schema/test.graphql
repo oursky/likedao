@@ -11,7 +11,7 @@ input CreateTest {
 
 extend type Query {
   queryTestByID(id: ID!): Test
-  queryTestsByIds(ids: [ID!]!): [Test]
+  queryTestsByIDs(ids: [ID!]!): [Test]
 }
 
 extend type Mutation {

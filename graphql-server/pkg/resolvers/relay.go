@@ -15,7 +15,7 @@ func (r *queryResolver) Node(ctx context.Context, id models.NodeID) (models.Node
 	case "test":
 		return r.QueryTestByID(ctx, id)
 	case "block":
-		return r.QueryBlockByHash(ctx, id)
+		return r.BlockByID(ctx, id)
 	default:
 		panic(fmt.Sprintf(
 			`unknown entity type "%s"`,
