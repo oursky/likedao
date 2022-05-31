@@ -7,6 +7,13 @@ import { ReactComponent as MenuIcon } from "../../../assets/ic-menu.svg";
 import { ReactComponent as XIcon } from "../../../assets/ic-x.svg";
 import { ReactComponent as ChevronRightIcon } from "../../../assets/ic-chevron-right.svg";
 import { ReactComponent as DropDownIcon } from "../../../assets/ic-dropdown.svg";
+import { ReactComponent as CopyIcon } from "../../../assets/ic-copy.svg";
+import { ReactComponent as SendIcon } from "../../../assets/ic-send.svg";
+import { ReactComponent as AddIcon } from "../../../assets/ic-add.svg";
+import { ReactComponent as GiftIcon } from "../../../assets/ic-gift.svg";
+import { ReactComponent as ReinvestIcon } from "../../../assets/ic-reinvest.svg";
+import { ReactComponent as ExitIcon } from "../../../assets/ic-exit.svg";
+import { ReactComponent as LightningIcon } from "../../../assets/ic-lightning.svg";
 
 enum IconType {
   Home = "Home",
@@ -17,29 +24,38 @@ enum IconType {
   X = "X",
   ChevronRight = "ChevronRight",
   DropDown = "DropDown",
+  Copy = "Copy",
+  Send = "Send",
+  Add = "Add",
+  Gift = "Gift",
+  Reinvest = "Reinvest",
+  Exit = "Exit",
+  Lightning = "Lightning",
 }
 
+const iconMap = {
+  [IconType.Home]: HomeIcon,
+  [IconType.PieChart]: PieChartIcon,
+  [IconType.Validator]: ValidatorIcon,
+  [IconType.Vote]: VoteIcon,
+  [IconType.Menu]: MenuIcon,
+  [IconType.X]: XIcon,
+  [IconType.ChevronRight]: ChevronRightIcon,
+  [IconType.Copy]: CopyIcon,
+  [IconType.DropDown]: DropDownIcon,
+  [IconType.Send]: SendIcon,
+  [IconType.Add]: AddIcon,
+  [IconType.Gift]: GiftIcon,
+  [IconType.Reinvest]: ReinvestIcon,
+  [IconType.Exit]: ExitIcon,
+  [IconType.Lightning]: LightningIcon,
+};
+
 function getIcon(icon: IconType) {
-  switch (icon) {
-    case IconType.Home:
-      return HomeIcon;
-    case IconType.PieChart:
-      return PieChartIcon;
-    case IconType.Validator:
-      return ValidatorIcon;
-    case IconType.Vote:
-      return VoteIcon;
-    case IconType.Menu:
-      return MenuIcon;
-    case IconType.X:
-      return XIcon;
-    case IconType.ChevronRight:
-      return ChevronRightIcon;
-    case IconType.DropDown:
-      return DropDownIcon;
-    default:
-      return null;
+  if (icon in iconMap) {
+    return iconMap[icon];
   }
+  throw new Error(`Icon ${icon} not found`);
 }
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
@@ -50,10 +66,6 @@ const Icon: React.FC<IconProps> = (props) => {
   const { icon, ...rest } = props;
 
   const Component = getIcon(icon);
-
-  if (!Component) {
-    return null;
-  }
 
   return <Component {...rest} />;
 };

@@ -1,4 +1,5 @@
 {
+  "AddressBar.yourAddress": "Your address",
   "App.title": "你好世界",
   "AppSideBar.navigation.overview": "Overview",
   "AppSideBar.navigation.portfolio": "Portfolio",
@@ -10,7 +11,13 @@
   "ConnectWallet.connectModal.noWallet": "Continue without address",
   "ConnectWallet.connectModal.title": "Welcome 👋",
   "ConnectWallet.connectModal.walletConnect": "WallectConnect",
-  "ConnectWallet.description": "Connect wallet to get started",
+  "ConnectWallet.connecting": "Connecting to wallet...",
   "ConnectWallet.disconnected.connect": "Connect to wallet",
-  "ConnectWallet.disconnected.description": "Connect wallet to get started"
+  "ConnectWallet.disconnected.description": "Connect wallet to get started",
+  "ConnectWallet.prompt.failed": "Failed to connect to wallet, Please try again",
+  "UserInfoPanel.addressCopied": "Address copied to clipboard",
+  "UserInfoPanel.shortcuts.receive": "Receive",
+  "UserInfoPanel.shortcuts.reinvest": "Reinvest",
+  "UserInfoPanel.shortcuts.rewards": "Rewards",
+  "UserInfoPanel.shortcuts.send": "Send"
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import IconButton from "../common/Buttons/IconButton";
@@ -6,14 +6,15 @@ import { IconType } from "../common/Icons/Icons";
 import Divider from "../common/Divider/Divider";
 import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
-import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
-import LocalizedText from "../common/Localized/LocalizedText";
-import AppButton from "../common/Buttons/AppButton";
-import { useWallet } from "../../providers/WalletProvider";
-import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { isRequestStateLoaded } from "../../models/RequestState";
 import { ChainHealth, ChainStatus } from "../../generated/graphql";
+import { useCosmos } from "../../api/cosmosAPI";
 import { useChainHealthQuery } from "./AppSideBarAPI";
+import { Header } from "./Header";
+import { LoginPanel } from "./LoginPanel";
+import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
+import { AddressBar } from "./AddressBar";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -23,9 +24,11 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
   const location = useLocation();
   const wallet = useWallet();
+  const cosmosAPI = useCosmos();
 
   const chainHealthRequestState = useChainHealthQuery();
   const [isMenuActive, setIsMenuActive] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   const chainHealth = useMemo((): ChainHealth => {
     if (isRequestStateLoaded(chainHealthRequestState)) {
@@ -54,6 +57,24 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
     }
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
+  // TODO: Handle shortcuts
+  const onSend = useCallback(() => {}, []);
+  const onReceive = useCallback(() => {}, []);
+  const onCollectReward = useCallback(() => {}, []);
+  const onReinvest = useCallback(() => {}, []);
+
+  useEffect(() => {
+    if (wallet.status !== ConnectionStatus.Connected) return;
+    cosmosAPI
+      .getBalance()
+      .then((balance) => {
+        setUserInfo({ balance, address: wallet.account.address });
+      })
+      .catch((e) => {
+        console.error("Failed to fetch user balance =", e);
+      });
+  }, [cosmosAPI, wallet]);
+
   return (
     <div
       className={cn(
@@ -79,34 +100,9 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           "sm:flex-row"
         )}
       >
-        <div className={cn("flex-0", "flex", "flex-col", "gap-y-6", "sm:w-72")}>
-          <div className={cn("flex", "flex-row", "sm:flex-col")}>
-            <div
-              className={cn(
-                "flex-1",
-                "flex",
-                "flex-row",
-                "gap-x-4",
-                "items-center",
-                "sm:items-start",
-                "sm:flex-col",
-                "sm:gap-y-4",
-                "sm:gap-x-0"
-              )}
-            >
-              <LikeLogo height={48} width={48} />
-              <h1
-                className={cn(
-                  "text-base",
-                  "leading-5",
-                  "font-normal",
-                  "text-likecoin-green"
-                )}
-              >
-                <LocalizedText messageID="AppSideBar.title" />
-              </h1>
-              <ChainSwitcher chainHealth={chainHealth} />
-            </div>
+        <div className={cn("flex-0", "flex", "flex-col", "sm:w-72")}>
+          <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
+            <Header chainHealth={chainHealth} />
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
               size={24}
@@ -114,28 +110,50 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               onClick={toggleMobileMenuMenu}
             />
           </div>
-          {!wallet.isConnected ? (
-            <div className={cn("flex", "flex-col", "gap-y-6")}>
-              <h3
-                className={cn(
-                  "text-base",
-                  "leading-6",
-                  "font-medium",
-                  "text-black"
-                )}
-              >
-                <LocalizedText messageID="ConnectWallet.disconnected.description" />
-              </h3>
-              <AppButton
-                size="regular"
-                type="primary"
-                messageID="ConnectWallet.disconnected.connect"
-                onClick={wallet.openConnectWalletModal}
+          {wallet.status !== ConnectionStatus.Connected ? (
+            <LoginPanel
+              className={cn("order-2", "my-6")}
+              onConnect={wallet.openConnectWalletModal}
+            />
+          ) : (
+            <div
+              className={cn(
+                "order-3",
+                "flex-col",
+                "gap-y-6",
+                "hidden",
+                "sm:flex"
+              )}
+            >
+              <Divider />
+              <UserInfoPanel
+                className={cn("order-3")}
+                userInfo={userInfo}
+                onClickSend={onSend}
+                onClickReceive={onReceive}
+                onClickReward={onCollectReward}
+                onClickReinvest={onReinvest}
               />
             </div>
-          ) : // Handle connected panel
-          null}
-          <div className={cn("hidden", "sm:flex", "flex-col", "gap-y-6")}>
+          )}
+          <div
+            className={cn(
+              "hidden",
+              "sm:flex",
+              "flex-col",
+              "gap-y-4",
+              "mb-6",
+              wallet.status === ConnectionStatus.Connected
+                ? "order-2"
+                : "order-3"
+            )}
+          >
+            {wallet.status === ConnectionStatus.Connected && (
+              <AddressBar
+                address={userInfo?.address ?? ""}
+                onDisconnect={wallet.disconnect}
+              />
+            )}
             <Divider />
             <AppNavigationMenu
               activeRoute={location.pathname}
@@ -167,6 +185,22 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               className={cn("pb-6")}
               onMenuItemSelect={closeMobileMenu}
             />
+            {wallet.status === ConnectionStatus.Connected && (
+              <div className={cn("flex", "flex-col", "gap-y-6")}>
+                <Divider />
+                <UserInfoPanel
+                  userInfo={userInfo}
+                  onClickSend={onSend}
+                  onClickReceive={onReceive}
+                  onClickReward={onCollectReward}
+                  onClickReinvest={onReinvest}
+                />
+                <AddressBar
+                  address={userInfo?.address ?? ""}
+                  onDisconnect={wallet.disconnect}
+                />
+              </div>
+            )}
           </div>
           <main className={cn("flex", "flex-1")}>{children}</main>
         </div>
