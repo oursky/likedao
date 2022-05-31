@@ -3,6 +3,7 @@ graphqlServer:
   sentry:
     dsn: dsn
     environment: graphql-server
+  corsAllowOrigins: "*"
   serverDatabase:
     url: postgres://likedao:likedao@server-db/likedao?sslmode=disable
     schema: likedao

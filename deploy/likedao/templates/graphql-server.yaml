@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: BDJUNO_DATABASE_SCHEMA
+            - name: CORS_ALLOW_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
+                  key: CORS_ALLOW_ORIGINS
             - name: SERVER_DATABASE_POOL_SIZE
               value: {{ .Values.graphqlServer.serverDatabase.poolSize | quote }}
             - name: BDJUNO_DATABASE_POOL_SIZE
@@ -101,6 +106,7 @@ metadata:
   name: graphql-server-config-{{ .Values.deploymentTag }}
 type: Opaque
 data:
+  CORS_ALLOW_ORIGINS: {{ .Values.graphqlServer.corsAllowOrigins | b64enc }}
   SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}
   SERVER_DATABASE_SCHEMA: {{ .Values.graphqlServer.serverDatabase.schema | b64enc }}
   BDJUNO_DATABASE_URL: {{ .Values.graphqlServer.bdjunoDatabase.url | b64enc }}
