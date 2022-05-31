@@ -1,0 +1,6 @@
+query AppSideBarQueryChainHealth {
+  chainHealth {
+    height
+    status
+  }
+}
