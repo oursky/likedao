@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { toast } from "react-toastify";
 import Config from "../../config/Config";
 import { ParsedCoin } from "../../api/cosmosAPI";
-import { convertToReadableBalance } from "../../utils/coin";
+import { convertBigNumberToFixedPointString } from "../../utils/number";
 import CopyableText from "../common/CopyableText/CopyableText";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { IconType } from "../common/Icons/Icons";
@@ -56,7 +56,10 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
             "break-all"
           )}
         >
-          {`${convertToReadableBalance(balance, coinDecimals)} ${coinDenom}`}
+          {`${convertBigNumberToFixedPointString(
+            balance,
+            coinDecimals
+          )} ${coinDenom}`}
         </h3>
         <p
           className={cn(
@@ -66,7 +69,7 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
             "text-likecoin-lightgreen"
           )}
         >
-          {convertToReadableBalance(balance, coinDecimals, 9)}
+          {convertBigNumberToFixedPointString(balance, coinDecimals, 9)}
         </p>
       </div>
 
