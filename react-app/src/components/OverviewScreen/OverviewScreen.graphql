@@ -1,0 +1,10 @@
+query OverviewScreenQuery {
+  communityStatus {
+    bondedRatio
+    inflation
+    communityPool {
+      denom
+      amount
+    }
+  }
+}
