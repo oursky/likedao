@@ -5,11 +5,13 @@ import { useBank } from "../api/bankAPI";
 import { useCosmos } from "../api/cosmosAPI";
 import { SendTokenFormValues } from "../components/forms/SendTokenForm/SendTokenFormModel";
 import SendTokenModal from "../components/TransactionModals/SendTokenModal";
+import UserAddressModal from "../components/UserAddressModal/UserAddressModal";
 import { useLocale } from "./AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "./WalletProvider";
 
 enum TransactionModal {
   SendToken = "SendToken",
+  ReceiveToken = "ReceiveToken",
 }
 
 interface TransactionProviderProps {
@@ -18,6 +20,7 @@ interface TransactionProviderProps {
 
 interface TransactionProviderContextValue {
   openSendTokenModal: () => void;
+  openReceiveTokenModal: () => void;
 }
 
 const TransactionContext = React.createContext<TransactionProviderContextValue>(
@@ -36,6 +39,10 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
   const openSendTokenModal = useCallback(() => {
     setActiveModal(TransactionModal.SendToken);
+  }, []);
+
+  const openReceiveTokenModal = useCallback(() => {
+    setActiveModal(TransactionModal.ReceiveToken);
   }, []);
 
   const closeModals = useCallback(() => {
@@ -86,8 +93,9 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const contextValue = useMemo((): TransactionProviderContextValue => {
     return {
       openSendTokenModal,
+      openReceiveTokenModal,
     };
-  }, [openSendTokenModal]);
+  }, [openSendTokenModal, openReceiveTokenModal]);
 
   return (
     <TransactionContext.Provider value={contextValue}>
@@ -99,6 +107,15 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
           onClose={closeModals}
         />
       )}
+      <UserAddressModal
+        address={
+          wallet.status === ConnectionStatus.Connected
+            ? wallet.account.address
+            : ""
+        }
+        isOpened={activeModal === TransactionModal.ReceiveToken}
+        onClose={closeModals}
+      />
     </TransactionContext.Provider>
   );
 };
