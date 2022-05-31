@@ -10,6 +10,7 @@ import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { isRequestStateLoaded } from "../../models/RequestState";
 import { ChainHealth, ChainStatus } from "../../generated/graphql";
 import { useCosmos } from "../../api/cosmosAPI";
+import { useTransaction } from "../../providers/TransactionProvider";
 import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
@@ -25,6 +26,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const location = useLocation();
   const wallet = useWallet();
   const cosmosAPI = useCosmos();
+  const transaction = useTransaction();
 
   const chainHealthRequestState = useChainHealthQuery();
   const [isMenuActive, setIsMenuActive] = useState(false);
@@ -58,7 +60,6 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
   // TODO: Handle shortcuts
-  const onSend = useCallback(() => {}, []);
   const onReceive = useCallback(() => {}, []);
   const onCollectReward = useCallback(() => {}, []);
   const onReinvest = useCallback(() => {}, []);
@@ -129,7 +130,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               <UserInfoPanel
                 className={cn("order-3")}
                 userInfo={userInfo}
-                onClickSend={onSend}
+                onClickSend={transaction.openSendTokenModal}
                 onClickReceive={onReceive}
                 onClickReward={onCollectReward}
                 onClickReinvest={onReinvest}
@@ -190,7 +191,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                 <Divider />
                 <UserInfoPanel
                   userInfo={userInfo}
-                  onClickSend={onSend}
+                  onClickSend={transaction.openSendTokenModal}
                   onClickReceive={onReceive}
                   onClickReward={onCollectReward}
                   onClickReinvest={onReinvest}
