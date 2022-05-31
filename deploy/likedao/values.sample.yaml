@@ -13,6 +13,8 @@ graphqlServer:
     schema: bdjuno
     poolSize: 5
   host: api.likedao.example.com
+  chain:
+    coinDenom: nanolike
 reactApp:
   imageName: ghcr.io/oursky/likedao-react-app
   host: likedao.example.com

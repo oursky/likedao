@@ -2,3 +2,9 @@
 A type denoting an exact moment in time.
 """
 scalar DateTime
+
+"""
+A type denoting an large numbers.
+"""
+scalar BigInt
+scalar BigFloat

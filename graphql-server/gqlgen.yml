@@ -46,6 +46,11 @@ autobind:
 models:
   DateTime:
     model: github.com/99designs/gqlgen/graphql.Time
+
+  BigInt:
+    model: github.com/99designs/gqlgen/graphql.String
+  BigFloat:
+    model: github.com/99designs/gqlgen/graphql.String
     
   ID:
     model: github.com/oursky/likedao/pkg/models.NodeID
@@ -69,3 +74,7 @@ models:
 
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime
+    
+  Coin:
+    model: github.com/forbole/bdjuno/database/types.DbDecCoin
+

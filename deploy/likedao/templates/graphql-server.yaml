@@ -67,6 +67,11 @@ spec:
                 secretKeyRef:
                   name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: SERVER_DATABASE_SCHEMA
+            - name: CHAIN_COIN_DENOM
+              valueFrom:
+                secretKeyRef:
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
+                  key: CHAIN_COIN_DENOM
             - name: BDJUNO_DATABASE_SCHEMA
               valueFrom:
                 secretKeyRef:
@@ -107,6 +112,7 @@ metadata:
 type: Opaque
 data:
   CORS_ALLOW_ORIGINS: {{ .Values.graphqlServer.corsAllowOrigins | b64enc }}
+  CHAIN_COIN_DENOM: {{ .Values.graphqlServer.chain.coinDenom | b64enc }}
   SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}
   SERVER_DATABASE_SCHEMA: {{ .Values.graphqlServer.serverDatabase.schema | b64enc }}
   BDJUNO_DATABASE_URL: {{ .Values.graphqlServer.bdjunoDatabase.url | b64enc }}

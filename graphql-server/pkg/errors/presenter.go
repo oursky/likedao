@@ -42,7 +42,10 @@ func DefaultErrorPresenter(ctx context.Context, e error) *gqlerror.Error {
 			fmt.Fprintf(os.Stderr, "%+v", stackErr.StackTrace())
 		}
 
-		return InternalError.NewErrorWithDefaultMessage(ctx)
+		return &gqlerror.Error{
+			Path:    graphql.GetPath(ctx),
+			Message: ErrInternalError.Error(),
+		}
 	}
 
 	// Otherwise the error is returned to user as-is.

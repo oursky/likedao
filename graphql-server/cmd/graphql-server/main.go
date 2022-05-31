@@ -53,7 +53,7 @@ func main() {
 	}
 
 	router.Use(cors.New(corsConfig))
-	router.Use(middlewares.Services(serverDB, chainDB))
+	router.Use(middlewares.Services(config, serverDB, chainDB))
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
