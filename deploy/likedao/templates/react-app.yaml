@@ -43,7 +43,7 @@ spec:
             - name: react-app-config-{{ .Values.deploymentTag }}
               mountPath: /usr/share/config/config.js
               subPath: config.js
-            - name: react-app-keplr
+            - name: react-app-keplr-{{ .Values.deploymentTag }}
               mountPath: /usr/share/config/keplr.js
               subPath: keplr.js
           readinessProbe:
