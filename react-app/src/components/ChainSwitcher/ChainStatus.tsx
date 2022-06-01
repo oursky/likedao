@@ -54,6 +54,10 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
             "text-xs",
             "leading-5",
             "font-normal",
+            "text-ellipsis",
+            "overflow-hidden",
+            "break-all",
+            "whitespace-nowrap",
             "text-likecoin-green"
           )}
         >
