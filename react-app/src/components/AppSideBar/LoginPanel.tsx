@@ -17,7 +17,7 @@ const LoginPanel: React.FC<LoginPanelProps> = (props) => {
       </h3>
       <AppButton
         size="regular"
-        type="primary"
+        theme="primary"
         messageID="ConnectWallet.disconnected.connect"
         onClick={onConnect}
       />

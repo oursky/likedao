@@ -126,7 +126,7 @@ const UserAddressModal: React.FC<UserAddressModalProps> = (props) => {
                 <AppButton
                   className={cn("self-end")}
                   size="regular"
-                  type="primary"
+                  theme="primary"
                   onClick={onClose}
                   messageID="UserAddressModal.done"
                 />

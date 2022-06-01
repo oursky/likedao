@@ -56,13 +56,13 @@ const CollectRewardsForm: React.FC<CollectRewardsFormProps> = (props) => {
 
       <div className={cn("flex", "flex-row", "gap-x-2.5", "self-end")}>
         <AppButton
-          type="secondary"
+          theme="secondary"
           size="regular"
           onClick={onCancel}
           messageID="TransactionModal.cancel"
         />
         <AppButton
-          type="primary"
+          theme="primary"
           size="regular"
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={handleSubmit(onSubmit)}
