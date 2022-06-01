@@ -38,14 +38,18 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
       return cn(
         "bg-likecoin-green",
         "text-white",
-        "hover:bg-likecoin-lightgreen"
+        "disabled:bg-gray-300",
+        "hover:bg-likecoin-lightgreen",
+        "acitve:bg-likecoin-darkgreen"
       );
     case "secondary":
       return cn(
         "bg-white",
         "text-likecoin-green",
+        "disabled:bg-gray-300",
         "hover:bg-likecoin-lightgreen",
-        "hover:text-white"
+        "hover:text-white",
+        "acitve:bg-likecoin-darkgreen"
       );
     default:
       throw new Error("Unknown button type");
