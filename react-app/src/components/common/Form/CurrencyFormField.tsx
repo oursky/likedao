@@ -2,9 +2,24 @@ import React, { useCallback } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import cn from "classnames";
 import AppButton from "../Buttons/AppButton";
-import { BaseFormField, BaseFormFieldProps } from "./FormField";
+import {
+  BaseFormField,
+  BaseFormFieldProps,
+  FormFieldSize,
+} from "./BaseFormField";
 
 import "./CurrencyFormField.module.css";
+
+function getInputClassNameBySize(size: FormFieldSize): string {
+  switch (size) {
+    case "regular":
+      return cn("py-3", "px-4");
+    case "small":
+      return cn("py-2", "px-3");
+    default:
+      throw new Error(`Unknown form field size`);
+  }
+}
 
 interface CurrencyFormFieldProps extends BaseFormFieldProps {
   inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
@@ -21,6 +36,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
     inputProps,
     inputClassName,
     setValue,
+    size = "regular",
     ...rest
   } = props;
 
@@ -31,7 +47,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
   }, [inputProps?.max, setValue]);
 
   return (
-    <BaseFormField {...rest} errorMessage={errorMessage}>
+    <BaseFormField {...rest} size={size} errorMessage={errorMessage}>
       <div className={cn("w-full", "flex", "flex-row", "gap-x-2")}>
         <div className={cn("flex-1", "relative")}>
           <input
@@ -47,6 +63,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
               "rounded-md",
               "focus:outline-none",
               errorMessage != null ? "border-red-700" : "border-gray-300",
+              getInputClassNameBySize(size),
               inputClassName
             )}
             {...registerReturn}
