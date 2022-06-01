@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppSideBar from "../components/AppSideBar/AppSideBar";
+import CreateProposalScreen from "../components/CreateProposalScreen/CreateProposalScreen";
 import DummyScreen from "../components/DummyScreen/DummyScreen";
 import OverviewScreen from "../components/OverviewScreen/OverviewScreen";
 import ProposalScreen from "../components/ProposalScreen/ProposalScreen";
@@ -17,7 +18,10 @@ const AppRouter: React.FC = () => {
           <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
           <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
           <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
-
+          <Route
+            path={AppRoutes.NewProposal}
+            element={<CreateProposalScreen />}
+          />
           {/* TODO: Handle 404 screen  */}
           <Route path="*" element={<OverviewScreen />} />
         </Routes>
