@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
 import AppButton from "../../common/Buttons/AppButton";
 import Config from "../../../config/Config";
-import { FormField } from "../../common/Form/FormField";
+import * as FormField from "../../common/Form";
 import {
   CollectRewardsFormValues,
   useCollectRewardsFormModel,
