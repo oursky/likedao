@@ -13,6 +13,7 @@
     "@sentry/tracing": "^6.19.7",
     "apollo-link-scalars": "^4.0.1",
     "bignumber.js": "^9.0.2",
+    "@uiw/react-md-editor": "^3.14.1",
     "@walletconnect/client": "^1.7.8",
     "@walletconnect/qrcode-modal": "^1.7.8",
     "bech32": "^2.0.0",
@@ -28,6 +29,7 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "react-toastify": "9.0.3",
+    "rehype-sanitize": "^5.0.1",
     "stream": "npm:stream-browserify",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
