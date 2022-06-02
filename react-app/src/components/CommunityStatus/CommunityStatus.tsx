@@ -1,54 +1,26 @@
-import React, { useMemo } from "react";
+import React from "react";
 import BigNumber from "bignumber.js";
-import { CommunityStatus as ICommunityStatus } from "../../generated/graphql";
-import Config from "../../config/Config";
+
 import { CommunityStatusRegular } from "./CommunityStatusRegular";
 import { CommunityStatusHeader } from "./CommunityStatusHeader";
 
 export interface CommunityStatusProps {
   className?: string;
   type?: "regular" | "header";
-  communityStatus: ICommunityStatus;
+  inflation: BigNumber;
+  bondedRatio: BigNumber;
+  communityPool: BigNumber;
 }
 
 const CommunityStatus: React.FC<CommunityStatusProps> = (props) => {
-  const { type, communityStatus, ...rest } = props;
-  const chainInfo = Config.chainInfo;
-
-  const [inflation, bondedRatio, communityPoolAmount] = useMemo((): [
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ] => {
-    const { inflation, bondedRatio, communityPool } = communityStatus;
-
-    const chainCurrency = communityPool.find(
-      (c) => c.denom === chainInfo.currency.coinMinimalDenom
-    );
-
-    return [inflation, bondedRatio, chainCurrency?.amount ?? new BigNumber(0)];
-  }, [chainInfo.currency.coinMinimalDenom, communityStatus]);
+  const { type, ...rest } = props;
 
   switch (type) {
     case "header":
-      return (
-        <CommunityStatusHeader
-          {...rest}
-          inflation={inflation}
-          bondedRatio={bondedRatio}
-          communityPool={communityPoolAmount}
-        />
-      );
+      return <CommunityStatusHeader {...rest} />;
     case "regular":
     default:
-      return (
-        <CommunityStatusRegular
-          {...rest}
-          inflation={inflation}
-          bondedRatio={bondedRatio}
-          communityPool={communityPoolAmount}
-        />
-      );
+      return <CommunityStatusRegular {...rest} />;
   }
 };
 

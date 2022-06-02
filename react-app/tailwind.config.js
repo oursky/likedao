@@ -5,12 +5,18 @@ module.exports = {
       fontSize: {
         "2xs": ".6875rem",
       },
+      maxWidth: {
+        "2lg": "32.5rem",
+      },
       colors: {
         likecoin: {
           green: "#28646E",
+          black: "#222222",
+          darkgrey: "#666666",
           lightgreen: "#A5B6B9",
           grey: "#D8D8D8",
           darkgrey: "#666666",
+          lightgrey: "#E8E8E8",
           "primary-bg": "#F8F7F4",
           gradient: {
             from: "#D7EFE7",

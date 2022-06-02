@@ -1,14 +1,14 @@
 import { useCallback, useMemo } from "react";
-import BigNumber from "bignumber.js";
 import { newSendMessage } from "../models/cosmos/bank";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
+import { convertTokenToMinimalToken } from "../utils/coin";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IBankAPI {
   signSendTokenTx(
     recipent: string,
-    amount: BigNumber,
+    amount: string,
     memo?: string
   ): Promise<SignedTx>;
 }
@@ -19,16 +19,19 @@ export const useBank = (): IBankAPI => {
   const chainInfo = Config.chainInfo;
 
   const signSendTokenTx = useCallback(
-    async (recipent: string, amount: BigNumber, memo?: string) => {
+    async (recipent: string, amount: string, memo?: string) => {
       if (wallet.status !== ConnectionStatus.Connected) {
         throw new Error("Wallet not connected");
       }
 
+      const coinAmount = convertTokenToMinimalToken(amount);
+
       const { address } = wallet.account;
 
       const balance = await cosmos.getBalance();
+      const coinBalance = convertTokenToMinimalToken(balance.amount);
 
-      if (balance.amount.isLessThan(amount)) {
+      if (coinBalance.isLessThan(coinAmount)) {
         throw new Error("Insufficient funds");
       }
 
@@ -38,7 +41,7 @@ export const useBank = (): IBankAPI => {
         amount: [
           {
             denom: chainInfo.currency.coinMinimalDenom,
-            amount: amount.toString(),
+            amount: coinAmount.toFixed(),
           },
         ],
       });

@@ -1,6 +1,5 @@
 import React from "react";
 import cn from "classnames";
-import BigNumber from "bignumber.js";
 import LocalizedText from "../common/Localized/LocalizedText";
 import Config from "../../config/Config";
 import {
@@ -9,14 +8,7 @@ import {
 } from "../../utils/number";
 import { CommunityStatusProps } from "./CommunityStatus";
 
-type CommunityStatusHeaderProps = Omit<
-  CommunityStatusProps,
-  "type" | "communityStatus"
-> & {
-  inflation: BigNumber;
-  bondedRatio: BigNumber;
-  communityPool: BigNumber;
-};
+type CommunityStatusHeaderProps = Omit<CommunityStatusProps, "type">;
 
 export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
   props
@@ -46,10 +38,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
             "break-all"
           )}
         >
-          {convertBigNumberToLocalizedIntegerString(
-            communityPool,
-            chainInfo.currency.coinDecimals
-          )}
+          {convertBigNumberToLocalizedIntegerString(communityPool)}
           <span className={cn("ml-1")}>{chainInfo.currency.coinDenom}</span>
         </span>
       </div>
@@ -67,7 +56,8 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
         <span
           className={cn("text-md", "leading-5", "font-medium", "text-black")}
         >
-          {convertBigNumberToFixedPointString(bondedRatio, -2, 2)}%
+          {convertBigNumberToFixedPointString(bondedRatio.multipliedBy(100), 2)}
+          %
         </span>
       </div>
       <div className={cn("flex", "flex-row", "gap-x-3")}>
@@ -84,7 +74,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
         <span
           className={cn("text-md", "leading-5", "font-medium", "text-black")}
         >
-          {convertBigNumberToFixedPointString(inflation, -2, 2)}%
+          {convertBigNumberToFixedPointString(inflation.multipliedBy(100), 2)}%
         </span>
       </div>
     </div>

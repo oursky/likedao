@@ -3,6 +3,7 @@ import { ApolloProvider } from "@apollo/client";
 import { createApolloClient } from "../clients/apolloClient";
 import AppLocaleProvider from "./AppLocaleProvider";
 import WalletProvider from "./WalletProvider";
+import TransactionProvider from "./TransactionProvider";
 
 const apolloClient = createApolloClient();
 
@@ -16,7 +17,9 @@ const AppProviders: React.FC<AppProvidersProps> = (props) => {
   return (
     <AppLocaleProvider>
       <ApolloProvider client={apolloClient}>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          <TransactionProvider>{children}</TransactionProvider>
+        </WalletProvider>
       </ApolloProvider>
     </AppLocaleProvider>
   );

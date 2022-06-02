@@ -1,10 +1,14 @@
+fragment OverviewScreenScreenCommunityStatus on CommunityStatus {
+  bondedRatio
+  inflation
+  communityPool {
+    denom
+    amount
+  }
+}
+
 query OverviewScreenQuery {
   communityStatus {
-    bondedRatio
-    inflation
-    communityPool {
-      denom
-      amount
-    }
+    ...OverviewScreenScreenCommunityStatus
   }
 }
