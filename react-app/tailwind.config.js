@@ -10,6 +10,7 @@ module.exports = {
           green: "#28646E",
           lightgreen: "#A5B6B9",
           grey: "#D8D8D8",
+          darkgrey: "#666666",
           "primary-bg": "#F8F7F4",
           gradient: {
             from: "#D7EFE7",

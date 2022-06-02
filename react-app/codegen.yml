@@ -8,3 +8,6 @@ generates:
       - "typescript-operations"
       - "typescript-document-nodes"
       - "fragment-matcher"
+  ./src/generated/graphql.schema.json:
+    plugins:
+      - "introspection"
