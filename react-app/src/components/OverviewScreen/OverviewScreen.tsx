@@ -39,7 +39,11 @@ const OverviewScreen: React.FC = () => {
         "gap-y-3"
       )}
     >
-      <CommunityStatus communityStatus={communityStatusRequestState.data} />
+      <CommunityStatus
+        inflation={communityStatusRequestState.data.inflation}
+        bondedRatio={communityStatusRequestState.data.bondedRatio}
+        communityPool={communityStatusRequestState.data.communityPool.amount}
+      />
       <p>Other Content</p>
     </div>
   );

@@ -1,6 +1,5 @@
 import React from "react";
 import cn from "classnames";
-import BigNumber from "bignumber.js";
 import { MessageID } from "../../i18n/LocaleModel";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
@@ -43,14 +42,7 @@ const CommunityStatusPanel: React.FC<CommunityStatusPanelProps> = (props) => {
   );
 };
 
-type CommunityStatusRegularProps = Omit<
-  CommunityStatusProps,
-  "type" | "communityStatus"
-> & {
-  inflation: BigNumber;
-  bondedRatio: BigNumber;
-  communityPool: BigNumber;
-};
+type CommunityStatusRegularProps = Omit<CommunityStatusProps, "type">;
 
 export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
   props
@@ -84,10 +76,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
               "break-all"
             )}
           >
-            {convertBigNumberToMillifiedIntegerString(
-              communityPool,
-              chainInfo.currency.coinDecimals
-            )}
+            {convertBigNumberToMillifiedIntegerString(communityPool)}
 
             <span className={cn("ml-1", "text-xs", "leading-3")}>
               {chainInfo.currency.coinDenom}
@@ -101,10 +90,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
               "text-likecoin-darkgrey"
             )}
           >
-            {convertBigNumberToLocalizedIntegerString(
-              communityPool,
-              chainInfo.currency.coinDecimals
-            )}
+            {convertBigNumberToLocalizedIntegerString(communityPool)}
           </span>
         </div>
       </CommunityStatusPanel>
@@ -120,7 +106,8 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
             "text-gray-900"
           )}
         >
-          {convertBigNumberToFixedPointString(bondedRatio, -2, 2)}%
+          {convertBigNumberToFixedPointString(bondedRatio.multipliedBy(100), 2)}
+          %
         </span>
       </CommunityStatusPanel>
       <CommunityStatusPanel
@@ -135,7 +122,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
             "text-gray-900"
           )}
         >
-          {convertBigNumberToFixedPointString(inflation, -2, 2)}%
+          {convertBigNumberToFixedPointString(inflation.multipliedBy(100), 2)}%
         </span>
       </CommunityStatusPanel>
     </div>
