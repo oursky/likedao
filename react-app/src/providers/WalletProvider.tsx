@@ -151,7 +151,7 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
   }, [chainInfo, translate, closeConnectWalletModal, disconnect]);
 
   useEffect(() => {
-    if (!!activeWallet || walletStatus !== ConnectionStatus.Idle) return;
+    if (activeWallet !== null || walletStatus !== ConnectionStatus.Idle) return;
     switch (autoConnectWalletType) {
       case AutoConnectWalletType.Keplr:
         connectToKeplr();
