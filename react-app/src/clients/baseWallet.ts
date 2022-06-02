@@ -1,9 +1,7 @@
-import { Coin, OfflineSigner } from "@cosmjs/proto-signing";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { ChainInfo } from "../config/Config";
 import { ExtendedQueryClient } from "./queryClient";
-
-export type ParsedCoin = Pick<Coin, "denom"> & { amount: number };
 
 export class BaseWallet {
   protected chainInfo: ChainInfo;
