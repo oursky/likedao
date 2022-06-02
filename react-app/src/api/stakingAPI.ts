@@ -7,6 +7,7 @@ import {
   newUndelegateMessage,
 } from "../models/cosmos/staking";
 import { convertTokenToMinimalToken } from "../utils/coin";
+import { useQueryClient } from "../providers/QueryClientProvider";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IStakingAPI {
@@ -25,6 +26,7 @@ interface IStakingAPI {
 export const useStaking = (): IStakingAPI => {
   const wallet = useWallet();
   const cosmos = useCosmos();
+  const { query } = useQueryClient();
   const chainInfo = Config.chainInfo;
 
   const signDelegateTokenTx = useCallback(
@@ -68,10 +70,7 @@ export const useStaking = (): IStakingAPI => {
 
       const { address } = wallet.account;
 
-      const delegation = await wallet.query.staking.delegation(
-        address,
-        validator
-      );
+      const delegation = await query.staking.delegation(address, validator);
 
       if (!delegation.delegationResponse?.balance) {
         throw new Error("No delegation");
@@ -96,7 +95,7 @@ export const useStaking = (): IStakingAPI => {
 
       return cosmos.signTx([request], memo);
     },
-    [chainInfo, cosmos, wallet]
+    [chainInfo, query, cosmos, wallet]
   );
 
   return useMemo(

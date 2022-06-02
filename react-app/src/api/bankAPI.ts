@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "react";
 import { newSendMessage } from "../models/cosmos/bank";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
-import Config from "../config/Config";
 import { convertTokenToMinimalToken } from "../utils/coin";
+import Config from "../config/Config";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IBankAPI {
