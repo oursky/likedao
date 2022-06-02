@@ -67,7 +67,14 @@ function getButtonSizeStyle(size: AppButtonSize): string {
 }
 
 const AppButton: React.FC<AppButtonProps> = (props) => {
-  const { type, size, messageID, onClick: onClick_, ...rest } = props;
+  const {
+    type,
+    size,
+    messageID,
+    onClick: onClick_,
+    className,
+    ...rest
+  } = props;
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -81,7 +88,11 @@ const AppButton: React.FC<AppButtonProps> = (props) => {
   return (
     <button
       type="button"
-      className={cn(getButtonTypeClassNames(type), getButtonSizeStyle(size))}
+      className={cn(
+        getButtonTypeClassNames(type),
+        getButtonSizeStyle(size),
+        className
+      )}
       onClick={onClick}
       {...rest}
     >

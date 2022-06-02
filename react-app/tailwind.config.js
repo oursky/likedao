@@ -18,6 +18,7 @@ module.exports = {
           darkgrey: "#666666",
           lightgrey: "#E8E8E8",
           "primary-bg": "#F8F7F4",
+          black: "#222222",
           gradient: {
             from: "#D7EFE7",
             to: "#EFE7B8",

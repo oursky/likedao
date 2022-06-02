@@ -60,7 +60,6 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   }, [closeMobileMenu, isMenuActive, openMobileMenu]);
 
   // TODO: Handle shortcuts
-  const onReceive = useCallback(() => {}, []);
   const onCollectReward = useCallback(() => {}, []);
   const onReinvest = useCallback(() => {}, []);
 
@@ -131,7 +130,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                 className={cn("order-3")}
                 userInfo={userInfo}
                 onClickSend={transaction.openSendTokenModal}
-                onClickReceive={onReceive}
+                onClickReceive={transaction.openReceiveTokenModal}
                 onClickReward={onCollectReward}
                 onClickReinvest={onReinvest}
               />
@@ -192,7 +191,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                 <UserInfoPanel
                   userInfo={userInfo}
                   onClickSend={transaction.openSendTokenModal}
-                  onClickReceive={onReceive}
+                  onClickReceive={transaction.openReceiveTokenModal}
                   onClickReward={onCollectReward}
                   onClickReinvest={onReinvest}
                 />
