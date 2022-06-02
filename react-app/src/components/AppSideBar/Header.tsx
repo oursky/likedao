@@ -31,6 +31,7 @@ const Header: React.FC<HeaderProps> = (props) => {
           "text-base",
           "leading-5",
           "font-normal",
+          "whitespace-nowrap",
           "text-likecoin-green"
         )}
       >

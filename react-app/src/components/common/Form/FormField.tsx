@@ -138,7 +138,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
           <AppButton
             messageID="form.fields.currency.max"
             size="regular"
-            type="secondary"
+            theme="secondary"
             onClick={setValueToMax}
           />
         )}

@@ -83,13 +83,11 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
         "bg-gradient-to-b",
         "from-white",
         "to-likecoin-primary-bg",
-        "p-3",
         "sm:p-8"
       )}
     >
       <div
         className={cn(
-          "h-full",
           "flex",
           "flex-col",
           "gap-x-4",
@@ -99,7 +97,17 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           "sm:flex-row"
         )}
       >
-        <div className={cn("flex-0", "flex", "flex-col", "sm:w-72")}>
+        <div
+          className={cn(
+            "flex-0",
+            "flex",
+            "flex-col",
+            "px-3",
+            "pt-3",
+            "sm:p-0",
+            "sm:w-72"
+          )}
+        >
           <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
             <Header chainHealth={chainHealth} />
             <IconButton
@@ -161,7 +169,16 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
             />
           </div>
         </div>
-        <div className={cn("flex-1", "flex", "relative", "max-w-screen-2xl")}>
+        <div
+          className={cn(
+            "flex-1",
+            "flex",
+            "relative",
+            "px-3",
+            "sm:max-w-screen-2xl",
+            "sm:px-0"
+          )}
+        >
           <div
             className={cn(
               isMenuActive ? "flex" : "hidden",
@@ -175,6 +192,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               "flex-col",
               "gap-y-6",
               "z-10",
+              "px-3",
               "sm:hidden"
             )}
           >
@@ -201,7 +219,8 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
               </div>
             )}
           </div>
-          <main className={cn("flex", "flex-1")}>{children}</main>
+
+          <main className={cn("flex", "flex-1", "min-w-0")}>{children}</main>
         </div>
       </div>
     </div>

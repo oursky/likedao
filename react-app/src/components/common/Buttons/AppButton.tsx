@@ -1,24 +1,39 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
+import { Link as RouterLink } from "react-router-dom";
 import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
-type AppButtonType = "primary" | "secondary";
+type AppButtonTheme = "primary" | "secondary";
 type AppButtonSize = "regular" | "small";
 
-interface AppButtonProps
-  extends Omit<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    "type" | "onClick"
-  > {
-  type: AppButtonType;
+interface AppButtonCommonProps {
+  theme: AppButtonTheme;
   size: AppButtonSize;
   messageID: MessageID;
+}
+
+interface LinkProps
+  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "type">,
+    Pick<AppButtonCommonProps, "messageID"> {
+  type?: "link";
+  to: string;
+}
+
+interface ButtonProps
+  extends Omit<
+      React.ButtonHTMLAttributes<HTMLButtonElement>,
+      "type" | "onClick"
+    >,
+    Pick<AppButtonCommonProps, "messageID"> {
+  type?: "button";
   onClick?: () => void;
 }
 
-function getButtonTypeClassNames(type: AppButtonType): string {
-  switch (type) {
+type AppButtonProps = (LinkProps | ButtonProps) & AppButtonCommonProps;
+
+function getButtonThemeClassNames(theme: AppButtonTheme): string {
+  switch (theme) {
     case "primary":
       return cn(
         "bg-likecoin-green",
@@ -66,15 +81,8 @@ function getButtonSizeStyle(size: AppButtonSize): string {
   }
 }
 
-const AppButton: React.FC<AppButtonProps> = (props) => {
-  const {
-    type,
-    size,
-    messageID,
-    onClick: onClick_,
-    className,
-    ...rest
-  } = props;
+const Button: React.FC<Omit<ButtonProps, "type">> = (props) => {
+  const { messageID, onClick: onClick_, ...rest } = props;
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -86,19 +94,41 @@ const AppButton: React.FC<AppButtonProps> = (props) => {
   );
 
   return (
-    <button
-      type="button"
-      className={cn(
-        getButtonTypeClassNames(type),
-        getButtonSizeStyle(size),
-        className
-      )}
-      onClick={onClick}
-      {...rest}
-    >
+    <button type="button" onClick={onClick} {...rest}>
       <LocalizedText messageID={messageID} />
     </button>
   );
+};
+
+const Link: React.FC<Omit<LinkProps, "type">> = (props) => {
+  const { messageID, ...rest } = props;
+
+  return (
+    <RouterLink {...rest}>
+      <LocalizedText messageID={messageID} />
+    </RouterLink>
+  );
+};
+
+const AppButton: React.FC<AppButtonProps> = (props) => {
+  const { type = "button", theme, size, className, ...rest } = props;
+
+  const computedClassName = useMemo(
+    () =>
+      cn(getButtonThemeClassNames(theme), getButtonSizeStyle(size), className),
+    [className, theme, size]
+  );
+
+  switch (type) {
+    case "button":
+      return (
+        <Button {...(rest as ButtonProps)} className={computedClassName} />
+      );
+    case "link":
+      return <Link {...(rest as LinkProps)} className={computedClassName} />;
+    default:
+      throw new Error("Unknown button type");
+  }
 };
 
 export default AppButton;
