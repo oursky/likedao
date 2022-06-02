@@ -6,10 +6,16 @@ import {
   makeSubmitProposalMessage,
   ProposalContentBody,
 } from "../models/cosmos/gov";
-import { convertTokenToMinimalToken } from "../utils/coin";
+import { useQueryClient } from "../providers/QueryClientProvider";
+import { BigNumberCoin } from "../models/coin";
+import {
+  convertTokenToMinimalToken,
+  convertMinimalTokenToToken,
+} from "../utils/coin";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IGovAPI {
+  getMinDepositParams(): Promise<BigNumberCoin>;
   signSubmitProposalTx(
     proposal: ProposalContentBody,
     initialDeposit: BigNumber,
@@ -20,6 +26,7 @@ interface IGovAPI {
 export const useGov = (): IGovAPI => {
   const wallet = useWallet();
   const cosmos = useCosmos();
+  const { query } = useQueryClient();
   const coinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 
   const signSubmitProposalTx = useCallback(
@@ -61,10 +68,26 @@ export const useGov = (): IGovAPI => {
     [coinMinimalDenom, cosmos, wallet]
   );
 
+  const getMinDepositParams = useCallback(async () => {
+    const params = await query.gov.params("deposit");
+
+    const coin = params.depositParams?.minDeposit.find(
+      (c) => c.denom === coinMinimalDenom
+    );
+
+    const coinAmount = new BigNumber(coin?.amount ?? 0);
+
+    return {
+      denom: coinMinimalDenom,
+      amount: convertMinimalTokenToToken(coinAmount),
+    };
+  }, [coinMinimalDenom, query]);
+
   return useMemo(
     () => ({
+      getMinDepositParams,
       signSubmitProposalTx,
     }),
-    [signSubmitProposalTx]
+    [getMinDepositParams, signSubmitProposalTx]
   );
 };

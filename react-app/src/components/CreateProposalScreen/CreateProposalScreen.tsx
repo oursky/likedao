@@ -29,6 +29,9 @@ const CreateProposalScreen: React.FC = () => {
   const [createProposalFormValues, setCreateProposalFormValues] =
     useState<CreateProposalFormValues | null>(null);
   const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
+  const [minimumDeposit, setMinimumDeposit] = useState<BigNumber>(
+    new BigNumber(0)
+  );
 
   const onCloseModal = useCallback(() => {
     setIsSubmissionModalActive(false);
@@ -86,15 +89,16 @@ const CreateProposalScreen: React.FC = () => {
   );
 
   useEffect(() => {
-    cosmosAPI
-      .getBalance()
-      .then((balance) => {
+    // TODO: Handle query from bdjuno after implementing gov param display
+    Promise.all([cosmosAPI.getBalance(), govAPI.getMinDepositParams()])
+      .then(([balance, minDeposit]) => {
         setUserBalance(balance.amount);
+        setMinimumDeposit(minDeposit.amount);
       })
       .catch((err) => {
         console.log("Failed to get balance", err);
       });
-  }, [cosmosAPI]);
+  }, [chainInfo, cosmosAPI, govAPI, wallet]);
 
   return (
     <div
@@ -113,8 +117,7 @@ const CreateProposalScreen: React.FC = () => {
       {isSubmissionModalActive && !!createProposalFormValues && (
         <SubmitProposalModal
           availableTokens={userBalance}
-          // TODO: Handle required deposit
-          requiredDeposit={new BigNumber(0)}
+          requiredDeposit={minimumDeposit}
           defaultValues={createProposalFormValues}
           onSubmit={onSubmitSubmitProposal}
           onClose={onCloseModal}
