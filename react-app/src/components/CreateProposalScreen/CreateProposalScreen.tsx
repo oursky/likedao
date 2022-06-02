@@ -1,13 +1,96 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
+import BigNumber from "bignumber.js";
+import { TextProposal } from "cosmjs-types/cosmos/gov/v1beta1/gov";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import CreateProposalForm from "../forms/CreateProposalForm/CreateProposalForm";
 import { CreateProposalFormValues } from "../forms/CreateProposalForm/CreateProposalFormModel";
+import SubmitProposalModal from "../TransactionModals/SubmitProposalModal";
+import { SubmitProposalFormValues } from "../forms/SubmitProposalForm/SubmitProposalFormModel";
+import { useCosmos } from "../../api/cosmosAPI";
+import { useGov } from "../../api/govAPI";
+import Config from "../../config/Config";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { ProposalType } from "../../models/cosmos/gov";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import AppRoutes from "../../navigation/AppRoutes";
 
 const CreateProposalScreen: React.FC = () => {
-  // TODO: Handle submission
-  const onSubmit = useCallback((values: CreateProposalFormValues) => {
-    console.log(values);
+  const wallet = useWallet();
+  const cosmosAPI = useCosmos();
+  const govAPI = useGov();
+  const { translate } = useLocale();
+  const navigate = useNavigate();
+  const chainInfo = Config.chainInfo;
+
+  const [isSubmissionModalActive, setIsSubmissionModalActive] =
+    useState<boolean>(false);
+  const [createProposalFormValues, setCreateProposalFormValues] =
+    useState<CreateProposalFormValues | null>(null);
+  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
+
+  const onCloseModal = useCallback(() => {
+    setIsSubmissionModalActive(false);
   }, []);
+
+  const onSubmitCreateProposal = useCallback(
+    (values: CreateProposalFormValues) => {
+      setCreateProposalFormValues(values);
+      setIsSubmissionModalActive(true);
+    },
+    []
+  );
+
+  const onSubmitSubmitProposal = useCallback(
+    async (values: SubmitProposalFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await govAPI.signSubmitProposalTx(
+          {
+            // TODO: Handle other proposal types
+            type: values.type as ProposalType.Signaling,
+            proposal: {
+              title: values.title,
+              description: values.description,
+            } as TextProposal,
+          },
+          new BigNumber(values.amount),
+          values.memo ?? undefined
+        );
+
+        setIsSubmissionModalActive(false);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccounts();
+
+        navigate(AppRoutes.Proposals);
+
+        return;
+      } catch (e: unknown) {
+        console.error("Error signing send token tx", e);
+        toast.error(translate("transaction.failure"));
+        setIsSubmissionModalActive(false);
+      }
+    },
+    [cosmosAPI, govAPI, wallet, translate, navigate]
+  );
+
+  useEffect(() => {
+    cosmosAPI
+      .getBalance()
+      .then((balance) => {
+        setUserBalance(balance.amount);
+      })
+      .catch((err) => {
+        console.log("Failed to get balance", err);
+      });
+  }, [cosmosAPI]);
 
   return (
     <div
@@ -22,7 +105,17 @@ const CreateProposalScreen: React.FC = () => {
         "py-6"
       )}
     >
-      <CreateProposalForm onSubmit={onSubmit} />
+      <CreateProposalForm onSubmit={onSubmitCreateProposal} />
+      {isSubmissionModalActive && !!createProposalFormValues && (
+        <SubmitProposalModal
+          availableTokens={userBalance}
+          // TODO: Handle required deposit
+          requiredDeposit={new BigNumber(0)}
+          defaultValues={createProposalFormValues}
+          onSubmit={onSubmitSubmitProposal}
+          onClose={onCloseModal}
+        />
+      )}
     </div>
   );
 };
