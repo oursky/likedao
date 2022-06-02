@@ -7,6 +7,7 @@ export interface ChainLink {
 
 export interface ChainInfo {
   bech32Prefix: string;
+  gasPrice: string;
   chainId: string;
   chainRpc: string;
   currency: {
@@ -31,6 +32,7 @@ export interface IConfig {
 const defaultConfig: IConfig = {
   sentry: null,
   chainInfo: {
+    gasPrice: "200000nanolike",
     bech32Prefix: "like",
     chainId: "",
     chainRpc: "",
