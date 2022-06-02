@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import cn from "classnames";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
@@ -20,12 +20,7 @@ interface SendTokenFormProps {
 
 const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
   const chainInfo = Config.chainInfo;
-  const {
-    className,
-    availableTokens: availableMinimalTokens,
-    onCancel,
-    onSubmit,
-  } = props;
+  const { className, availableTokens, onCancel, onSubmit } = props;
 
   const {
     register,
@@ -47,12 +42,6 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     [setValue, clearErrors]
   );
 
-  const availableTokens = useMemo(() => {
-    const decimals = chainInfo.currency.coinDecimals;
-
-    return availableMinimalTokens.shiftedBy(-decimals);
-  }, [availableMinimalTokens, chainInfo.currency.coinDecimals]);
-
   const { registerOptions } = useSendTokenFormModel(availableTokens);
 
   return (
@@ -70,7 +59,6 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
         label="SendTokenModal.fields.amount"
         currencyUnit={chainInfo.currency.coinDenom}
         inputProps={{
-          max: availableTokens.toNumber(),
           placeholder: "0",
         }}
         setValue={setAmount}
@@ -89,7 +77,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
         <LocalizedText
           messageID="SendTokenModal.fields.amount.available"
           messageArgs={{
-            amount: availableTokens.toNumber(),
+            amount: availableTokens.toFixed(),
             denom: chainInfo.currency.coinDenom,
           }}
         />

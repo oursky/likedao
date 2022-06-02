@@ -1,19 +1,19 @@
 import { useCallback, useMemo } from "react";
-import { calculateFee, Coin, DeliverTxResponse } from "@cosmjs/stargate";
-import BigNumber from "bignumber.js";
+import { calculateFee, DeliverTxResponse } from "@cosmjs/stargate";
 import { EncodeObject } from "@cosmjs/proto-signing";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import Config from "../config/Config";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
+import { convertMinimalTokenToToken } from "../utils/coin";
+import { BigNumberCoin } from "../models/coin";
 
-export type ParsedCoin = Pick<Coin, "denom"> & { amount: BigNumber };
 export type SignedTx = Uint8Array;
 
 // This is the value used by cosmJS
 const GAS_ADJUSTMENT = 1.3;
 
 interface ICosmosAPI {
-  getBalance(): Promise<ParsedCoin>;
+  getBalance(): Promise<BigNumberCoin>;
   signTx(messages: EncodeObject[], memo?: string): Promise<SignedTx>;
   broadcastTx(tx: SignedTx): Promise<DeliverTxResponse>;
 }
@@ -32,7 +32,7 @@ export const useCosmos = (): ICosmosAPI => {
       chainInfo.currency.coinMinimalDenom
     );
 
-    const amount = new BigNumber(balance.amount);
+    const amount = convertMinimalTokenToToken(balance.amount);
 
     return {
       denom: balance.denom,

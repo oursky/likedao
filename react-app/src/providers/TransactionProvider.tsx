@@ -5,7 +5,6 @@ import { useBank } from "../api/bankAPI";
 import { useCosmos } from "../api/cosmosAPI";
 import { SendTokenFormValues } from "../components/forms/SendTokenForm/SendTokenFormModel";
 import SendTokenModal from "../components/TransactionModals/SendTokenModal";
-import Config from "../config/Config";
 import { useLocale } from "./AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "./WalletProvider";
 
@@ -30,7 +29,6 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const wallet = useWallet();
   const cosmosAPI = useCosmos();
   const bankAPI = useBank();
-  const chainInfo = Config.chainInfo;
   const { translate } = useLocale();
 
   const [activeModal, setActiveModal] = useState<TransactionModal | null>(null);
@@ -47,12 +45,13 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const submitSendRequest = useCallback(
     (values: SendTokenFormValues) => {
       if (wallet.status !== ConnectionStatus.Connected) return;
-      const amount = new BigNumber(values.amount).shiftedBy(
-        chainInfo.currency.coinDecimals
-      );
 
       bankAPI
-        .signSendTokenTx(values.recipent, amount, values.memo ?? undefined)
+        .signSendTokenTx(
+          values.recipent,
+          values.amount,
+          values.memo ?? undefined
+        )
         .then(async (tx) => {
           setActiveModal(null);
           // TODO: Review this loading state
@@ -70,7 +69,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
           closeModals();
         });
     },
-    [cosmosAPI, bankAPI, chainInfo, wallet, closeModals, translate]
+    [cosmosAPI, bankAPI, wallet, closeModals, translate]
   );
 
   useEffect(() => {

@@ -6,17 +6,18 @@ import {
   newDelegateMessage,
   newUndelegateMessage,
 } from "../models/cosmos/staking";
+import { convertTokenToMinimalToken } from "../utils/coin";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IStakingAPI {
   signDelegateTokenTx(
     validator: string,
-    amount: BigNumber,
+    amount: string,
     memo?: string
   ): Promise<SignedTx>;
   signUndelegateTokenTx(
     validator: string,
-    amount: BigNumber,
+    amount: string,
     memo?: string
   ): Promise<SignedTx>;
 }
@@ -27,16 +28,19 @@ export const useStaking = (): IStakingAPI => {
   const chainInfo = Config.chainInfo;
 
   const signDelegateTokenTx = useCallback(
-    async (validator: string, amount: BigNumber, memo?: string) => {
+    async (validator: string, amount: string, memo?: string) => {
       if (wallet.status !== ConnectionStatus.Connected) {
         throw new Error("Wallet not connected");
       }
 
+      const coinAmount = convertTokenToMinimalToken(amount);
+
       const { address } = wallet.account;
 
       const balance = await cosmos.getBalance();
+      const coinBalance = convertTokenToMinimalToken(balance.amount);
 
-      if (balance.amount.isLessThan(amount)) {
+      if (coinBalance.isLessThan(coinAmount)) {
         throw new Error("Insufficient funds");
       }
 
@@ -45,7 +49,7 @@ export const useStaking = (): IStakingAPI => {
         validatorAddress: validator,
         amount: {
           denom: chainInfo.currency.coinMinimalDenom,
-          amount: amount.toString(),
+          amount: coinAmount.toFixed(),
         },
       });
 
@@ -55,10 +59,12 @@ export const useStaking = (): IStakingAPI => {
   );
 
   const signUndelegateTokenTx = useCallback(
-    async (validator: string, amount: BigNumber, memo?: string) => {
+    async (validator: string, amount: string, memo?: string) => {
       if (wallet.status !== ConnectionStatus.Connected) {
         throw new Error("Wallet not connected");
       }
+
+      const withdrawalAmount = convertTokenToMinimalToken(amount);
 
       const { address } = wallet.account;
 
@@ -75,7 +81,7 @@ export const useStaking = (): IStakingAPI => {
         delegation.delegationResponse.balance.amount
       );
 
-      if (delegationAmount.isLessThan(amount)) {
+      if (delegationAmount.isLessThan(withdrawalAmount)) {
         throw new Error("Withdraw amount is more than delegated amount");
       }
 
@@ -84,7 +90,7 @@ export const useStaking = (): IStakingAPI => {
         validatorAddress: validator,
         amount: {
           denom: chainInfo.currency.coinMinimalDenom,
-          amount: amount.toString(),
+          amount: withdrawalAmount.toFixed(),
         },
       });
 
