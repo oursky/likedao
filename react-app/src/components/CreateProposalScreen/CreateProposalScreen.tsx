@@ -36,10 +36,14 @@ const CreateProposalScreen: React.FC = () => {
 
   const onSubmitCreateProposal = useCallback(
     (values: CreateProposalFormValues) => {
-      setCreateProposalFormValues(values);
-      setIsSubmissionModalActive(true);
+      if (wallet.status === ConnectionStatus.Connected) {
+        setCreateProposalFormValues(values);
+        setIsSubmissionModalActive(true);
+      } else {
+        wallet.openConnectWalletModal?.();
+      }
     },
-    []
+    [wallet]
   );
 
   const onSubmitSubmitProposal = useCallback(
