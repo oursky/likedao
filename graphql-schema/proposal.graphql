@@ -21,7 +21,6 @@ enum ProposalFilter {
   Deposit
   Passed
   Rejected
-  Following
 }
 
 type Proposal {
@@ -45,4 +44,19 @@ type ProposalEdge {
 type ProposalConnection {
   pageInfo: PageInfo!
   edges: [ProposalEdge!]!
+  totalCount: Int!
+}
+
+input QueryProposalsInput {
+  # Limit
+  first: Int!
+  # Offset
+  after: Int!
+  filter: ProposalFilter
+  followingAddress: String
+  searchTerm: String
+}
+
+extend type Query {
+  proposals(input: QueryProposalsInput!): ProposalConnection!
 }

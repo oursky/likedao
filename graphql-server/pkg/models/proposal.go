@@ -49,13 +49,6 @@ func (e ProposalFilter) ToProposalStatus() ProposalStatus {
 	}
 }
 
-type QueryProposalsInput struct {
-	Before           string
-	SearchTerm       string
-	Filter           ProposalFilter
-	FollowingAddress string
-}
-
 type Proposal struct {
 	bun.BaseModel `bun:"table:proposal"`
 
