@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 )
 
 func GetNodeID(obj interface{}) NodeID {
@@ -11,6 +12,8 @@ func GetNodeID(obj interface{}) NodeID {
 		return NodeID{EntityType: "test", ID: v.ID}
 	case Block:
 		return NodeID{EntityType: "block", ID: v.Hash}
+	case Proposal:
+		return NodeID{EntityType: "proposal", ID: strconv.Itoa(v.ID)}
 	default:
 		panic(fmt.Sprintf(
 			`unknown entity type "%s"`,

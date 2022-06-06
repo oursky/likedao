@@ -10,6 +10,7 @@ var (
 	ErrInvalidNodeID     = errors.New("Invalid node ID")
 	ErrValidationFailure = errors.New("Failed to validate values")
 	ErrNotFound          = errors.New("Not found")
+	ErrInvalidCursor     = errors.New("Invalid cursor")
 )
 
 type ServerError struct {

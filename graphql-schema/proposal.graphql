@@ -1,0 +1,47 @@
+enum ProposalType {
+  Text
+  ParameterChange
+  CommunityPoolSpend
+  SoftwareUpgrade
+  CancelSoftwareUpgrade
+}
+
+enum ProposalStatus {
+  Unspecified
+  DepositPeriod
+  VotingPeriod
+  Passed
+  Rejected
+  Failed
+}
+
+enum ProposalFilter {
+  Voting
+  Deposit
+  Passed
+  Rejected
+  Following
+}
+
+type Proposal {
+  id: ID!
+  title: String!
+  description: String!
+  type: ProposalType!
+  submitTime: DateTime!
+  depositEndTime: DateTime!
+  votingStartTime: DateTime!
+  votingEndTime: DateTime!
+  proposerAddress: String!
+  status: ProposalStatus!
+}
+
+type ProposalEdge {
+  cursor: String!
+  node: Proposal!
+}
+
+type ProposalConnection {
+  pageInfo: PageInfo!
+  edges: [ProposalEdge!]!
+}
