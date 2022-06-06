@@ -77,8 +77,8 @@ models:
     fields:
       id:
         fieldName: NodeID
-  ProposalFilter:
-    model: github.com/oursky/likedao/pkg/models.ProposalFilter
+  ProposalStatus:
+    model: github.com/oursky/likedao/pkg/models.ProposalStatus
   ProposalEdge:
     model: github.com/oursky/likedao/pkg/models.ProposalEdge
   ProposalConnection: 

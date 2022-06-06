@@ -13,6 +13,7 @@ enum ProposalStatus {
   Passed
   Rejected
   Failed
+  Invalid
 }
 
 enum ProposalFilter {
@@ -29,9 +30,9 @@ type Proposal {
   description: String!
   type: ProposalType!
   submitTime: DateTime!
-  depositEndTime: DateTime!
-  votingStartTime: DateTime!
-  votingEndTime: DateTime!
+  depositEndTime: DateTime
+  votingStartTime: DateTime
+  votingEndTime: DateTime
   proposerAddress: String!
   status: ProposalStatus!
 }

@@ -7,34 +7,45 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type ProposalFilter string
+type ProposalStatus string
 
 const (
-	Voting    ProposalFilter = "voting"
-	Deposit                  = "deposit"
-	Passed                   = "passed"
-	Rejected                 = "rejected"
-	Following                = "following"
+	ProposalStatusUnspecified   ProposalStatus = "PROPOSAL_STATUS_UNSPECIFIED"
+	ProposalStatusDepositPeriod ProposalStatus = "PROPOSAL_STATUS_DEPOSIT_PERIOD"
+	ProposalStatusVotingPeriod  ProposalStatus = "PROPOSAL_STATUS_VOTING_PERIOD"
+	ProposalStatusPassed        ProposalStatus = "PROPOSAL_STATUS_PASSED"
+	ProposalStatusRejected      ProposalStatus = "PROPOSAL_STATUS_REJECTED"
+	ProposalStatusFailed        ProposalStatus = "PROPOSAL_STATUS_FAILED"
+	ProposalStatusInvalid       ProposalStatus = "PROPOSAL_STATUS_INVALID"
 )
 
-func (f ProposalFilter) String() string {
-	return string(f)
+func (e ProposalStatus) IsValid() bool {
+	switch e {
+	case ProposalStatusDepositPeriod, ProposalStatusVotingPeriod, ProposalStatusPassed, ProposalStatusRejected, ProposalStatusFailed, ProposalStatusInvalid:
+		return true
+	}
+	return false
+}
+func (e *ProposalStatus) UnmarshalGQL(v string) error {
+	*e = ProposalStatus(v)
+	if !e.IsValid() {
+		return servererrors.Wrapf(servererrors.ErrValidationFailure, "invalid proposal status: %s", v)
+	}
+	return nil
 }
 
-func ParseProposalFilter(s string) (ProposalFilter, error) {
-	switch s {
-	case "voting":
-		return Voting, nil
-	case "deposit":
-		return Deposit, nil
-	case "passed":
-		return Passed, nil
-	case "rejected":
-		return Rejected, nil
-	case "following":
-		return Following, nil
+func (e ProposalFilter) ToProposalStatus() ProposalStatus {
+	switch e {
+	case ProposalFilterVoting:
+		return ProposalStatusVotingPeriod
+	case ProposalFilterDeposit:
+		return ProposalStatusDepositPeriod
+	case ProposalFilterPassed:
+		return ProposalStatusPassed
+	case ProposalFilterRejected:
+		return ProposalStatusRejected
 	default:
-		return "", servererrors.Wrapf(servererrors.ErrValidationFailure, "invalid proposal filter: %s", s)
+		return ProposalStatusUnspecified
 	}
 }
 
@@ -48,18 +59,18 @@ type QueryProposalsInput struct {
 type Proposal struct {
 	bun.BaseModel `bun:"table:proposal"`
 
-	ID              int               `bun:"column:id,pk"`
-	Title           string            `bun:"column:title,notnull"`
-	Description     string            `bun:"column:description,notnull"`
-	Content         map[string]string `bun:"type:jsonb column:content,notnull"`
-	ProposalRoute   string            `bun:"column:proposal_route,notnull"`
-	ProposalType    string            `bun:"column:proposal_type,notnull"`
-	SubmitTime      time.Time         `bun:"column:submit_time,notnull"`
-	DepositEndTime  time.Time         `bun:"column:deposit_end_time,notnull"`
-	VotingStartTime time.Time         `bun:"column:voting_start_time,notnull"`
-	VotingEndTime   time.Time         `bun:"column:voting_end_time,notnull"`
-	ProposerAddress string            `bun:"column:proposer_address,notnull"`
-	Status          string            `bun:"column:status,notnull"`
+	// Skipping content field because already parsed by bdjuno
+	ID              int            `bun:"column:id,pk"`
+	Title           string         `bun:"column:title,notnull"`
+	Description     string         `bun:"column:description,notnull"`
+	ProposalRoute   string         `bun:"column:proposal_route,notnull"`
+	ProposalType    string         `bun:"column:proposal_type,notnull"`
+	SubmitTime      time.Time      `bun:"column:submit_time,notnull"`
+	DepositEndTime  time.Time      `bun:"column:deposit_end_time"`
+	VotingStartTime time.Time      `bun:"column:voting_start_time"`
+	VotingEndTime   time.Time      `bun:"column:voting_end_time"`
+	ProposerAddress string         `bun:"column:proposer_address,notnull"`
+	Status          ProposalStatus `bun:"column:status,notnull"`
 }
 
 func (p Proposal) IsNode() {}
