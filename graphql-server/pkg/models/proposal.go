@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	bdjuno "github.com/forbole/bdjuno/database/types"
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/uptrace/bun"
 )
@@ -73,3 +74,21 @@ func (p Proposal) NodeID() NodeID {
 
 type ProposalConnection = Connection[Proposal]
 type ProposalEdge = Edge[Proposal]
+
+type ProposalDeposit struct {
+	bun.BaseModel `bun:"table:proposal_deposit"`
+
+	ProposalID       int               `bun:"column:proposal_id,pk"`
+	DepositorAddress string            `bun:"column:depositor_address,notnull"`
+	Amount           bdjuno.DbDecCoins `bun:"column:amount,notnull"`
+	Height           int64             `bun:"column:height,notnull"`
+}
+
+type ProposalVote struct {
+	bun.BaseModel `bun:"table:proposal_vote"`
+
+	ProposalID   int    `bun:"column:proposal_id,pk"`
+	VoterAddress string `bun:"column:voter_address,notnull"`
+	Option       string `bun:"column:option,notnull"`
+	Height       int64  `bun:"column:height,notnull"`
+}

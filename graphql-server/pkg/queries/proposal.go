@@ -11,6 +11,7 @@ import (
 
 type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
+	ScopeRelatedAddress(address string) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 }
 
@@ -20,6 +21,7 @@ type ProposalQuery struct {
 	session *bun.DB
 
 	scopedProposalStatus models.ProposalStatus
+	scopedRelatedAddress string
 }
 
 func NewProposalQuery(ctx context.Context, config config.Config, session *bun.DB) IProposalQuery {
@@ -33,12 +35,30 @@ func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 		query = query.Where("status = ?", q.scopedProposalStatus)
 	}
 
+	if q.scopedRelatedAddress != "" {
+
+		relatedDeposits := q.session.NewSelect().Model((*models.ProposalDeposit)(nil)).Column("proposal_id").Where("depositor_address = ?", q.scopedRelatedAddress)
+		relatedVotes := q.session.NewSelect().Model((*models.ProposalVote)(nil)).Column("proposal_id").Where("voter_address = ?", q.scopedRelatedAddress)
+
+		relatedProposals := relatedDeposits.Union(relatedVotes)
+
+		query = query.
+			WhereOr("id IN (?)", relatedProposals).
+			WhereOr("proposal.proposer_address = ?", q.scopedRelatedAddress)
+	}
+
 	return query
 }
 
 func (q *ProposalQuery) ScopeProposalStatus(status models.ProposalStatus) IProposalQuery {
 	var newQuery = *q
 	newQuery.scopedProposalStatus = status
+	return &newQuery
+}
+
+func (q *ProposalQuery) ScopeRelatedAddress(address string) IProposalQuery {
+	var newQuery = *q
+	newQuery.scopedRelatedAddress = address
 	return &newQuery
 }
 
