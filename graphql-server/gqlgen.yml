@@ -79,8 +79,10 @@ models:
         fieldName: NodeID
   ProposalFilter:
     model: github.com/oursky/likedao/pkg/models.ProposalFilter
-  QueryProposalsInput:
-    model: github.com/oursky/likedao/pkg/models.QueryProposalsInput
+  ProposalEdge:
+    model: github.com/oursky/likedao/pkg/models.ProposalEdge
+  ProposalConnection: 
+    model: github.com/oursky/likedao/pkg/models.ProposalConnection
 
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime
