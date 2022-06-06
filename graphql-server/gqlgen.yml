@@ -72,8 +72,21 @@ models:
       id:
         fieldName: NodeID
 
+  Proposal:
+    model: github.com/oursky/likedao/pkg/models.Proposal
+    fields:
+      id:
+        fieldName: NodeID
+  ProposalFilter:
+    model: github.com/oursky/likedao/pkg/models.ProposalFilter
+  QueryProposalsInput:
+    model: github.com/oursky/likedao/pkg/models.QueryProposalsInput
+
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime
+
+  PageInfo:
+    model: github.com/oursky/likedao/pkg/models.PageInfo
     
   Coin:
     model: github.com/forbole/bdjuno/database/types.DbDecCoin
