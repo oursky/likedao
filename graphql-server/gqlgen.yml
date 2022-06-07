@@ -86,6 +86,8 @@ models:
     model: github.com/oursky/likedao/pkg/models.ProposalEdge
   ProposalConnection: 
     model: github.com/oursky/likedao/pkg/models.ProposalConnection
+  ProposalTallyResult: 
+    model: github.com/oursky/likedao/pkg/models.ProposalTallyResult
 
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime

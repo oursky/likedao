@@ -5,6 +5,7 @@ import (
 
 	bdjuno "github.com/forbole/bdjuno/database/types"
 	servererrors "github.com/oursky/likedao/pkg/errors"
+	"github.com/uptrace/bun/extra/bunbig"
 	"github.com/uptrace/bun"
 )
 
@@ -91,4 +92,15 @@ type ProposalVote struct {
 	VoterAddress string `bun:"column:voter_address,notnull"`
 	Option       string `bun:"column:option,notnull"`
 	Height       int64  `bun:"column:height,notnull"`
+}
+
+type ProposalTallyResult struct {
+	bun.BaseModel `bun:"table:proposal_tally_result"`
+
+	ProposalID int `bun:"column:proposal_id,pk"`
+	Yes        *bunbig.Int `bun:"column:yes,notnull"`
+	No         *bunbig.Int `bun:"column:no,notnull"`
+	Abstain    *bunbig.Int `bun:"column:abstain,notnull"`
+	NoWithVeto *bunbig.Int `bun:"column:no_with_veto,notnull"`
+	Height    int64 `bun:"column:height,notnull"`
 }
