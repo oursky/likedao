@@ -27,7 +27,7 @@ const IconButton: React.FC<IconButtonProps> = (props) => {
   return (
     <button
       type="button"
-      className={cn("p-2", className)}
+      className={cn("p-2", "hover:bg-gray-100", "rounded-full", className)}
       onClick={onClick}
       {...rest}
     >

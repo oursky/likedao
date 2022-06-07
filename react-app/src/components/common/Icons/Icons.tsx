@@ -15,6 +15,8 @@ import { ReactComponent as ReinvestIcon } from "../../../assets/ic-reinvest.svg"
 import { ReactComponent as ExitIcon } from "../../../assets/ic-exit.svg";
 import { ReactComponent as LightningIcon } from "../../../assets/ic-lightning.svg";
 import { ReactComponent as EllipseIcon } from "../../../assets/ic-ellipse.svg";
+import { ReactComponent as LinkIcon } from "../../../assets/ic-link.svg";
+import { ReactComponent as ShareIcon } from "../../../assets/ic-share.svg";
 
 enum IconType {
   Home = "Home",
@@ -33,6 +35,8 @@ enum IconType {
   Exit = "Exit",
   Lightning = "Lightning",
   Ellipse = "Ellipse",
+  Link = "Link",
+  Share = "Share",
 }
 
 const iconMap = {
@@ -52,6 +56,8 @@ const iconMap = {
   [IconType.Exit]: ExitIcon,
   [IconType.Lightning]: LightningIcon,
   [IconType.Ellipse]: EllipseIcon,
+  [IconType.Link]: LinkIcon,
+  [IconType.Share]: ShareIcon,
 };
 
 function getIcon(icon: IconType) {
