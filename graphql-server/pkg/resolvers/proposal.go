@@ -10,6 +10,7 @@ import (
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
+	gql_bigint "github.com/xplorfin/gql-bigint"
 )
 
 func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (models.ProposalType, error) {
@@ -20,6 +21,42 @@ func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (mode
 	}
 
 	return *proposalType, nil
+}
+
+func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal) (*models.ProposalTallyResult, error) {
+	tally, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTallyResult(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+	return tally, nil
+}
+
+func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+	if obj.Yes == nil {
+		return 0, nil
+	}
+	return gql_bigint.BigInt(obj.Yes.ToInt64()), nil
+}
+
+func (r *proposalTallyResultResolver) No(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+	if obj.No == nil {
+		return 0, nil
+	}
+	return gql_bigint.BigInt(obj.No.ToInt64()), nil
+}
+
+func (r *proposalTallyResultResolver) NoWithVeto(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+	if obj.NoWithVeto == nil {
+		return 0, nil
+	}
+	return gql_bigint.BigInt(obj.NoWithVeto.ToInt64()), nil
+}
+
+func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+	if obj.Abstain == nil {
+		return 0, nil
+	}
+	return gql_bigint.BigInt(obj.Abstain.ToInt64()), nil
 }
 
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
@@ -53,4 +90,10 @@ func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposa
 // Proposal returns graphql1.ProposalResolver implementation.
 func (r *Resolver) Proposal() graphql1.ProposalResolver { return &proposalResolver{r} }
 
+// ProposalTallyResult returns graphql1.ProposalTallyResultResolver implementation.
+func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
+	return &proposalTallyResultResolver{r}
+}
+
 type proposalResolver struct{ *Resolver }
+type proposalTallyResultResolver struct{ *Resolver }
