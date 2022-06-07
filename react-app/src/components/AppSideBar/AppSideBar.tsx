@@ -220,7 +220,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
             )}
           </div>
 
-          <main className={cn("flex", "flex-1", "min-w-0")}>{children}</main>
+          <main className={cn("block", "w-full")}>{children}</main>
         </div>
       </div>
     </div>

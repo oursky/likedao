@@ -26,7 +26,7 @@ const AppNavigationMenu: React.FC<AppNavigationMenuProps> = (props) => {
       <NavigationMenuItem
         labelId="AppSideBar.navigation.proposals"
         icon={IconType.Vote}
-        isActive={activeRoute === AppRoutes.Proposals}
+        isActive={activeRoute.startsWith(AppRoutes.Proposals)}
         navigateTo={AppRoutes.Proposals}
         onNavigationItemSelect={onMenuItemSelect}
       />
