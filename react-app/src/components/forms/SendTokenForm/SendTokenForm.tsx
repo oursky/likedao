@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 import AppButton from "../../common/Buttons/AppButton";
 import Config from "../../../config/Config";
 import LocalizedText from "../../common/Localized/LocalizedText";
-import { FormField } from "../../common/Form/FormField";
+import * as FormField from "../../common/Form";
 import {
   SendTokenFormValues,
   useSendTokenFormModel,

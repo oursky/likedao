@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { bech32 } from "bech32";
 import { Validate, ValidationRule } from "react-hook-form";
 import { useLocale } from "../providers/AppLocaleProvider";
@@ -28,7 +28,7 @@ export const useFormValidators = (): IValidators => {
   const maxLengthValidator = useCallback(
     (maxLength: number): ValidationRule<number> => ({
       value: maxLength,
-      message: translate("form.validation.amount.lessThan", {
+      message: translate("form.validation.maxLength", {
         value: maxLength,
       }),
     }),

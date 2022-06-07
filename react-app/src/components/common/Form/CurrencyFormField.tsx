@@ -1,76 +1,25 @@
 import React, { useCallback } from "react";
-import cn from "classnames";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { MessageID } from "../../../i18n/LocaleModel";
-import LocalizedText from "../Localized/LocalizedText";
-import "./FormField.module.css";
+import cn from "classnames";
 import AppButton from "../Buttons/AppButton";
+import {
+  BaseFormField,
+  BaseFormFieldProps,
+  FormFieldSize,
+} from "./BaseFormField";
 
-interface BaseFormFieldProps {
-  label: MessageID;
-  children?: React.ReactNode;
-  errorMessage?: string;
+import "./CurrencyFormField.module.css";
+
+function getInputClassNameBySize(size: FormFieldSize): string {
+  switch (size) {
+    case "regular":
+      return cn("py-3", "px-4");
+    case "small":
+      return cn("py-2", "px-3");
+    default:
+      throw new Error(`Unknown form field size`);
+  }
 }
-const BaseFormField: React.FC<BaseFormFieldProps> = (props) => {
-  const { label, children, errorMessage } = props;
-
-  return (
-    <div
-      className={cn(
-        "w-full",
-        "flex",
-        "flex-col",
-        "gap-y-1",
-        "text-base",
-        "leading-6",
-        "font-normal",
-        "items-start"
-      )}
-    >
-      <label
-        className={cn(
-          "text-sm",
-          "font-medium",
-          "leading-5",
-          "text-likecoin-black"
-        )}
-      >
-        <LocalizedText messageID={label} />
-      </label>
-      {children}
-      {!!errorMessage && (
-        <span className={cn("text-red-700")}>{errorMessage}</span>
-      )}
-    </div>
-  );
-};
-
-interface InputFormFieldProps extends BaseFormFieldProps {
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  registerReturn: UseFormRegisterReturn;
-}
-const InputFormField: React.FC<InputFormFieldProps> = (props) => {
-  const { registerReturn, inputProps, errorMessage, ...rest } = props;
-
-  return (
-    <BaseFormField {...rest} errorMessage={errorMessage}>
-      <input
-        className={cn(
-          "w-full",
-          "drop-shadow-sm",
-          "border",
-          "py-3",
-          "px-4",
-          "rounded-md",
-          "focus:outline-none",
-          !!errorMessage ? "border-red-700" : "border-gray-300"
-        )}
-        {...registerReturn}
-        {...inputProps}
-      />
-    </BaseFormField>
-  );
-};
 
 interface CurrencyFormFieldProps extends BaseFormFieldProps {
   inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
@@ -87,6 +36,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
     inputProps,
     inputClassName,
     setValue,
+    size = "regular",
     ...rest
   } = props;
 
@@ -97,7 +47,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
   }, [inputProps?.max, setValue]);
 
   return (
-    <BaseFormField {...rest} errorMessage={errorMessage}>
+    <BaseFormField {...rest} size={size} errorMessage={errorMessage}>
       <div className={cn("w-full", "flex", "flex-row", "gap-x-2")}>
         <div className={cn("flex-1", "relative")}>
           <input
@@ -112,7 +62,8 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
               "pr-14",
               "rounded-md",
               "focus:outline-none",
-              !!errorMessage ? "border-red-700" : "border-gray-300",
+              errorMessage != null ? "border-red-700" : "border-gray-300",
+              getInputClassNameBySize(size),
               inputClassName
             )}
             {...registerReturn}
@@ -134,7 +85,7 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
             </span>
           )}
         </div>
-        {!!inputProps?.max && (
+        {inputProps?.max != null && (
           <AppButton
             messageID="form.fields.currency.max"
             size="regular"
@@ -147,7 +98,4 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
   );
 };
 
-export const FormField = {
-  TextInput: InputFormField,
-  Currency: CurrencyFormField,
-};
+export { CurrencyFormField };
