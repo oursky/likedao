@@ -34,6 +34,7 @@ type Proposal {
   votingEndTime: DateTime
   proposerAddress: String!
   status: ProposalStatus!
+  tallyResult: ProposalTallyResult!
 }
 
 type ProposalEdge {
@@ -45,6 +46,13 @@ type ProposalConnection {
   pageInfo: PageInfo!
   edges: [ProposalEdge!]!
   totalCount: Int!
+}
+
+type ProposalTallyResult {
+  yes: BigInt!
+  no: BigInt!
+  noWithVeto: BigInt!
+  abstain: BigInt!
 }
 
 input QueryProposalsInput {
