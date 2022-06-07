@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
-type AppButtonTheme = "primary" | "secondary";
+type AppButtonTheme = "primary" | "secondary" | "rounded";
 type AppButtonSize = "regular" | "small";
 
 interface AppButtonCommonProps {
@@ -50,6 +50,13 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "hover:bg-likecoin-lightgreen",
         "hover:text-white",
         "acitve:bg-likecoin-darkgreen"
+      );
+    case "rounded":
+      return cn(
+        "rounded-full",
+        "bg-likecoin-secondarygreen",
+        "hover:bg-likecoin-lightgreen",
+        "hover:text-white"
       );
     default:
       throw new Error("Unknown button type");
