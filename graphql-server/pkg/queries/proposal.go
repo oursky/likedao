@@ -10,6 +10,7 @@ import (
 )
 
 type IProposalQuery interface {
+	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 }
 
@@ -17,23 +18,39 @@ type ProposalQuery struct {
 	ctx     context.Context
 	config  config.Config
 	session *bun.DB
+
+	scopedProposalStatus models.ProposalStatus
 }
 
 func NewProposalQuery(ctx context.Context, config config.Config, session *bun.DB) IProposalQuery {
 	return &ProposalQuery{ctx: ctx, config: config, session: session}
 }
 
-func (q *ProposalQuery) QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error) {
-
+func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 	query := q.session.NewSelect().Model((*models.Proposal)(nil))
 
-	totalCount, err := q.session.NewSelect().Model((*models.Proposal)(nil)).Count(q.ctx)
+	if q.scopedProposalStatus != "" {
+		query = query.Where("status = ?", q.scopedProposalStatus)
+	}
+
+	return query
+}
+
+func (q *ProposalQuery) ScopeProposalStatus(status models.ProposalStatus) IProposalQuery {
+	var newQuery = *q
+	newQuery.scopedProposalStatus = status
+	return &newQuery
+}
+
+func (q *ProposalQuery) QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error) {
+	query := q.NewQuery()
+
+	totalCount, err := q.NewQuery().Count(q.ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: Handle search
-	// TODO: Handle filters
 
 	query = query.Order("submit_time DESC").Order("id DESC").Limit(first + 1).Offset(after)
 
