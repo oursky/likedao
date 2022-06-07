@@ -28,6 +28,7 @@ module.exports = {
             yes: "#6DCDBC",
             no: "#C72F2F",
           },
+          yellow: "#FFD951",
         },
       },
     },
