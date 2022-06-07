@@ -36,8 +36,9 @@ type MutatorContext struct {
 }
 
 type DataLoaderContext struct {
-	Test  dataloaders.TestDataloader
-	Block dataloaders.BlockDataloader
+	Test     dataloaders.TestDataloader
+	Block    dataloaders.BlockDataloader
+	Proposal dataloaders.ProposalDataloader
 }
 
 type DatabaseContext struct {
@@ -65,8 +66,9 @@ func NewRequestContext(
 		Test: mutators.NewTestMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{
-		Test:  dataloaders.NewTestDataloader(queries.Test),
-		Block: dataloaders.NewBlockDataloader(queries.Block),
+		Test:     dataloaders.NewTestDataloader(queries.Test),
+		Block:    dataloaders.NewBlockDataloader(queries.Block),
+		Proposal: dataloaders.NewProposalDataloader(queries.Proposal),
 	}
 
 	databases := DatabaseContext{

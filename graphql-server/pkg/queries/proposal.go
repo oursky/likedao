@@ -13,6 +13,7 @@ type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
 	ScopeRelatedAddress(address string) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
+	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 }
 
 type ProposalQuery struct {
@@ -95,4 +96,28 @@ func (q *ProposalQuery) QueryPaginatedProposals(first int, after int) (*Paginate
 		},
 	}, nil
 
+}
+
+func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.ProposalTallyResult, error) {
+	tallyResults := make([]*models.ProposalTallyResult, 0, len(ids))
+	if err := q.session.NewSelect().Model(&tallyResults).Where("proposal_id IN (?)", bun.In(ids)).Scan(q.ctx); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	result := make([]*models.ProposalTallyResult, 0, len(tallyResults))
+	idToTallyResult := make(map[int]models.ProposalTallyResult, len(tallyResults))
+	for _, tallyResult := range tallyResults {
+		idToTallyResult[tallyResult.ProposalID] = *tallyResult
+	}
+
+	for _, id := range ids {
+		tallyResult, exists := idToTallyResult[id]
+		if exists {
+			result = append(result, &tallyResult)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
 }
