@@ -28,6 +28,7 @@ type QueryContext struct {
 	Inflation     queries.IInflationQuery
 	StakingPool   queries.IStakingPoolQuery
 	Supply        queries.ISupplyQuery
+	Proposal      queries.IProposalQuery
 }
 
 type MutatorContext struct {
@@ -58,6 +59,7 @@ func NewRequestContext(
 		Inflation:     queries.NewInflationQuery(ctx, chainDB),
 		StakingPool:   queries.NewStakingPoolQuery(ctx, chainDB),
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
+		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 	}
 	mutators := MutatorContext{
 		Test: mutators.NewTestMutator(ctx, serverDB),
