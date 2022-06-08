@@ -23,6 +23,13 @@ enum ProposalFilter {
   Rejected
 }
 
+enum ProposalVoteOption {
+  Yes
+  No
+  Abstain
+  NoWithVeto
+}
+
 type Proposal {
   id: ID!
   proposalId: Int!
@@ -35,7 +42,7 @@ type Proposal {
   votingEndTime: DateTime
   proposerAddress: String!
   status: ProposalStatus!
-  tallyResult: ProposalTallyResult!
+  tallyResult: ProposalTallyResult
 }
 
 type ProposalEdge {
@@ -54,6 +61,7 @@ type ProposalTallyResult {
   no: BigInt!
   noWithVeto: BigInt!
   abstain: BigInt!
+  mostVoted: ProposalVoteOption!
 }
 
 input QueryProposalsInput {
