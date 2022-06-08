@@ -9,14 +9,18 @@ import { useClipboard } from "../../hooks/useClipboard";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { Proposal } from "../../generated/graphql";
 import LocalizedText from "../common/Localized/LocalizedText";
+import useShare from "../../hooks/useShare";
 
 const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
   proposal,
 }) => {
   const copy = useClipboard();
   const { translate } = useLocale();
-
-  const shareAPIAvailable = !!navigator.share;
+  const { share, canShare } = useShare({
+    title: document.title,
+    text: window.location.href, // TODO: change to update document.title to proposal title and use here
+    url: window.location.href,
+  });
 
   const handleCopyLink = useCallback(() => {
     copy(window.location.href)
@@ -28,18 +32,6 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
       });
   }, [copy, translate]);
 
-  const handleShare = useCallback(() => {
-    navigator
-      .share({
-        title: document.title,
-        text: window.location.href,
-        url: window.location.href,
-      })
-      .catch((err) => {
-        console.error("Error sharing = ", err);
-      });
-  }, []);
-
   return (
     <Paper>
       <MDEditor.Markdown
@@ -47,7 +39,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
         source={proposal.description}
       />
       <div className={cn("flex", "justify-end", "mt-6", "text-right")}>
-        <IconButton
+      <IconButton
           icon={IconType.Link}
           size={24}
           title="Copy link"
@@ -55,21 +47,21 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
           className={cn(
             "mr-2",
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            shareAPIAvailable && "hidden",
+            canShare && "hidden",
             "sm:inline-block"
           )}
           onClick={handleCopyLink}
         />
         {
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          shareAPIAvailable && (
+          canShare && (
             <IconButton
               icon={IconType.Share}
               size={24}
               title="Share"
               tooltip={<LocalizedText messageID="ProposalDetail.share" />}
               className={cn("mr-2")}
-              onClick={handleShare}
+              onClick={share}
             />
           )
         }
