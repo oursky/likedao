@@ -29,6 +29,8 @@ module.exports = {
           "vote-color": {
             yes: "#6DCDBC",
             no: "#C72F2F",
+            veto: "#24272B",
+            abstain: "#B7B7B7",
           },
           yellow: "#FFD951",
         },
