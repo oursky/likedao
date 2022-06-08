@@ -36,6 +36,7 @@ omit_slice_element_pointers: true
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
+  - "github.com/xplorfin/gql-bigint"
 #  - "github.com/oursky/likedao/graph/model"
 
 # This section declares type mapping between the GraphQL and go type systems
@@ -48,7 +49,9 @@ models:
     model: github.com/99designs/gqlgen/graphql.Time
 
   BigInt:
-    model: github.com/99designs/gqlgen/graphql.String
+    model:
+      - github.com/xplorfin/gql-bigint.BigInt
+      - github.com/99designs/gqlgen/graphql.String
   BigFloat:
     model: github.com/99designs/gqlgen/graphql.String
     
@@ -77,12 +80,14 @@ models:
     fields:
       id:
         fieldName: NodeID
-  ProposalFilter:
-    model: github.com/oursky/likedao/pkg/models.ProposalFilter
+  ProposalStatus:
+    model: github.com/oursky/likedao/pkg/models.ProposalStatus
   ProposalEdge:
     model: github.com/oursky/likedao/pkg/models.ProposalEdge
   ProposalConnection: 
     model: github.com/oursky/likedao/pkg/models.ProposalConnection
+  ProposalTallyResult: 
+    model: github.com/oursky/likedao/pkg/models.ProposalTallyResult
 
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime

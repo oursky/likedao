@@ -28,6 +28,7 @@ type QueryContext struct {
 	Inflation     queries.IInflationQuery
 	StakingPool   queries.IStakingPoolQuery
 	Supply        queries.ISupplyQuery
+	Proposal      queries.IProposalQuery
 }
 
 type MutatorContext struct {
@@ -35,8 +36,9 @@ type MutatorContext struct {
 }
 
 type DataLoaderContext struct {
-	Test  dataloaders.TestDataloader
-	Block dataloaders.BlockDataloader
+	Test     dataloaders.TestDataloader
+	Block    dataloaders.BlockDataloader
+	Proposal dataloaders.ProposalDataloader
 }
 
 type DatabaseContext struct {
@@ -58,13 +60,15 @@ func NewRequestContext(
 		Inflation:     queries.NewInflationQuery(ctx, chainDB),
 		StakingPool:   queries.NewStakingPoolQuery(ctx, chainDB),
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
+		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 	}
 	mutators := MutatorContext{
 		Test: mutators.NewTestMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{
-		Test:  dataloaders.NewTestDataloader(queries.Test),
-		Block: dataloaders.NewBlockDataloader(queries.Block),
+		Test:     dataloaders.NewTestDataloader(queries.Test),
+		Block:    dataloaders.NewBlockDataloader(queries.Block),
+		Proposal: dataloaders.NewProposalDataloader(queries.Proposal),
 	}
 
 	databases := DatabaseContext{

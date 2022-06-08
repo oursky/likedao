@@ -13,6 +13,7 @@ enum ProposalStatus {
   Passed
   Rejected
   Failed
+  Invalid
 }
 
 enum ProposalFilter {
@@ -20,7 +21,6 @@ enum ProposalFilter {
   Deposit
   Passed
   Rejected
-  Following
 }
 
 type Proposal {
@@ -29,11 +29,12 @@ type Proposal {
   description: String!
   type: ProposalType!
   submitTime: DateTime!
-  depositEndTime: DateTime!
-  votingStartTime: DateTime!
-  votingEndTime: DateTime!
+  depositEndTime: DateTime
+  votingStartTime: DateTime
+  votingEndTime: DateTime
   proposerAddress: String!
   status: ProposalStatus!
+  tallyResult: ProposalTallyResult!
 }
 
 type ProposalEdge {
@@ -44,4 +45,26 @@ type ProposalEdge {
 type ProposalConnection {
   pageInfo: PageInfo!
   edges: [ProposalEdge!]!
+  totalCount: Int!
+}
+
+type ProposalTallyResult {
+  yes: BigInt!
+  no: BigInt!
+  noWithVeto: BigInt!
+  abstain: BigInt!
+}
+
+input QueryProposalsInput {
+  # Limit
+  first: Int!
+  # Offset
+  after: Int!
+  filter: ProposalFilter
+  followingAddress: String
+  searchTerm: String
+}
+
+extend type Query {
+  proposals(input: QueryProposalsInput!): ProposalConnection!
 }
