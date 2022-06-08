@@ -9,7 +9,6 @@ import ConnectWalletModal from "../components/ConnectWalletModal/ConnectWalletMo
 import Config from "../config/Config";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useWindowEvent } from "../hooks/useWindowEvent";
-import { ExtendedQueryClient } from "../clients/queryClient";
 import { useLocale } from "./AppLocaleProvider";
 
 const AUTO_CONNECT_WALLET_TYPE_KEY = "LS/AutoConnectWalletType";
@@ -41,7 +40,6 @@ interface DisconnectedWalletContextValue {
 interface ConnectedWalletContextValue {
   status: ConnectionStatus.Connected;
   provider: SigningStargateClient;
-  query: ExtendedQueryClient;
   account: AccountData;
   refreshAccounts: () => Promise<void>;
   disconnect: () => void;
@@ -186,7 +184,6 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     return {
       status: walletStatus,
       provider: activeWallet.provider,
-      query: activeWallet.query,
       account: account!,
       refreshAccounts,
       disconnect,

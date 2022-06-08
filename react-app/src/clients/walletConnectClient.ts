@@ -8,7 +8,6 @@ import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { bech32 } from "bech32";
 import { ChainInfo } from "../config/Config";
 import { BaseWallet } from "./baseWallet";
-import { newQueryClient, ExtendedQueryClient } from "./queryClient";
 
 interface WalletConnectWalletConnectOptions {
   onDisconnect: () => void;
@@ -21,10 +20,9 @@ export class WalletConnectWallet extends BaseWallet {
     chainInfo: ChainInfo,
     offlineSigner: OfflineSigner,
     cosmJS: SigningStargateClient,
-    queryClient: ExtendedQueryClient,
     connector: WalletConnect
   ) {
-    super(chainInfo, offlineSigner, cosmJS, queryClient);
+    super(chainInfo, offlineSigner, cosmJS);
     this.connector = connector;
   }
 
@@ -99,15 +97,7 @@ export class WalletConnectWallet extends BaseWallet {
       offlineSigner
     );
 
-    const queryClient = await newQueryClient(chainInfo);
-
-    return new WalletConnectWallet(
-      chainInfo,
-      offlineSigner,
-      cosmJS,
-      queryClient,
-      connector
-    );
+    return new WalletConnectWallet(chainInfo, offlineSigner, cosmJS, connector);
   }
 
   async disconnect(): Promise<void> {

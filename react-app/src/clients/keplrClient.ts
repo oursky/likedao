@@ -2,7 +2,6 @@ import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { ChainInfo } from "../config/Config";
 import { BaseWallet } from "./baseWallet";
-import { newQueryClient } from "./queryClient";
 
 export class KeplrWallet extends BaseWallet {
   static async connect(chainInfo: ChainInfo): Promise<KeplrWallet> {
@@ -21,9 +20,7 @@ export class KeplrWallet extends BaseWallet {
       offlineSigner
     );
 
-    const queryClient = await newQueryClient(chainInfo);
-
-    return new KeplrWallet(chainInfo, offlineSigner, cosmJS, queryClient);
+    return new KeplrWallet(chainInfo, offlineSigner, cosmJS);
   }
 
   // eslint-disable-next-line class-methods-use-this
