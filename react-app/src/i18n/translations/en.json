@@ -34,6 +34,8 @@
   "ProposalDetail.publishedBy": "Published By",
   "ProposalDetail.turnOut": "Turn out",
   "ProposalDetail.voteNow": "Vote now",
+  "ProposalDetail.votingDateRange": "{from} to {to}",
+  "ProposalDetail.votingDaysRemaining": "{days} days left",
   "ProposalDetail.votingPeriod": "Voting Period",
   "ProposalScreen.newProposal": "New proposal",
   "ProposalScreen.title": "Proposals",

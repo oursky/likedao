@@ -30,12 +30,12 @@ const ProposalDetailScreen: React.FC = () => {
   };
 
   return (
-    <>
+    <div>
       <ProposalHeader proposal={proposal} />
       <Paper>Description Placeholder</Paper>
       <Paper>Votes and Deposit Placeholder</Paper>
       <Paper>Comments Placeholder</Paper>
-    </>
+    </div>
   );
 };
 

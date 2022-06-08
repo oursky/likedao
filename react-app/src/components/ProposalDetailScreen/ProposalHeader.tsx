@@ -20,10 +20,12 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     submitTime,
   } = proposal;
 
+  const daysRemaining = votingEndTime.getDate() - new Date().getDate();
+
   return (
     <Paper>
       <div className={cn("flex", "flex-col", "gap-x-2.5", "items-center")}>
-        <body className={cn("text-xs", "mb-4")}>#{id}</body>
+        <div className={cn("text-xs", "mb-4")}>#{id}</div>
         <h1
           className={cn(
             "text-3xl",
@@ -47,7 +49,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           "my-4",
           "p-2",
           "sm:flex-row",
-          "sm:items-start"
+          "sm:items-end"
         )}
       >
         <div
@@ -55,17 +57,29 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "flex",
             "flex-col",
             "items-center",
-            "justify-center",
+            "justify-end",
             "grow",
             "text-sm"
           )}
         >
           <LocalizedText messageID="ProposalDetail.votingPeriod" />
           <p className={cn("mb-1", "text-sm", "text-center")}>
-            <UTCDatetime date={votingStartTime} /> to{" "}
-            <UTCDatetime date={votingEndTime} />
+            <LocalizedText
+              messageID="ProposalDetail.votingDateRange"
+              messageArgs={{
+                from: <UTCDatetime date={votingStartTime} />,
+                to: <UTCDatetime date={votingEndTime} />,
+              }}
+            />
           </p>
-          <Badge>12 days left</Badge>
+          {daysRemaining > 0 && (
+            <Badge>
+              <LocalizedText
+                messageID="ProposalDetail.votingDaysRemaining"
+                messageArgs={{ days: daysRemaining }}
+              />
+            </Badge>
+          )}
         </div>
         <div
           className={cn(
@@ -79,11 +93,11 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           )}
         >
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
-            <p>Deposit</p>
+            <LocalizedText messageID="ProposalDetail.deposit" />
             <p>100,000 LIKE</p>
           </div>
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
-            <p>Turn out</p>
+            <LocalizedText messageID="ProposalDetail.turnOut" />
             <p>16%</p>
           </div>
         </div>

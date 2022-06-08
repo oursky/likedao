@@ -21,7 +21,7 @@ const Badge: React.FC<{
       ...ColorClasses[`${variant}-${color}`],
       "rounded-xl",
       "px-3",
-      "py-[2px]",
+      "py-0.5",
       "text-sm"
     )}
   >
