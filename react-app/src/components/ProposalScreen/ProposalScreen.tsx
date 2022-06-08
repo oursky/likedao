@@ -1,11 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import cn from "classnames";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
+import {
+  isRequestStateError,
+  isRequestStateInitial,
+  isRequestStateLoading,
+} from "../../models/RequestState";
+import { useProposalsQuery } from "./ProposalScreenAPI";
+
+const PROPOSAL_LIST_PAGE_SIZE = 5;
 
 const ProposalScreen: React.FC = () => {
+  const { requestState, fetch } = useProposalsQuery(0, PROPOSAL_LIST_PAGE_SIZE);
+
+  useEffect(() => {
+    // TODO: Should fetch based on offset
+    fetch();
+  }, [fetch]);
+
+  if (
+    isRequestStateLoading(requestState) ||
+    isRequestStateInitial(requestState)
+  ) {
+    return <p>Loading...</p>;
+  }
+
+  if (isRequestStateError(requestState)) {
+    return <p>{`Failed to load: ${requestState.error.message}`}</p>;
+  }
+
   return (
     <div
       className={cn(
@@ -70,18 +96,10 @@ const ProposalScreen: React.FC = () => {
             to={AppRoutes.NewProposal}
           />
         </div>
-        <div
-          className={cn(
-            "mt-7",
-            "flex",
-            "flex-col",
-            "items-center",
-            "justify-cetner",
-            "h-[528px]",
-            "bg-red-400"
-          )}
-        >
-          Table
+        <div className={cn("mt-7", "flex", "flex-col")}>
+          {requestState.data.proposals.map((proposal) => (
+            <p key={proposal.proposalId}>{proposal.proposalId}</p>
+          ))}
         </div>
       </div>
     </div>
