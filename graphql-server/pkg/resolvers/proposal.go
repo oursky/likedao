@@ -87,6 +87,14 @@ func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposa
 	return &conn, nil
 }
 
+func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*models.Proposal, error) {
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.Load(id.ID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 // Proposal returns graphql1.ProposalResolver implementation.
 func (r *Resolver) Proposal() graphql1.ProposalResolver { return &proposalResolver{r} }
 
@@ -97,3 +105,20 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 
 type proposalResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) ProposalByIDs(ctx context.Context, ids []models.NodeID) ([]*models.Proposal, error) {
+	proposalIDs := models.ExtractObjectIDs(ids)
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadAll(proposalIDs)
+	for _, err := range errs {
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}

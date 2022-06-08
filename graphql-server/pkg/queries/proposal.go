@@ -14,6 +14,7 @@ type IProposalQuery interface {
 	ScopeRelatedAddress(address string) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
+	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 }
 
 type ProposalQuery struct {
@@ -120,4 +121,13 @@ func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.Proposal
 	}
 
 	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, error) {
+	proposals := make([]*models.Proposal, len(ids))
+	err := q.NewQuery().Where("id IN (?)", bun.In(ids)).Scan(q.ctx, &proposals)
+	if err != nil {
+		return nil, err
+	}
+	return proposals, nil
 }

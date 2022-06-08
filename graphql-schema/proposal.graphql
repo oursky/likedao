@@ -67,4 +67,5 @@ input QueryProposalsInput {
 
 extend type Query {
   proposals(input: QueryProposalsInput!): ProposalConnection!
+  proposalByID(id: ID!): Proposal
 }
