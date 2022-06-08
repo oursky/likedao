@@ -28,6 +28,12 @@ const ProposalDetailScreen: React.FC = () => {
     submitTime: new Date(),
     votingEndTime: new Date(),
     votingStartTime: new Date(),
+    tallyResult: {
+      yes: 1,
+      no: 1,
+      abstain: 1,
+      noWithVeto: 0,
+    },
   };
 
   return (
