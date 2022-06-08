@@ -23,8 +23,8 @@ const scalars: Record<string, GraphQLScalarType> = {
       return parsed instanceof BigNumber ? parsed.toFixed() : null;
     },
     parseValue: (value: unknown): BigNumber | null => {
-      if (!value) return null;
-      if (typeof value === "string") {
+      if (value == null) return null;
+      if (typeof value === "string" || typeof value === "number") {
         return new BigNumber(value);
       }
 
@@ -37,8 +37,8 @@ const scalars: Record<string, GraphQLScalarType> = {
       return parsed instanceof BigNumber ? parsed.toFixed() : null;
     },
     parseValue: (value: unknown): BigNumber | null => {
-      if (!value) return null;
-      if (typeof value === "string") {
+      if (value == null) return null;
+      if (typeof value === "string" || typeof value === "number") {
         return new BigNumber(value);
       }
 
