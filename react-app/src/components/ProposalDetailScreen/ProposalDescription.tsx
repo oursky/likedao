@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import cn from "classnames";
 import { toast } from "react-toastify";
+import rehypeSanitize from "rehype-sanitize";
 import Paper from "../common/Paper/Paper";
 import IconButton from "../common/Buttons/IconButton";
 import { IconType } from "../common/Icons/Icons";
@@ -10,7 +11,6 @@ import { useLocale } from "../../providers/AppLocaleProvider";
 import { Proposal } from "../../generated/graphql";
 import LocalizedText from "../common/Localized/LocalizedText";
 import useShare from "../../hooks/useShare";
-
 const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
   proposal,
 }) => {
@@ -37,6 +37,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
       <MDEditor.Markdown
         className={cn("!text-black", "font-medium")}
         source={proposal.description}
+        rehypePlugins={[[rehypeSanitize]]}
       />
       <div className={cn("flex", "justify-end", "mt-6", "text-right")}>
         {canShare ? (
