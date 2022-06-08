@@ -13,6 +13,10 @@ import (
 	gql_bigint "github.com/xplorfin/gql-bigint"
 )
 
+func (r *proposalResolver) ProposalID(ctx context.Context, obj *models.Proposal) (int, error) {
+	return obj.ID, nil
+}
+
 func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (models.ProposalType, error) {
 	proposalType := new(models.ProposalType)
 	err := proposalType.UnmarshalGQL(obj.ProposalType)

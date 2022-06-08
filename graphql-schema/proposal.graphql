@@ -25,6 +25,7 @@ enum ProposalFilter {
 
 type Proposal {
   id: ID!
+  proposalId: Int!
   title: String!
   description: String!
   type: ProposalType!
