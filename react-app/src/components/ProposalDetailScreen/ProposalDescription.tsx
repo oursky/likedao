@@ -39,32 +39,23 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
         source={proposal.description}
       />
       <div className={cn("flex", "justify-end", "mt-6", "text-right")}>
-      <IconButton
-          icon={IconType.Link}
-          size={24}
-          title="Copy link"
-          tooltip={<LocalizedText messageID="ProposalDetail.copyLink" />}
-          className={cn(
-            "mr-2",
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            canShare && "hidden",
-            "sm:inline-block"
-          )}
-          onClick={handleCopyLink}
-        />
-        {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          canShare && (
-            <IconButton
-              icon={IconType.Share}
-              size={24}
-              title="Share"
-              tooltip={<LocalizedText messageID="ProposalDetail.share" />}
-              className={cn("mr-2")}
-              onClick={share}
-            />
-          )
-        }
+        {canShare ? (
+          <IconButton
+            icon={IconType.Share}
+            size={24}
+            title="Share"
+            tooltip={<LocalizedText messageID="ProposalDetail.share" />}
+            onClick={share}
+          />
+        ) : (
+          <IconButton
+            icon={IconType.Link}
+            size={24}
+            title="Copy link"
+            tooltip={<LocalizedText messageID="ProposalDetail.copyLink" />}
+            onClick={handleCopyLink}
+          />
+        )}
       </div>
     </Paper>
   );
