@@ -1,0 +1,49 @@
+fragment ProposalScreenProposal on Proposal {
+  id
+  proposalId
+  title
+  description
+  type
+  submitTime
+  depositEndTime
+  votingStartTime
+  votingEndTime
+  proposerAddress
+  status
+  tallyResult {
+    yes
+    no
+    noWithVeto
+    abstain
+    mostVoted
+  }
+}
+
+query ProposalScreenQuery(
+  $first: Int!
+  $after: Int!
+  $filter: ProposalFilter
+  $followingAddress: String
+  $searchTerm: String
+) {
+  proposals(
+    input: {
+      after: $after
+      filter: $filter
+      followingAddress: $followingAddress
+      searchTerm: $searchTerm
+      first: $first
+    }
+  ) {
+    pageInfo {
+      startCursor
+      endCursor
+    }
+    totalCount
+    edges {
+      node {
+        ...ProposalScreenProposal
+      }
+    }
+  }
+}
