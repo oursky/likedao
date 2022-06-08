@@ -20,7 +20,9 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     submitTime,
   } = proposal;
 
-  const daysRemaining = votingEndTime.getDate() - new Date().getDate();
+  const daysRemaining = votingEndTime
+    ? votingEndTime.getDate() - new Date().getDate()
+    : -1;
 
   return (
     <Paper>
@@ -64,13 +66,17 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         >
           <LocalizedText messageID="ProposalDetail.votingPeriod" />
           <p className={cn("mb-1", "text-sm", "text-center")}>
-            <LocalizedText
-              messageID="ProposalDetail.votingDateRange"
-              messageArgs={{
-                from: <UTCDatetime date={votingStartTime} />,
-                to: <UTCDatetime date={votingEndTime} />,
-              }}
-            />
+            {votingStartTime && votingEndTime ? (
+              <LocalizedText
+                messageID="ProposalDetail.votingDateRange"
+                messageArgs={{
+                  from: <UTCDatetime date={votingStartTime} />,
+                  to: <UTCDatetime date={votingEndTime} />,
+                }}
+              />
+            ) : (
+              "-"
+            )}
           </p>
           {daysRemaining > 0 && (
             <Badge>

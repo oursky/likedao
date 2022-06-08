@@ -1,4 +1,5 @@
 import React from "react";
+import cn from "classnames";
 import { Navigate, useParams } from "react-router-dom";
 import {
   Proposal,
@@ -30,7 +31,7 @@ const ProposalDetailScreen: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={cn("flex", "flex-col")}>
       <ProposalHeader proposal={proposal} />
       <Paper>Description Placeholder</Paper>
       <Paper>Votes and Deposit Placeholder</Paper>
