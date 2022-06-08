@@ -28,6 +28,10 @@ func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (mode
 }
 
 func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal) (*models.ProposalTallyResult, error) {
+	if obj.Status == models.ProposalStatusFailed || obj.Status == models.ProposalStatusInvalid || obj.Status == models.ProposalStatusDepositPeriod {
+		return nil, nil
+	}
+
 	tally, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTallyResult(obj.ID)
 	if err != nil {
 		return nil, err
@@ -61,6 +65,33 @@ func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.P
 		return 0, nil
 	}
 	return gql_bigint.BigInt(obj.Abstain.ToInt64()), nil
+}
+
+func (r *proposalTallyResultResolver) MostVoted(ctx context.Context, obj *models.ProposalTallyResult) (models.ProposalVoteOption, error) {
+	var option models.ProposalVoteOption
+	var votes = int64(0)
+
+	// FIXME: Improve this handling
+	if obj.Yes != nil && obj.Yes.ToInt64() > votes {
+		option = models.ProposalVoteOptionYes
+		votes = obj.Yes.ToInt64()
+	}
+
+	if obj.No != nil && obj.No.ToInt64() > votes {
+		option = models.ProposalVoteOptionNo
+		votes = obj.No.ToInt64()
+	}
+
+	if obj.NoWithVeto != nil && obj.NoWithVeto.ToInt64() > votes {
+		option = models.ProposalVoteOptionNoWithVeto
+		votes = obj.NoWithVeto.ToInt64()
+	}
+
+	if obj.Abstain != nil && obj.Abstain.ToInt64() > votes {
+		option = models.ProposalVoteOptionAbstain
+	}
+
+	return option, nil
 }
 
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
