@@ -18,6 +18,8 @@ module.exports = {
           grey: "#D8D8D8",
           darkgrey: "#666666",
           lightgrey: "#E8E8E8",
+          lightergrey: "#F8F8F8",
+          secondarygreen: "#E0EFEB",
           "primary-bg": "#F8F7F4",
           black: "#222222",
           gradient: {
@@ -28,6 +30,7 @@ module.exports = {
             yes: "#6DCDBC",
             no: "#C72F2F",
           },
+          yellow: "#FFD951",
         },
       },
     },
