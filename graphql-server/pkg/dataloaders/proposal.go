@@ -1,8 +1,6 @@
 package dataloaders
 
 import (
-	"time"
-
 	godataloader "github.com/cychiuae/go-dataloader"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/oursky/likedao/pkg/queries"
@@ -31,8 +29,8 @@ type IProposalDataloader struct {
 
 func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloader {
 	proposalLoader := godataloader.NewDataLoader(godataloader.DataLoaderConfig[string, *models.Proposal]{
-		MaxBatch: 1000,
-		Wait:     20 * time.Millisecond,
+		MaxBatch: DefaultMaxBatch,
+		Wait:     DefaultWait,
 		Fetch: func(ids []string) ([]*models.Proposal, []error) {
 			proposals, err := proposalQuery.QueryProposalByIDs(ids)
 			if err != nil {
@@ -58,8 +56,8 @@ func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloa
 			}
 			return tallyResults, nil
 		},
-		MaxBatch: 1000,
-		Wait:     20 * time.Millisecond,
+		MaxBatch: DefaultMaxBatch,
+		Wait:     DefaultWait,
 	})
 
 	return &IProposalDataloader{

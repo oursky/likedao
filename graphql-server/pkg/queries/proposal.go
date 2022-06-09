@@ -157,7 +157,9 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, config config.Config) 
 		return 0, err
 	}
 	rows.Next()
-	rows.Scan(&res)
-
+	err = rows.Scan(&res)
+	if err != nil {
+		return 0, err
+	}
 	return res, nil
 }
