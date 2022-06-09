@@ -23,6 +23,15 @@ func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (mode
 	return *proposalType, nil
 }
 
+func (r *proposalResolver) DepositTotal(ctx context.Context, obj *models.Proposal) (gql_bigint.BigInt, error) {
+	config := pkgContext.GetConfigFromCtx(ctx)
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalDepositTotal(obj.ID, config)
+	if err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
 func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal) (*models.ProposalTallyResult, error) {
 	tally, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTallyResult(obj.ID)
 	if err != nil {

@@ -2,11 +2,13 @@ package queries
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
+	gql_bigint "github.com/xplorfin/gql-bigint"
 )
 
 type IProposalQuery interface {
@@ -15,6 +17,7 @@ type IProposalQuery interface {
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
+	QueryProposalDepositTotal(id int, config config.Config) (gql_bigint.BigInt, error)
 }
 
 type ProposalQuery struct {
@@ -130,4 +133,31 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 		return nil, err
 	}
 	return proposals, nil
+}
+
+func (q *ProposalQuery) QueryProposalDepositTotal(id int, config config.Config) (gql_bigint.BigInt, error) {
+	var res gql_bigint.BigInt
+	rows, err := q.session.DB.QueryContext(q.ctx, fmt.Sprintf(
+		`SELECT
+			sum((deposit.coin).amount::BIGINT)
+		FROM (
+			SELECT
+				unnest(proposal_deposit.amount) AS coin
+			FROM
+				%s.proposal_deposit
+			WHERE
+				proposal_deposit.proposal_id = %d
+			) AS deposit
+		where
+			(deposit.coin).denom = '%s'
+		GROUP BY
+			(deposit.coin).denom;`, config.ChainDatabase.Schema, id, config.Chain.CoinDenom,
+	))
+	if err != nil {
+		return 0, err
+	}
+	rows.Next()
+	rows.Scan(&res)
+
+	return res, nil
 }
