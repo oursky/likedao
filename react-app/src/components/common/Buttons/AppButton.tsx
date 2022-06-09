@@ -81,8 +81,8 @@ function getButtonSizeStyle(size: AppButtonSize): string {
         "text-sm",
         "leading-4",
         "font-medium",
-        "py-2",
-        "px-3",
+        "py-3",
+        "px-4",
         "rounded-md",
         "shadow-sm",
         "rounded-md"
