@@ -24,14 +24,8 @@ interface UserInfoPanelProps {
   onClickReinvest: () => void;
 }
 const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
-  const {
-    userInfo,
-    className,
-    onClickSend,
-    onClickReceive,
-    onClickReward,
-    onClickReinvest,
-  } = props;
+  const { userInfo, className, onClickSend, onClickReceive, onClickReward } =
+    props;
   const { coinDenom } = Config.chainInfo.currency;
   const { translate } = useLocale();
 
@@ -100,12 +94,13 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
           labelId="UserInfoPanel.shortcuts.rewards"
           onClick={onClickReward}
         />
+        {/* TODO: Handle reinvest in later stages
         <ShortcutButton
           className={cn("flex-1")}
           icon={IconType.Reinvest}
           labelId="UserInfoPanel.shortcuts.reinvest"
           onClick={onClickReinvest}
-        />
+        /> */}
       </div>
     </div>
   );
