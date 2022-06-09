@@ -19,7 +19,9 @@ const Badge: React.FC<{
       "rounded-xl",
       "px-3",
       "py-0.5",
-      "text-sm"
+      "text-sm",
+      "leading-5",
+      "font-medium"
     )}
   >
     {children}

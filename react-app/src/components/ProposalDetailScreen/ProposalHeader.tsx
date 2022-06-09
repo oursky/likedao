@@ -34,7 +34,8 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "leading-none",
             "text-center",
             "text-likecoin-green",
-            "leading-8"
+            "leading-9",
+            "font-medium"
           )}
         >
           {title}
@@ -62,7 +63,9 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "items-center",
             "justify-end",
             "grow",
-            "text-sm"
+            "text-sm",
+            "leading-5",
+            "font-medium"
           )}
         >
           <LocalizedText messageID="ProposalDetail.votingPeriod" />
@@ -96,7 +99,10 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "grow",
             "w-full",
             "sm:w-1/2",
-            "mt-5"
+            "mt-5",
+            "text-sm",
+            "leading-5",
+            "font-medium"
           )}
         >
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
@@ -110,7 +116,15 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         </div>
       </div>
       <div
-        className={cn("my-4", "p-6", "bg-likecoin-lightergrey", "rounded-xl")}
+        className={cn(
+          "my-4",
+          "p-6",
+          "bg-likecoin-lightergrey",
+          "rounded-xl",
+          "text-sm",
+          "leading-5",
+          "font-medium"
+        )}
       >
         <p className={cn("text-sm", "text-likecoin-lightgreen", "mb-1")}>
           <LocalizedText messageID="ProposalDetail.proposalType" />
@@ -124,7 +138,14 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           <span className={cn("text-sm", "text-likecoin-green")}>
             joggerpant23
           </span>
-          <span className={cn("text-xs", "text-likecoin-lightgreen", "ml-2")}>
+          <span
+            className={cn(
+              "text-xs",
+              "text-likecoin-lightgreen",
+              "ml-2",
+              "text-xs"
+            )}
+          >
             {truncateAddress(proposerAddress)}
           </span>
         </div>
@@ -146,12 +167,19 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           <AppButton
             size="regular"
             theme="rounded"
+            className={cn(
+              "text-likecoin-green",
+              "text-sm",
+              "leading-5",
+              "font-semibold"
+            )}
             messageID="ProposalDetail.addReaction"
           />
         </div>
         <AppButton
           size="regular"
           theme="primary"
+          className={cn("text-base", "leading-6", "font-medium")}
           messageID="ProposalDetail.voteNow"
         />
       </div>
