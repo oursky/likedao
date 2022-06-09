@@ -1,20 +1,15 @@
-import { useState, useCallback } from "react";
-
-const useShare = (
-  data?: ShareData
-): { canShare: boolean; share: () => void; error: any } => {
-  const [error, setError] = useState();
+const useShare = (): {
+  canShare: boolean;
+  share: (data?: ShareData) => Promise<void>;
+} => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const canShare = Boolean(navigator.canShare) && navigator.canShare(data);
+  const canShare = Boolean(navigator.canShare);
 
-  const share = useCallback(() => {
-    navigator.share(data).catch((err) => {
-      setError(err);
-      console.error("Error sharing = ", err);
-    });
-  }, [data]);
+  const share = canShare
+    ? navigator.share.bind(navigator)
+    : async () => Promise.resolve();
 
-  return { canShare, share, error };
+  return { canShare, share };
 };
 
 export default useShare;

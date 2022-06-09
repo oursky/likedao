@@ -11,16 +11,23 @@ import { useLocale } from "../../providers/AppLocaleProvider";
 import { Proposal } from "../../generated/graphql";
 import LocalizedText from "../common/Localized/LocalizedText";
 import useShare from "../../hooks/useShare";
+
 const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
   proposal,
 }) => {
   const copy = useClipboard();
   const { translate } = useLocale();
-  const { share, canShare } = useShare({
-    title: document.title,
-    text: window.location.href, // TODO: change to update document.title to proposal title and use here
-    url: window.location.href,
-  });
+  const { share, canShare } = useShare();
+
+  const handleClickShare = useCallback(() => {
+    share({
+      title: document.title,
+      text: window.location.href, // TODO: change to update document.title to proposal title and use here
+      url: window.location.href,
+    }).catch((err) => {
+      console.error("Failed to share =", err);
+    });
+  }, [share]);
 
   const handleCopyLink = useCallback(() => {
     copy(window.location.href)
@@ -46,7 +53,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
             size={24}
             title="Share"
             tooltip={<LocalizedText messageID="ProposalDetail.share" />}
-            onClick={share}
+            onClick={handleClickShare}
           />
         ) : (
           <IconButton
