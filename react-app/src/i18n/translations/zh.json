@@ -41,6 +41,7 @@
   "ProposalScreen.insight.mostVoted": "Most voted on",
   "ProposalScreen.insight.votingEndTime": "Voting end time",
   "ProposalScreen.newProposal": "New proposal",
+  "ProposalScreen.noProposals": "No Proposals",
   "ProposalScreen.proposalCard.viewDetails": "View details",
   "ProposalScreen.proposalStatus.depositPeriod": "Deposit Period",
   "ProposalScreen.proposalStatus.failed": "Failed",
