@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
@@ -10,14 +10,67 @@ import {
   isRequestStateLoading,
 } from "../../models/RequestState";
 import PageContoller from "../common/PageController/PageController";
-import { useProposalsQuery } from "./ProposalScreenAPI";
+import FilterTabs, { IFilterTabItem } from "../FilterTabs/FilterTabs";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { FilterKey, useProposalsQuery } from "./ProposalScreenAPI";
 import { ProposalList } from "./ProposalList";
 
 const PROPOSAL_LIST_PAGE_SIZE = 5;
 
+const defaultFilterItems: IFilterTabItem<FilterKey>[] = [
+  {
+    label: "ProposalScreen.filters.voting",
+    value: "voting",
+  },
+  {
+    label: "ProposalScreen.filters.deposit",
+    value: "deposit",
+  },
+  {
+    label: "ProposalScreen.filters.passed",
+    value: "passed",
+  },
+  {
+    label: "ProposalScreen.filters.rejected",
+    value: "rejected",
+  },
+];
+
 const ProposalScreen: React.FC = () => {
-  const { requestState, fetch } = useProposalsQuery(0, PROPOSAL_LIST_PAGE_SIZE);
+  const wallet = useWallet();
+  const { requestState, fetch, currentFilter, applyFilter } = useProposalsQuery(
+    0,
+    PROPOSAL_LIST_PAGE_SIZE
+  );
   const [offset, setOffset] = useState<number>(0);
+
+  const filterItems: IFilterTabItem<FilterKey>[] = useMemo(() => {
+    if (wallet.status === ConnectionStatus.Connected) {
+      const followingTab: IFilterTabItem<FilterKey> = {
+        label: "ProposalScreen.filters.following",
+        value: "following",
+      };
+      return [...defaultFilterItems, followingTab];
+    }
+
+    return defaultFilterItems;
+  }, [wallet]);
+
+  const setFilter = useCallback(
+    (filter: FilterKey) => {
+      if (
+        wallet.status === ConnectionStatus.Connected &&
+        filter === "following"
+      ) {
+        applyFilter(filter, wallet.account.address);
+        return;
+      }
+
+      applyFilter(filter, null);
+      setOffset(0);
+    },
+    [wallet, applyFilter]
+  );
 
   useEffect(() => {
     fetch(offset);
@@ -106,6 +159,11 @@ const ProposalScreen: React.FC = () => {
           </div>
         ) : (
           <div className={cn("mt-5", "flex", "flex-col", "gap-y-4")}>
+            <FilterTabs
+              tabs={filterItems}
+              selectedTab={currentFilter}
+              onSelectTab={setFilter}
+            />
             <ProposalList proposals={requestState.data.proposals} />
             <PageContoller
               offsetBased={true}
