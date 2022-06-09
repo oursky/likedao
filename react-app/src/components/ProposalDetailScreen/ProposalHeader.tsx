@@ -33,7 +33,8 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "text-3xl",
             "leading-none",
             "text-center",
-            "text-likecoin-green"
+            "text-likecoin-green",
+            "leading-8"
           )}
         >
           {title}
