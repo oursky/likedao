@@ -1,24 +1,21 @@
 import React from "react";
 import cn from "classnames";
 
-type BadgeVariant = "light" | "medium";
+type BadgeColor = "yellow" | "likecoin-yellow";
 
-type BadgeColor = "yellow";
-
-const ColorClasses = {
-  "medium-yellow": ["bg-likecoin-yellow"],
-  "light-yellow": ["bg-yellow-100", "text-yellow-800"],
+const ColorClasses: Record<BadgeColor, string[]> = {
+  "likecoin-yellow": ["bg-likecoin-yellow"],
+  yellow: ["bg-yellow-100", "text-yellow-800"],
 };
 
 const Badge: React.FC<{
   className?: string;
   children?: React.ReactNode;
-  variant?: BadgeVariant;
-  color?: BadgeColor;
-}> = ({ children, variant = "medium", color = "yellow" }) => (
+  color: BadgeColor;
+}> = ({ children, color }) => (
   <span
     className={cn(
-      ...ColorClasses[`${variant}-${color}`],
+      ...ColorClasses[color],
       "rounded-xl",
       "px-3",
       "py-0.5",

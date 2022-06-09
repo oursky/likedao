@@ -26,8 +26,8 @@ const ProposalDetailScreen: React.FC = () => {
       "Community-pool-spend Proposal: deposit 2,000,000 LIKE to Tech Subdao multisig wallet",
     depositEndTime: new Date(),
     submitTime: new Date(),
-    votingEndTime: new Date(),
-    votingStartTime: new Date(),
+    votingEndTime: new Date("2022-06-20"),
+    votingStartTime: new Date("2022-06-01"),
     tallyResult: {
       yes: 1,
       no: 1,

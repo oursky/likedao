@@ -40,7 +40,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         </h1>
       </div>
       <div className={cn("flex", "flex-col", "my-4", "items-center")}>
-        <Badge variant="light">{status}</Badge>
+        <Badge color="yellow">{status}</Badge>
       </div>
       <div
         className={cn(
@@ -79,7 +79,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             )}
           </p>
           {daysRemaining > 0 && (
-            <Badge>
+            <Badge color="likecoin-yellow">
               <LocalizedText
                 messageID="ProposalDetail.votingDaysRemaining"
                 messageArgs={{ days: daysRemaining }}
