@@ -124,18 +124,16 @@ const ProposalScreen: React.FC = () => {
             "justify-between"
           )}
         >
+          {/* TODO: Implement search bar */}
           <div
             className={cn(
               "w-full",
               "max-w-[320px]",
-              "bg-blue-400",
               "flex",
               "items-center",
               "justify-center"
             )}
-          >
-            Search Bar
-          </div>
+          ></div>
           <AppButton
             className={cn("whitespace-nowrap")}
             type="link"
