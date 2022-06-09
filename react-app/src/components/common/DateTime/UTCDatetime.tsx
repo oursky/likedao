@@ -1,5 +1,5 @@
 import React from "react";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 const UTCDatetime: React.FC<{ date: Date; className?: string }> = ({
   date,
@@ -7,7 +7,7 @@ const UTCDatetime: React.FC<{ date: Date; className?: string }> = ({
 }) => {
   return (
     <time className={className} dateTime={date.toISOString()}>
-      {format(date.toISOString().slice(0, -1), "YYYY-MM-DD HH:mm")} UTC
+      {formatInTimeZone(date, "UTC", "yyyy-MM-dd HH:mm")} UTC
     </time>
   );
 };
