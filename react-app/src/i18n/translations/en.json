@@ -30,6 +30,7 @@
   "CreateNewProposalForm.proposalType.signaling": "Signaling",
   "CreateNewProposalForm.submit": "Submit Proposal",
   "CreateNewProposalForm.title": "New Proposal",
+  "OverviewScreen.requestState.error": "Failed to fetch data, please try again later.",
   "ProposalDetail.addReaction": "Add Reaction",
   "ProposalDetail.copyLink": "Copy Link",
   "ProposalDetail.deposit": "Deposit",

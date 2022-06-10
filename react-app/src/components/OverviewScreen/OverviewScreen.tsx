@@ -1,15 +1,20 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
+import { toast } from "react-toastify";
 import CommunityStatus from "../CommunityStatus/CommunityStatus";
 import {
   isRequestStateError,
   isRequestStateInitial,
+  isRequestStateLoaded,
   isRequestStateLoading,
 } from "../../models/RequestState";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useCommunityStatusQuery } from "./OverviewScreenAPI";
 
 const OverviewScreen: React.FC = () => {
   const communityStatusRequestState = useCommunityStatusQuery();
+  const { translate } = useLocale();
 
   const [isScreenLoading, screenData] = useMemo(() => {
     if (
@@ -26,14 +31,16 @@ const OverviewScreen: React.FC = () => {
     return [false, communityStatusRequestState.data];
   }, [communityStatusRequestState]);
 
-  if (isRequestStateError(communityStatusRequestState)) {
-    // TODO: Handle error state
-    return (
-      <span>
-        Failed to fetch data: {communityStatusRequestState.error.message}
-      </span>
-    );
-  }
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(communityStatusRequestState)) {
+        toast.error(translate("OverviewScreen.requestState.error"));
+      }
+    },
+    () =>
+      isRequestStateError(communityStatusRequestState) ||
+      isRequestStateLoaded(communityStatusRequestState)
+  );
 
   return (
     <div
