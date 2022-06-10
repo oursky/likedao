@@ -30,7 +30,7 @@ type Proposal {
   type: ProposalType!
   submitTime: DateTime!
   depositEndTime: DateTime
-  # Sum of all deposit in chain's coin denom (non chain's coin denom deposits excluded)
+  "Sum of all deposit in chain's coin denom (non chain's coin denom deposits excluded)"
   depositTotal: BigInt!
   votingStartTime: DateTime
   votingEndTime: DateTime
