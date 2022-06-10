@@ -9,7 +9,6 @@ import { IconType } from "../common/Icons/Icons";
 import { useClipboard } from "../../hooks/useClipboard";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { Proposal } from "../../generated/graphql";
-import LocalizedText from "../common/Localized/LocalizedText";
 import useShare from "../../hooks/useShare";
 
 const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
@@ -52,7 +51,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
             icon={IconType.Share}
             size={24}
             title="Share"
-            tooltip={<LocalizedText messageID="ProposalDetail.share" />}
+            tooltip={translate("ProposalDetail.share")}
             onClick={handleClickShare}
           />
         ) : (
@@ -60,7 +59,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
             icon={IconType.Link}
             size={24}
             title="Copy link"
-            tooltip={<LocalizedText messageID="ProposalDetail.copyLink" />}
+            tooltip={translate("ProposalDetail.copyLink")}
             onClick={handleCopyLink}
           />
         )}

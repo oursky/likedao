@@ -4,13 +4,12 @@ import { Transition } from "@headlessui/react";
 
 const Tooltip: React.FC<{
   children: React.ReactNode;
-  title?: string;
-  content?: React.ReactNode;
-}> = ({ children, title, content }) => {
+  content?: React.ReactNode | string;
+}> = ({ children, content }) => {
   const [show, setShow] = useState(false);
 
   const handleMouseEnter = () => {
-    if (title || content) {
+    if (content) {
       setShow(true);
     }
   };
@@ -55,7 +54,7 @@ const Tooltip: React.FC<{
             "transition-opacity"
           )}
         >
-          {content ?? title}
+          {content}
         </div>
       </Transition>
     </div>

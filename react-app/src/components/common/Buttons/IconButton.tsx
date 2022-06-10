@@ -10,21 +10,12 @@ interface IconButtonProps
   > {
   icon: IconType;
   size: number;
-  title?: string;
   tooltip?: React.ReactNode;
   onClick?: () => void;
 }
 
 const IconButton: React.FC<IconButtonProps> = (props) => {
-  const {
-    icon,
-    size,
-    className,
-    title,
-    tooltip,
-    onClick: onClick_,
-    ...rest
-  } = props;
+  const { icon, size, className, tooltip, onClick: onClick_, ...rest } = props;
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,7 +27,7 @@ const IconButton: React.FC<IconButtonProps> = (props) => {
   );
 
   return (
-    <Tooltip title={title} content={tooltip}>
+    <Tooltip content={tooltip}>
       <button
         type="button"
         className={cn("p-2", "hover:bg-gray-100", "rounded-full", className)}
