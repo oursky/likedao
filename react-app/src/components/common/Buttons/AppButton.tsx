@@ -20,6 +20,12 @@ interface LinkProps
   to: string;
 }
 
+interface AnchorProps
+  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "type">,
+    Pick<AppButtonCommonProps, "messageID"> {
+  type?: "anchor";
+}
+
 interface ButtonProps
   extends Omit<
       React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -30,7 +36,8 @@ interface ButtonProps
   onClick?: () => void;
 }
 
-type AppButtonProps = (LinkProps | ButtonProps) & AppButtonCommonProps;
+type AppButtonProps = (LinkProps | ButtonProps | AnchorProps) &
+  AppButtonCommonProps;
 
 function getButtonThemeClassNames(theme: AppButtonTheme): string {
   switch (theme) {
@@ -121,6 +128,21 @@ const Link: React.FC<Omit<LinkProps, "type">> = (props) => {
   );
 };
 
+/**
+ * Anchor link to external websites
+ *
+ * Open in new tab by default
+ */
+const AnchorLink: React.FC<Omit<AnchorProps, "type">> = (props) => {
+  const { messageID, ...rest } = props;
+
+  return (
+    <a target="_blank" {...rest}>
+      <LocalizedText messageID={messageID} />
+    </a>
+  );
+};
+
 const AppButton: React.FC<AppButtonProps> = (props) => {
   const { type = "button", theme, size, className, ...rest } = props;
 
@@ -137,6 +159,10 @@ const AppButton: React.FC<AppButtonProps> = (props) => {
       );
     case "link":
       return <Link {...(rest as LinkProps)} className={computedClassName} />;
+    case "anchor":
+      return (
+        <AnchorLink {...(rest as AnchorProps)} className={computedClassName} />
+      );
     default:
       throw new Error("Unknown button type");
   }
