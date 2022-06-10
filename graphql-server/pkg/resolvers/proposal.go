@@ -114,20 +114,3 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 
 type proposalResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) ProposalByIDs(ctx context.Context, ids []models.NodeID) ([]*models.Proposal, error) {
-	proposalIDs := models.ExtractObjectIDs(ids)
-	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadAll(proposalIDs)
-	for _, err := range errs {
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
