@@ -155,8 +155,17 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 
 func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error) {
 	var res bunbig.Int
-	subquery := q.session.NewSelect().Model((*models.ProposalDeposit)(nil)).ColumnExpr("unnest(amount) AS coin").Where("proposal_id = ?", id)
-	query := q.session.NewSelect().ColumnExpr("SUM((deposit.coin).amount::BIGINT)").TableExpr("(?) AS deposit", subquery).Where("(deposit.coin).denom = ?", denom).GroupExpr("(deposit.coin).denom")
+	subquery := q.session.NewSelect().
+		Model((*models.ProposalDeposit)(nil)).
+		ColumnExpr("unnest(amount) AS coin").
+		Where("proposal_id = ?", id)
+
+	query := q.session.NewSelect().
+		ColumnExpr("SUM((deposit.coin).amount::BIGINT)").
+		TableExpr("(?) AS deposit", subquery).
+		Where("(deposit.coin).denom = ?", denom).
+		GroupExpr("(deposit.coin).denom")
+
 	err := query.Scan(q.ctx, &res)
 	if err != nil {
 		return bunbig.Int{}, err
