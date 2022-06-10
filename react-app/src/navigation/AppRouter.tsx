@@ -8,6 +8,7 @@ import ProposalDetailScreen from "../components/ProposalDetailScreen/ProposalDet
 import ProposalScreen from "../components/ProposalScreen/ProposalScreen";
 import WalletConnectingScreen from "../components/WalletConnectingScreen/WalletConnectingScreen";
 import { useWallet, ConnectionStatus } from "../providers/WalletProvider";
+import PortfolioScreen from "../components/PortfolioScreen/PortfolioScreen";
 import AppRoutes from "./AppRoutes";
 
 const AppRouter: React.FC = () => {
@@ -27,6 +28,7 @@ const AppRouter: React.FC = () => {
             path={AppRoutes.ProposalDetail}
             element={<ProposalDetailScreen />}
           />
+          <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
 
           {/* TODO: Handle 404 screen  */}
           <Route path="*" element={<OverviewScreen />} />
