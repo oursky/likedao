@@ -1,12 +1,15 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import { ChainStatus as ChainStatusStatus } from "../../generated/graphql";
+import {
+  ChainHealth,
+  ChainStatus as ChainStatusStatus,
+} from "../../generated/graphql";
 import { Icon, IconType } from "../common/Icons/Icons";
+import LocalizedText from "../common/Localized/LocalizedText";
 
 interface ChainStatusProps {
   chainId: string;
-  status: ChainStatusStatus;
-  height: number;
+  chainHealth?: ChainHealth;
 }
 
 function getStatusColour(status: ChainStatusStatus) {
@@ -24,10 +27,16 @@ function getStatusColour(status: ChainStatusStatus) {
 }
 
 const ChainStatus: React.FC<ChainStatusProps> = (props) => {
-  const { chainId, height, status } = props;
+  const { chainId, chainHealth } = props;
 
-  const statusColor = useMemo(() => getStatusColour(status), [status]);
-  const displayedHeight = useMemo(() => height.toLocaleString(), [height]);
+  const [statusColor, displayedHeight] = useMemo(() => {
+    if (chainHealth == null) return [null, null];
+
+    return [
+      getStatusColour(chainHealth.status),
+      chainHealth.height.toLocaleString(),
+    ];
+  }, [chainHealth]);
 
   return (
     <div className={cn("flex", "flex-row", "gap-x-2", "items-center")}>
@@ -37,7 +46,7 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
           "w-1.5",
           "rounded-full",
           "inline-block",
-          statusColor
+          statusColor ?? "bg-gray-400"
         )}
       ></div>
       <div
@@ -71,7 +80,9 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
             "text-likecoin-green"
           )}
         >
-          {displayedHeight}
+          {displayedHeight ?? (
+            <LocalizedText messageID="ChainStatus.connecting" />
+          )}
         </span>
       </div>
 

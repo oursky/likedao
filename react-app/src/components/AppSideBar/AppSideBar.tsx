@@ -1,16 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import IconButton from "../common/Buttons/IconButton";
 import { IconType } from "../common/Icons/Icons";
 import Divider from "../common/Divider/Divider";
 import AppNavigationMenu from "../AppNavigationMenu/AppNavigationMenu";
 
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { isRequestStateLoaded } from "../../models/RequestState";
-import { ChainHealth, ChainStatus } from "../../generated/graphql";
+import {
+  isRequestStateError,
+  isRequestStateLoaded,
+} from "../../models/RequestState";
 import { useCosmos } from "../../api/cosmosAPI";
 import { useTransaction } from "../../providers/TransactionProvider";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import Config from "../../config/Config";
 import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
@@ -23,6 +29,7 @@ interface AppSideBarProps {
 
 const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
+  const { translate } = useLocale();
   const location = useLocation();
   const wallet = useWallet();
   const cosmosAPI = useCosmos();
@@ -31,17 +38,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const chainHealthRequestState = useChainHealthQuery();
   const [isMenuActive, setIsMenuActive] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-  const chainHealth = useMemo((): ChainHealth => {
-    if (isRequestStateLoaded(chainHealthRequestState)) {
-      return chainHealthRequestState.data;
-    }
-
-    return {
-      height: 0,
-      status: ChainStatus.Offline,
-    };
-  }, [chainHealthRequestState]);
+  const chainId = Config.chainInfo.chainId;
 
   const openMobileMenu = useCallback(() => {
     setIsMenuActive(true);
@@ -73,6 +70,21 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
         console.error("Failed to fetch user balance =", e);
       });
   }, [cosmosAPI, wallet]);
+
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(chainHealthRequestState)) {
+        toast.error(
+          translate("AppSideBar.requestState.error", {
+            chainId,
+          })
+        );
+      }
+    },
+    () =>
+      isRequestStateError(chainHealthRequestState) ||
+      isRequestStateLoaded(chainHealthRequestState)
+  );
 
   return (
     <div
@@ -109,7 +121,13 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           )}
         >
           <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
-            <Header chainHealth={chainHealth} />
+            <Header
+              chainHealth={
+                isRequestStateLoaded(chainHealthRequestState)
+                  ? chainHealthRequestState.data
+                  : undefined
+              }
+            />
             <IconButton
               icon={isMenuActive ? IconType.X : IconType.Menu}
               size={24}

@@ -7,7 +7,7 @@ import { ChainSwitcherItem } from "./ChainSwitcherItem";
 import { ChainStatus } from "./ChainStatus";
 
 interface ChainSwitcherProps {
-  chainHealth: ChainHealth;
+  chainHealth?: ChainHealth;
 }
 
 const ChainSwitcher: React.FC<ChainSwitcherProps> = (props) => {
@@ -26,11 +26,7 @@ const ChainSwitcher: React.FC<ChainSwitcherProps> = (props) => {
             "rounded-md"
           )}
         >
-          <ChainStatus
-            chainId={chainInfo.chainId}
-            height={chainHealth.height}
-            status={chainHealth.status}
-          />
+          <ChainStatus chainId={chainInfo.chainId} chainHealth={chainHealth} />
         </Menu.Button>
       </div>
       <Transition
