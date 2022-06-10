@@ -126,12 +126,31 @@ func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.Proposal
 }
 
 func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
 	proposals := make([]*models.Proposal, len(ids))
 	err := q.NewQuery().Where("id IN (?)", bun.In(ids)).Scan(q.ctx, &proposals)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
-	return proposals, nil
+
+	// Reorder query results by order of input ids
+	result := make([]*models.Proposal, 0, len(proposals))
+	idToProposal := make(map[string]models.Proposal, len(proposals))
+	for _, propsal := range proposals {
+		idToProposal[propsal.NodeID().ID] = *propsal
+	}
+
+	for _, id := range ids {
+		proposal, exists := idToProposal[id]
+		if exists {
+			result = append(result, &proposal)
+		} else {
+			result = append(result, nil)
+		}
+	}
+	return result, nil
 }
 
 func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error) {
