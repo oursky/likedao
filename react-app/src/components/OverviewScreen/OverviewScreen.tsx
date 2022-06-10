@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import cn from "classnames";
 import CommunityStatus from "../CommunityStatus/CommunityStatus";
 import {
@@ -11,13 +11,20 @@ import { useCommunityStatusQuery } from "./OverviewScreenAPI";
 const OverviewScreen: React.FC = () => {
   const communityStatusRequestState = useCommunityStatusQuery();
 
-  if (
-    isRequestStateInitial(communityStatusRequestState) ||
-    isRequestStateLoading(communityStatusRequestState)
-  ) {
-    // TODO: Handle loading state
-    return <span>Loading...</span>;
-  }
+  const [isScreenLoading, screenData] = useMemo(() => {
+    if (
+      isRequestStateInitial(communityStatusRequestState) ||
+      isRequestStateLoading(communityStatusRequestState)
+    ) {
+      return [true, null];
+    }
+
+    if (isRequestStateError(communityStatusRequestState)) {
+      return [false, null];
+    }
+
+    return [false, communityStatusRequestState.data];
+  }, [communityStatusRequestState]);
 
   if (isRequestStateError(communityStatusRequestState)) {
     // TODO: Handle error state
@@ -40,9 +47,8 @@ const OverviewScreen: React.FC = () => {
       )}
     >
       <CommunityStatus
-        inflation={communityStatusRequestState.data.inflation}
-        bondedRatio={communityStatusRequestState.data.bondedRatio}
-        communityPool={communityStatusRequestState.data.communityPool.amount}
+        isLoading={isScreenLoading}
+        communityStatus={screenData}
       />
       <p>Other Content</p>
     </div>
