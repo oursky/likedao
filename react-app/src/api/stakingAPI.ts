@@ -6,8 +6,12 @@ import {
   newDelegateMessage,
   newUndelegateMessage,
 } from "../models/cosmos/staking";
-import { convertTokenToMinimalToken } from "../utils/coin";
+import {
+  convertMinimalTokenToToken,
+  convertTokenToMinimalToken,
+} from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
+import { BigNumberCoin } from "../models/coin";
 import { SignedTx, useCosmos } from "./cosmosAPI";
 
 interface IStakingAPI {
@@ -21,6 +25,7 @@ interface IStakingAPI {
     amount: string,
     memo?: string
   ): Promise<SignedTx>;
+  getUnstakingAmount(account: string): Promise<BigNumberCoin>;
 }
 
 export const useStaking = (): IStakingAPI => {
@@ -98,11 +103,30 @@ export const useStaking = (): IStakingAPI => {
     [chainInfo, query, cosmos, wallet]
   );
 
+  const getUnstakingAmount = useCallback(
+    async (address: string) => {
+      const res = await query.staking.delegatorUnbondingDelegations(address);
+
+      let amount = new BigNumber(0);
+      res.unbondingResponses.forEach((unbondingDelegation) => {
+        unbondingDelegation.entries.forEach((entry) => {
+          amount = BigNumber.sum(
+            convertMinimalTokenToToken(entry.balance),
+            amount
+          );
+        });
+      });
+      return { denom: chainInfo.currency.coinMinimalDenom, amount };
+    },
+    [chainInfo.currency.coinMinimalDenom, query.staking]
+  );
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
       signUndelegateTokenTx,
+      getUnstakingAmount,
     }),
-    [signDelegateTokenTx, signUndelegateTokenTx]
+    [signDelegateTokenTx, signUndelegateTokenTx, getUnstakingAmount]
   );
 };

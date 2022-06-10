@@ -15,8 +15,7 @@ export interface Portfolio {
   address: string;
 }
 
-// TODO: remove ?
-const PortfolioPanel: React.FC<{ portfolio?: Portfolio | null }> = ({
+const PortfolioPanel: React.FC<{ portfolio: Portfolio | null }> = ({
   portfolio,
 }) => {
   const { translate } = useLocale();
