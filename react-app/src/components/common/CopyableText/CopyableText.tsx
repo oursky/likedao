@@ -14,14 +14,13 @@ const CopyableText: React.FC<CopyableTextProps> = (props) => {
   const { containerClassName, className, text, onCopied } = props;
   const copy = useClipboard();
 
-  const onCopy = useCallback(() => {
-    copy(text)
-      .then(() => {
-        onCopied?.();
-      })
-      .catch((err) => {
-        console.error(`Failed to copy text = `, err);
-      });
+  const onCopy = useCallback(async () => {
+    try {
+      await copy(text);
+      onCopied?.();
+    } catch (err: unknown) {
+      console.error(`Failed to copy text = `, err);
+    }
   }, [copy, onCopied, text]);
 
   return (
@@ -36,6 +35,8 @@ const CopyableText: React.FC<CopyableTextProps> = (props) => {
         "pr-2",
         containerClassName
       )}
+      // Error handled by onCopy function
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onClick={onCopy}
     >
       <span

@@ -104,54 +104,55 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     }
   }, [activeWallet, setAutoConnectWalletType]);
 
-  const connectToKeplr = useCallback(() => {
+  const connectToKeplr = useCallback(async () => {
     setWalletStatus(ConnectionStatus.Connecting);
     closeConnectWalletModal();
-    KeplrWallet.connect(chainInfo)
-      .then(async (wallet: KeplrWallet) => {
-        setActiveWallet(wallet);
-        return wallet.offlineSigner.getAccounts();
-      })
-      .then((accounts: readonly AccountData[]) => {
-        const [account] = accounts;
-        setAccount(account);
-        setAutoConnectWalletType(AutoConnectWalletType.Keplr);
-        setWalletStatus(ConnectionStatus.Connected);
-      })
-      .catch((err) => {
-        console.error("Failed to connect to Keplr = ", err);
-        toast.error(translate("ConnectWallet.prompt.failed"));
-        setWalletStatus(ConnectionStatus.Idle);
-        setAutoConnectWalletType(null);
-      });
+
+    try {
+      const wallet = await KeplrWallet.connect(chainInfo);
+
+      setActiveWallet(wallet);
+
+      const [account] = await wallet.offlineSigner.getAccounts();
+
+      setAccount(account);
+      setAutoConnectWalletType(AutoConnectWalletType.Keplr);
+      setWalletStatus(ConnectionStatus.Connected);
+    } catch (err: unknown) {
+      console.error("Failed to connect to Keplr = ", err);
+      toast.error(translate("ConnectWallet.prompt.failed"));
+      setWalletStatus(ConnectionStatus.Idle);
+      setAutoConnectWalletType(null);
+    }
   }, [chainInfo, setAutoConnectWalletType, translate, closeConnectWalletModal]);
 
-  const connectToWalletConnect = useCallback(() => {
+  const connectToWalletConnect = useCallback(async () => {
     setWalletStatus(ConnectionStatus.Connecting);
     closeConnectWalletModal();
-    WalletConnectWallet.connect(chainInfo, {
-      onDisconnect: disconnect,
-    })
-      .then(async (wallet: WalletConnectWallet) => {
-        setActiveWallet(wallet);
-        return wallet.offlineSigner.getAccounts();
-      })
-      .then((accounts: readonly AccountData[]) => {
-        const [account] = accounts;
-        setAccount(account);
-        setWalletStatus(ConnectionStatus.Connected);
-      })
-      .catch((err) => {
-        console.error("Failed to connect to WalletConnect = ", err);
-        toast.error(translate("ConnectWallet.prompt.failed"));
-        setWalletStatus(ConnectionStatus.Idle);
+
+    try {
+      const wallet = await WalletConnectWallet.connect(chainInfo, {
+        onDisconnect: disconnect,
       });
+
+      setActiveWallet(wallet);
+
+      const [account] = await wallet.offlineSigner.getAccounts();
+      setAccount(account);
+      setWalletStatus(ConnectionStatus.Connected);
+    } catch (err: unknown) {
+      console.error("Failed to connect to WalletConnect = ", err);
+      toast.error(translate("ConnectWallet.prompt.failed"));
+      setWalletStatus(ConnectionStatus.Idle);
+    }
   }, [chainInfo, translate, closeConnectWalletModal, disconnect]);
 
   useEffect(() => {
     if (activeWallet !== null || walletStatus !== ConnectionStatus.Idle) return;
     switch (autoConnectWalletType) {
       case AutoConnectWalletType.Keplr:
+        // Error handled by function
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         connectToKeplr();
         break;
       default:
