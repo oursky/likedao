@@ -22,6 +22,7 @@ import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
 import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
 import { AddressBar } from "./AddressBar";
+import Footer from "./Footer";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -241,6 +242,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           <main className={cn("block", "w-full")}>{children}</main>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
