@@ -1,11 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import cn from "classnames";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
+import {
+  isRequestStateError,
+  isRequestStateInitial,
+  isRequestStateLoading,
+} from "../../models/RequestState";
+import { useProposalsQuery } from "./ProposalScreenAPI";
+import { ProposalList } from "./ProposalList";
+
+const PROPOSAL_LIST_PAGE_SIZE = 5;
 
 const ProposalScreen: React.FC = () => {
+  const { requestState, fetch } = useProposalsQuery(0, PROPOSAL_LIST_PAGE_SIZE);
+
+  useEffect(() => {
+    // TODO: Should fetch based on offset
+    fetch();
+  }, [fetch]);
+
+  // TODO: Change this to toast(TBC)
+  if (isRequestStateError(requestState)) {
+    return <p>{`Failed to load: ${requestState.error.message}`}</p>;
+  }
+
   return (
     <div
       className={cn(
@@ -70,19 +91,23 @@ const ProposalScreen: React.FC = () => {
             to={AppRoutes.NewProposal}
           />
         </div>
-        <div
-          className={cn(
-            "mt-7",
-            "flex",
-            "flex-col",
-            "items-center",
-            "justify-cetner",
-            "h-[528px]",
-            "bg-red-400"
-          )}
-        >
-          Table
-        </div>
+        {/* TODO: Align loading state height with empty state */}
+        {/* TODO: Update empty state design */}
+        {isRequestStateLoading(requestState) ||
+        isRequestStateInitial(requestState) ? (
+          <div className={cn("h-96", "flex", "items-center", "justify-center")}>
+            <Icon
+              icon={IconType.Ellipse}
+              className={cn("animate-spin")}
+              height={24}
+              width={24}
+            />
+          </div>
+        ) : (
+          <div className={cn("mt-5", "flex", "flex-col", "gap-y-4")}>
+            <ProposalList proposals={requestState.data.proposals} />
+          </div>
+        )}
       </div>
     </div>
   );

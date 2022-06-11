@@ -5,6 +5,7 @@ import {
   Proposal,
   ProposalStatus,
   ProposalType,
+  ProposalVoteOption,
 } from "../../generated/graphql";
 import AppRoutes from "../../navigation/AppRoutes";
 import Paper from "../common/Paper/Paper";
@@ -17,7 +18,8 @@ const ProposalDetailScreen: React.FC = () => {
 
   // mock data, remove after API integration
   const proposal: Proposal = {
-    id,
+    id: `proposal_${id}`,
+    proposalId: parseInt(id, 10),
     description: "description",
     type: ProposalType.Text,
     proposerAddress: "like1ewpwcdfgsdfdu0jj2unwhjjl58yshm9xnvr9c2",
@@ -33,6 +35,7 @@ const ProposalDetailScreen: React.FC = () => {
       no: 1,
       abstain: 1,
       noWithVeto: 0,
+      mostVoted: ProposalVoteOption.Yes,
     },
   };
 

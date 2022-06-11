@@ -3,6 +3,9 @@ schema: "../graphql-schema/*.graphql"
 documents: "./src/**/*.graphql"
 generates:
   ./src/generated/graphql.ts:
+    config:
+      enumValues:
+        ProposalStatus: ../models/cosmos/gov#ProposalStatus
     plugins:
       - "typescript"
       - "typescript-operations"

@@ -13,6 +13,16 @@ import {
 } from "cosmjs-types/cosmos/upgrade/v1beta1/upgrade";
 import { Any } from "cosmjs-types/google/protobuf/any";
 
+export enum ProposalStatus {
+  Unspecified = "PROPOSAL_STATUS_UNSPECIFIED",
+  DepositPeriod = "PROPOSAL_STATUS_DEPOSIT_PERIOD",
+  VotingPeriod = "PROPOSAL_STATUS_VOTING_PERIOD",
+  Passed = "PROPOSAL_STATUS_PASSED",
+  Rejected = "PROPOSAL_STATUS_REJECTED",
+  Failed = "PROPOSAL_STATUS_FAILED",
+  Invalid = "PROPOSAL_STATUS_INVALID",
+}
+
 export enum ProposalType {
   Signaling = "Signaling",
   ParameterChange = "ParameterChange",
