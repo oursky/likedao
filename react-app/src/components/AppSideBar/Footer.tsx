@@ -2,6 +2,7 @@ import React from "react";
 import cn from "classnames";
 import Divider from "../common/Divider/Divider";
 import AppButton from "../common/Buttons/AppButton";
+import LocalizedText from "../common/Localized/LocalizedText";
 
 const Footer: React.FC = () => {
   return (
@@ -20,8 +21,13 @@ const Footer: React.FC = () => {
           "sm:mt-5"
         )}
       >
-        <p className={cn("sm:grow", "sm:text-left")}>© 2022 Likecoin</p>
-        <p className={cn("mt-6", "sm:mt-0")}>Get Token</p>
+        <p className={cn("sm:grow", "sm:text-left")}>
+          © {new Date().getFullYear()}{" "}
+          <LocalizedText messageID="footer.likecoin" />
+        </p>
+        <p className={cn("mt-6", "sm:mt-0")}>
+          <LocalizedText messageID="footer.getToken" />
+        </p>
         <div
           className={cn(
             "flex",
@@ -36,7 +42,7 @@ const Footer: React.FC = () => {
             theme="secondary"
             size="small"
             type="anchor"
-            href="https://app.osmosis.zone/?from=UST&to=LIKE"
+            href="https://app.osmosis.zone/?from=ATOM&to=LIKE"
             className={cn(
               "text-sm",
               "leading-4",
@@ -83,7 +89,9 @@ const Footer: React.FC = () => {
             "sm:px-3"
           )}
         >
-          <p className={cn("pr-3")}>Need help?</p>
+          <p className={cn("pr-3")}>
+            <LocalizedText messageID="footer.needHelp" />
+          </p>
           <AppButton
             messageID="footer.contactSupport"
             theme="secondary"
