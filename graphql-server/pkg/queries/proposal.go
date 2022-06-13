@@ -127,7 +127,7 @@ func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.Proposal
 
 func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, error) {
 	if len(ids) == 0 {
-		return nil, nil
+		return []*models.Proposal{}, nil
 	}
 	proposals := make([]*models.Proposal, len(ids))
 	err := q.NewQuery().Where("id IN (?)", bun.In(ids)).Scan(q.ctx, &proposals)
