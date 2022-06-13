@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	abnfparser "github.com/fkgi/abnf"
+	"github.com/oursky/likedao/pkg/abnf"
 )
 
 const Delimitor = "|"
@@ -38,4 +41,68 @@ func (m *ExpirableValue) ParseString(str string) error {
 
 func (m *ExpirableValue) IsExpired() bool {
 	return m.ExpiryTime.Before(time.Now())
+}
+
+type AuthenticationMessage struct {
+	Authority    string    `json:"authority"`
+	Address      string    `json:"address"`
+	Statement    string    `json:"statement"`
+	URI          string    `json:"uri"`
+	ChainID      string    `json:"chain_id"`
+	Nonce        string    `json:"nonce"`
+	IssuedAt     time.Time `json:"issued_at"`
+	ExpirationAt time.Time `json:"expiration_at"`
+	NotBefore    time.Time `json:"not_before"`
+	RequestID    string    `json:"request_id"`
+	Resources    []string  `json:"resources"`
+}
+
+func (m *AuthenticationMessage) ParseAbnf(message string) error {
+	tree := abnfparser.ParseString(message, abnf.AuthenticationMessage())
+
+	if tree == nil {
+		return fmt.Errorf("failed to parse abnf")
+	}
+
+	m.Authority = string(tree.Child(abnf.AuthorityFQDN).V)
+	m.Address = string(tree.Child(abnf.AddressFQDN).V)
+	m.Statement = string(tree.Child(abnf.StatementFQDN).V)
+	m.URI = string(tree.Child(abnf.URIFQDN).V)
+	m.ChainID = string(tree.Child(abnf.ChainIDFQDN).V)
+	m.Nonce = string(tree.Child(abnf.NonceFQDN).V)
+
+	issuedAt, err := time.Parse(time.RFC3339, string(tree.Child(abnf.IssuedAtFQDN).V))
+	if err != nil {
+		return err
+	}
+	m.IssuedAt = issuedAt
+
+	if expirationAt := tree.Child(abnf.ExpirationAtFQDN); expirationAt != nil {
+		expirationAtTime, err := time.Parse(time.RFC3339, string(expirationAt.V))
+		if err != nil {
+			return err
+		}
+		m.ExpirationAt = expirationAtTime
+	}
+
+	if notBefore := tree.Child(abnf.NotBeforeFQDN); notBefore != nil {
+		notBeforeTime, err := time.Parse(time.RFC3339, string(notBefore.V))
+		if err != nil {
+			return err
+		}
+		m.NotBefore = notBeforeTime
+	}
+
+	if requestID := tree.Child(abnf.RequestIDFQDN); requestID != nil {
+		m.RequestID = string(requestID.V)
+	}
+
+	resourceTrees := tree.Children(abnf.ResourceFQDN)
+	resources := make([]string, len(resourceTrees))
+	for _, rsTree := range resourceTrees {
+		resources = append(resources, string(rsTree.V))
+	}
+	m.Resources = resources
+
+	return nil
 }
