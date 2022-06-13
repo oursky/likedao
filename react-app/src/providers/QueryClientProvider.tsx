@@ -24,7 +24,7 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   const { children } = props;
   const chainInfo = Config.chainInfo;
   const desmosRpc = Config.desmosRpc;
-  console.log({ desmosRpc });
+
   const [queryClient, setQueryClient] = useState<ExtendedQueryClient | null>(
     null
   );
