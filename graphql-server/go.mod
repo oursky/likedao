@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/99designs/gqlgen v0.17.4
 	github.com/cychiuae/go-dataloader v1.0.1
+	github.com/fkgi/abnf v1.0.0
 	github.com/forbole/bdjuno v0.0.0-20211005100659-82415a54ae05
 	github.com/getsentry/sentry-go v0.13.0
 	github.com/gin-contrib/cors v1.3.1
