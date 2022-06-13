@@ -60,7 +60,7 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
 
   return (
     <QueryClientContext.Provider value={value}>
-      {!!(queryClient && desmosQueryClient) && children}
+      {(queryClient && desmosQueryClient) != null && children}
     </QueryClientContext.Provider>
   );
 };
