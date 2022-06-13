@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { DesmosClient } from "@desmoslabs/desmjs";
 import Config from "../config/Config";
-import { ExtendedQueryClient, newQueryClient } from "../clients/queryClient";
+import {
+  ExtendedQueryClient,
+  newQueryClient,
+  newDesmosQueryClient,
+} from "../clients/queryClient";
 
 interface QueryClientProviderProps {
   children?: React.ReactNode;
@@ -8,6 +13,7 @@ interface QueryClientProviderProps {
 
 interface QueryClientProviderContextValue {
   query: ExtendedQueryClient;
+  desmosQuery: DesmosClient;
 }
 
 const QueryClientContext = React.createContext<QueryClientProviderContextValue>(
@@ -17,15 +23,20 @@ const QueryClientContext = React.createContext<QueryClientProviderContextValue>(
 const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   const { children } = props;
   const chainInfo = Config.chainInfo;
+  const desmosRpc = Config.desmosRpc;
+  console.log({ desmosRpc });
   const [queryClient, setQueryClient] = useState<ExtendedQueryClient | null>(
     null
   );
+  const [desmosQueryClient, setDesmosQueryClient] =
+    useState<DesmosClient | null>(null);
 
   const value = useMemo(
     (): QueryClientProviderContextValue => ({
       query: queryClient!,
+      desmosQuery: desmosQueryClient!,
     }),
-    [queryClient]
+    [queryClient, desmosQueryClient]
   );
   useEffect(() => {
     newQueryClient(chainInfo)
@@ -37,9 +48,19 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
       });
   }, [chainInfo]);
 
+  useEffect(() => {
+    newDesmosQueryClient(desmosRpc)
+      .then((client) => {
+        setDesmosQueryClient(client);
+      })
+      .catch((err) => {
+        console.log("Error creating desmos query client", err);
+      });
+  }, [desmosRpc]);
+
   return (
     <QueryClientContext.Provider value={value}>
-      {!!queryClient && children}
+      {!!(queryClient && desmosQueryClient) && children}
     </QueryClientContext.Provider>
   );
 };
