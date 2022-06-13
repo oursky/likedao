@@ -138,8 +138,8 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 	// Reorder query results by order of input ids
 	result := make([]*models.Proposal, 0, len(proposals))
 	idToProposal := make(map[string]models.Proposal, len(proposals))
-	for _, propsal := range proposals {
-		idToProposal[propsal.NodeID().ID] = *propsal
+	for _, proposal := range proposals {
+		idToProposal[proposal.NodeID().ID] = *proposal
 	}
 
 	for _, id := range ids {
@@ -155,14 +155,14 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 
 func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error) {
 	var res bunbig.Int
-	subquery := q.session.NewSelect().
+	depositCoinsQuery := q.session.NewSelect().
 		Model((*models.ProposalDeposit)(nil)).
 		ColumnExpr("unnest(amount) AS coin").
 		Where("proposal_id = ?", id)
 
 	query := q.session.NewSelect().
 		ColumnExpr("SUM((deposit.coin).amount::BIGINT)").
-		TableExpr("(?) AS deposit", subquery).
+		TableExpr("(?) AS deposit", depositCoinsQuery).
 		Where("(deposit.coin).denom = ?", denom).
 		GroupExpr("(deposit.coin).denom")
 
