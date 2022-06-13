@@ -34,13 +34,14 @@ export const useCreateProposalFormModel = (): {
       },
       title: {
         required: requiredValidator,
-        // https://github.com/cosmos/cosmos-sdk/blob/55054282d2df794d9a5fe2599ea25473379ebc3d/x/gov/types/v1beta1/proposal.go#L169
+        // https://github.com/cosmos/cosmos-sdk/blob/master/x/gov/types/v1beta1/proposal.go#L169
         maxLength: maxLengthValidator(140),
       },
       description: {
         required: false,
-        // https://github.com/cosmos/cosmos-sdk/blob/55054282d2df794d9a5fe2599ea25473379ebc3d/x/gov/types/v1beta1/proposal.go#L168
-        maxLength: maxLengthValidator(10000),
+        // TODO: Change to 10000 once chain is updated to 0.45+
+        // https://github.com/cosmos/cosmos-sdk/blob/master/x/gov/types/v1beta1/proposal.go#L168
+        maxLength: maxLengthValidator(5000),
       },
     };
   }, [requiredValidator, maxLengthValidator, translate]);
