@@ -1,5 +1,8 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
+import { Coin } from "cosmjs-types/cosmos/base/v1beta1/coin";
+import { DelegationResponse } from "cosmjs-types/cosmos/staking/v1beta1/staking";
+import { assert } from "@cosmjs/utils";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import {
@@ -9,6 +12,7 @@ import {
 import {
   convertMinimalTokenToToken,
   convertTokenToMinimalToken,
+  addCoins,
 } from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
@@ -25,6 +29,7 @@ interface IStakingAPI {
     amount: string,
     memo?: string
   ): Promise<SignedTx>;
+  getBalanceStaked(account: string): Promise<BigNumberCoin>;
   getUnstakingAmount(account: string): Promise<BigNumberCoin>;
 }
 
@@ -103,12 +108,63 @@ export const useStaking = (): IStakingAPI => {
     [chainInfo, query, cosmos, wallet]
   );
 
+  /**
+   * TODO: Remove and use getter on stargate client instead upon upgrading cosmjs/* to v0.48 or above
+   * Source: https://github.com/cosmos/cosmjs/commit/35a99fa44fb7dad45c6e529fbd9356baa4cb3a5f#diff-85b6fde6b221072d41a75679ef8130231d58d723738d773a30a08ce21ddc0a2b
+   */
+  const getBalanceStaked = useCallback(
+    async (address: string) => {
+      const allDelegations = [];
+      let startAtKey: Uint8Array | undefined;
+      while (startAtKey?.length !== 0 && startAtKey !== undefined) {
+        const { delegationResponses, pagination } =
+          await query.staking.delegatorDelegations(address, startAtKey);
+
+        const loadedDelegations = delegationResponses;
+        allDelegations.push(...loadedDelegations);
+        startAtKey = pagination?.nextKey;
+      }
+
+      const sumValues = allDelegations.reduce(
+        (
+          previousValue: Coin | null,
+          currentValue: DelegationResponse
+        ): Coin => {
+          assert(currentValue.balance);
+          return previousValue !== null
+            ? addCoins(previousValue, currentValue.balance)
+            : currentValue.balance;
+        },
+        null
+      );
+      return {
+        denom: sumValues
+          ? sumValues.denom
+          : chainInfo.currency.coinMinimalDenom,
+        amount: convertMinimalTokenToToken(sumValues ? sumValues.amount : 0),
+      };
+    },
+    [query.staking, chainInfo]
+  );
+
   const getUnstakingAmount = useCallback(
     async (address: string) => {
-      const res = await query.staking.delegatorUnbondingDelegations(address);
+      const allDelegations = [];
+      let startAtKey: Uint8Array | undefined;
+      while (startAtKey?.length !== 0 && startAtKey !== undefined) {
+        const { unbondingResponses, pagination } =
+          await query.staking.delegatorUnbondingDelegations(
+            address,
+            startAtKey
+          );
+
+        const loadedDelegations = unbondingResponses;
+        allDelegations.push(...loadedDelegations);
+        startAtKey = pagination?.nextKey;
+      }
 
       let amount = new BigNumber(0);
-      res.unbondingResponses.forEach((unbondingDelegation) => {
+      allDelegations.forEach((unbondingDelegation) => {
         unbondingDelegation.entries.forEach((entry) => {
           amount = BigNumber.sum(
             convertMinimalTokenToToken(entry.balance),
@@ -116,7 +172,11 @@ export const useStaking = (): IStakingAPI => {
           );
         });
       });
-      return { denom: chainInfo.currency.coinMinimalDenom, amount };
+
+      return {
+        denom: chainInfo.currency.coinMinimalDenom,
+        amount: convertMinimalTokenToToken(amount),
+      };
     },
     [chainInfo.currency.coinMinimalDenom, query.staking]
   );
@@ -125,8 +185,14 @@ export const useStaking = (): IStakingAPI => {
     () => ({
       signDelegateTokenTx,
       signUndelegateTokenTx,
+      getBalanceStaked,
       getUnstakingAmount,
     }),
-    [signDelegateTokenTx, signUndelegateTokenTx, getUnstakingAmount]
+    [
+      signDelegateTokenTx,
+      signUndelegateTokenTx,
+      getBalanceStaked,
+      getUnstakingAmount,
+    ]
   );
 };
