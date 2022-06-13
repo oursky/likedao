@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import cn from "classnames";
+import { Bech32 } from "@cosmjs/encoding";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { useCosmos } from "../../api/cosmosAPI";
 import { useStaking } from "../../api/stakingAPI";
+import { useQueryClient } from "../../providers/QueryClientProvider";
 import PortfolioPanel, { Portfolio } from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
   const wallet = useWallet();
   const cosmosAPI = useCosmos();
   const staking = useStaking();
+  const { desmosQuery } = useQueryClient();
 
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
 
@@ -17,12 +20,19 @@ const PortfolioScreen: React.FC = () => {
     try {
       // TODO: call apis concurrently
       const balance = await cosmosAPI.getBalance();
-      const stakingBalance = await cosmosAPI.getStakingBalance();
+      const stakingBalance = await staking.getBalanceStaked(
+        wallet.account.address
+      );
       const unstakingBalance = await staking.getUnstakingAmount(
         wallet.account.address
       );
 
+      const profile = await desmosQuery.getProfile(
+        Bech32.encode("desmos", Bech32.decode(wallet.account.address).data)
+      );
+
       setPortfolio({
+        profile,
         balance,
         unstakingBalance,
         stakingBalance,
@@ -31,7 +41,7 @@ const PortfolioScreen: React.FC = () => {
     } catch (err: unknown) {
       console.error("Failed to fetch user balance =", err);
     }
-  }, [wallet, staking, cosmosAPI]);
+  }, [wallet, staking, cosmosAPI, desmosQuery]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {
