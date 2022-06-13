@@ -64,56 +64,55 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   }, []);
 
   const submitSendRequest = useCallback(
-    (values: SendTokenFormValues) => {
+    async (values: SendTokenFormValues) => {
       if (wallet.status !== ConnectionStatus.Connected) return;
 
-      bankAPI
-        .signSendTokenTx(
+      try {
+        const tx = await bankAPI.signSendTokenTx(
           values.recipent,
           values.amount,
           values.memo ?? undefined
-        )
-        .then(async (tx) => {
-          setActiveModal(null);
-          // TODO: Review this loading state
-          return toast.promise(cosmosAPI.broadcastTx(tx), {
-            pending: translate("transaction.broadcasting"),
-            success: translate("transaction.success"),
-          });
-        })
-        .then(async () => {
-          return wallet.refreshAccounts();
-        })
-        .catch((e) => {
-          console.error("Error signing send token tx", e);
-          toast.error(translate("transaction.failure"));
-          closeModals();
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
         });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
     },
     [cosmosAPI, bankAPI, wallet, closeModals, translate]
   );
 
   const submitCollectRewardsRequest = useCallback(
-    (_: CollectRewardsFormValues) => {
+    async (_: CollectRewardsFormValues) => {
       if (wallet.status !== ConnectionStatus.Connected) return;
-      distributionAPI
-        .signWithdrawDelegationRewardsTx(undefined)
-        .then(async (tx) => {
-          setActiveModal(null);
-          // TODO: Review this loading state
-          return toast.promise(cosmosAPI.broadcastTx(tx), {
-            pending: translate("transaction.broadcasting"),
-            success: translate("transaction.success"),
-          });
-        })
-        .then(async () => {
-          return wallet.refreshAccounts();
-        })
-        .catch((e) => {
-          console.error("Error signing send token tx", e);
-          toast.error(translate("transaction.failure"));
-          closeModals();
+
+      try {
+        const tx = await distributionAPI.signWithdrawDelegationRewardsTx(
+          undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
         });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
     },
     [cosmosAPI, distributionAPI, wallet, closeModals, translate]
   );

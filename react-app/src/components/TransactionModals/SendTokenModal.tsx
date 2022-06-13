@@ -6,7 +6,7 @@ import { BaseTransactionModal, TransactionStep } from "./BaseTransactionModal";
 
 interface SendTokenModalProps {
   availableTokens: BigNumber;
-  onSubmit: (values: SendTokenFormValues) => void;
+  onSubmit: (values: SendTokenFormValues) => Promise<void>;
   onClose: () => void;
 }
 
@@ -20,6 +20,8 @@ const SendTokenModal: React.FC<SendTokenModalProps> = (props) => {
   const onNextClick = useCallback(
     (values: SendTokenFormValues) => {
       setCurrentStep(TransactionStep.Sign);
+      // Error handled in transaction provider
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       onSubmit(values);
     },
     [onSubmit]

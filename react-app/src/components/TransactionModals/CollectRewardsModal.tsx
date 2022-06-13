@@ -6,7 +6,7 @@ import { BaseTransactionModal, TransactionStep } from "./BaseTransactionModal";
 
 interface CollectRewardsModalProps {
   availableRewards: BigNumber;
-  onSubmit: (values: CollectRewardsFormValues) => void;
+  onSubmit: (values: CollectRewardsFormValues) => Promise<void>;
   onClose: () => void;
 }
 
@@ -20,6 +20,8 @@ const CollectRewardsModal: React.FC<CollectRewardsModalProps> = (props) => {
   const onNextClick = useCallback(
     (values: CollectRewardsFormValues) => {
       setCurrentStep(TransactionStep.Sign);
+      // Error handled in transaction provider
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       onSubmit(values);
     },
     [onSubmit]

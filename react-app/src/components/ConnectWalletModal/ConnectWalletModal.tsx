@@ -12,8 +12,8 @@ import LocalizedText from "../common/Localized/LocalizedText";
 interface ConnectWalletModalProps {
   isOpened: boolean;
   onClose: () => void;
-  onKeplrConnect: () => void;
-  onWalletConnectConnect: () => void;
+  onKeplrConnect: () => Promise<void>;
+  onWalletConnectConnect: () => Promise<void>;
 }
 
 const ConnectWalletModal: React.FC<ConnectWalletModalProps> = (props) => {
@@ -28,6 +28,8 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = (props) => {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      // Error handled in wallet provider
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       onKeplrConnect_();
     },
     [onKeplrConnect_]
@@ -37,6 +39,8 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = (props) => {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      // Error handled in wallet provider
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       onWalletConnectConnect_();
     },
     [onWalletConnectConnect_]
