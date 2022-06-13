@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import cn from "classnames";
+import { useSearchParams } from "react-router-dom";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
@@ -38,11 +39,22 @@ const defaultFilterItems: IFilterTabItem<FilterKey>[] = [
 
 const ProposalScreen: React.FC = () => {
   const wallet = useWallet();
-  const { requestState, fetch, currentFilter, applyFilter } = useProposalsQuery(
-    0,
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [offset, filter, searchTerm] = useMemo(() => {
+    const pageStr = searchParams.get("page") ?? "1";
+    const filter = searchParams.get("filter") ?? "voting";
+    const search = searchParams.get("search");
+
+    const page = Math.max(parseInt(pageStr, 10), 1) - 1;
+
+    return [page * PROPOSAL_LIST_PAGE_SIZE, filter as FilterKey, search];
+  }, [searchParams]);
+
+  const { requestState, fetch } = useProposalsQuery(
+    offset,
     PROPOSAL_LIST_PAGE_SIZE
   );
-  const [offset, setOffset] = useState<number>(0);
 
   const filterItems: IFilterTabItem<FilterKey>[] = useMemo(() => {
     if (wallet.status === ConnectionStatus.Connected) {
@@ -56,25 +68,33 @@ const ProposalScreen: React.FC = () => {
     return defaultFilterItems;
   }, [wallet]);
 
+  const setPage = useCallback(
+    (offset: number) => {
+      const page = Math.floor(offset / PROPOSAL_LIST_PAGE_SIZE) + 1;
+      const params = searchParams;
+      params.set("page", page.toString());
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams]
+  );
+
   const setFilter = useCallback(
     (filter: FilterKey) => {
-      if (
-        wallet.status === ConnectionStatus.Connected &&
-        filter === "following"
-      ) {
-        applyFilter(filter, wallet.account.address);
-        return;
-      }
-
-      applyFilter(filter, null);
-      setOffset(0);
+      const params = searchParams;
+      params.set("filter", filter);
+      params.set("page", "1");
+      setSearchParams(params);
     },
-    [wallet, applyFilter]
+    [setSearchParams, searchParams]
   );
 
   useEffect(() => {
-    fetch(offset);
-  }, [fetch, offset]);
+    const address =
+      wallet.status === ConnectionStatus.Connected
+        ? wallet.account.address
+        : undefined;
+    fetch(offset, filter, address, searchTerm ?? undefined);
+  }, [fetch, offset, filter, searchTerm, wallet]);
 
   // TODO: Change this to toast(TBC)
   if (isRequestStateError(requestState)) {
@@ -159,7 +179,7 @@ const ProposalScreen: React.FC = () => {
           <div className={cn("mt-5", "flex", "flex-col", "gap-y-4")}>
             <FilterTabs
               tabs={filterItems}
-              selectedTab={currentFilter}
+              selectedTab={filter}
               onSelectTab={setFilter}
             />
             <ProposalList proposals={requestState.data.proposals} />
@@ -168,7 +188,7 @@ const ProposalScreen: React.FC = () => {
               pageSize={PROPOSAL_LIST_PAGE_SIZE}
               totalItems={requestState.data.totalCount}
               currentOffset={offset}
-              onPageChange={setOffset}
+              onPageChange={setPage}
             />
           </div>
         )}
