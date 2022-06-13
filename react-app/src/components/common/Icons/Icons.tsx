@@ -17,6 +17,7 @@ import { ReactComponent as LightningIcon } from "../../../assets/ic-lightning.sv
 import { ReactComponent as EllipseIcon } from "../../../assets/ic-ellipse.svg";
 import { ReactComponent as LinkIcon } from "../../../assets/ic-link.svg";
 import { ReactComponent as ShareIcon } from "../../../assets/ic-share.svg";
+import { ReactComponent as ThinXIcon } from "../../../assets/ic-thin-x.svg";
 
 enum IconType {
   Home = "Home",
@@ -37,6 +38,7 @@ enum IconType {
   Ellipse = "Ellipse",
   Link = "Link",
   Share = "Share",
+  ThinX = "ThinX",
 }
 
 const iconMap = {
@@ -58,6 +60,7 @@ const iconMap = {
   [IconType.Ellipse]: EllipseIcon,
   [IconType.Link]: LinkIcon,
   [IconType.Share]: ShareIcon,
+  [IconType.ThinX]: ThinXIcon,
 };
 
 function getIcon(icon: IconType) {
