@@ -8,7 +8,6 @@ import (
 
 	graphql "github.com/99designs/gqlgen/graphql"
 	gqlerrcode "github.com/99designs/gqlgen/graphql/errcode"
-	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -24,7 +23,7 @@ func (nodeID NodeID) String() string {
 func ParseNodeID(nodeID string) (NodeID, error) {
 	parts := strings.Split(nodeID, "_")
 	if len(parts) != 2 {
-		return NodeID{}, servererrors.ErrInvalidNodeID
+		return NodeID{}, fmt.Errorf("invalid node ID: %s", nodeID)
 	}
 	return NodeID{
 		EntityType: parts[0],

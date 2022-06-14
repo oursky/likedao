@@ -11,7 +11,7 @@ import (
 func Authed(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	address := pkgContext.GetAuthedUserAddress(ctx)
 	if address == "" {
-		return nil, servererrors.ErrUnauthenticated
+		return nil, servererrors.Unauthenticated.NewErrorWithDefaultMessage(ctx)
 	}
 
 	return next(ctx)

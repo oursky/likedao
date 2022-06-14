@@ -1,10 +1,10 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	bdjuno "github.com/forbole/bdjuno/database/types"
-	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/extra/bunbig"
 )
@@ -31,7 +31,7 @@ func (e ProposalStatus) IsValid() bool {
 func (e *ProposalStatus) UnmarshalGQL(v string) error {
 	*e = ProposalStatus(v)
 	if !e.IsValid() {
-		return servererrors.Wrapf(servererrors.ErrValidationFailure, "invalid proposal status: %s", v)
+		return fmt.Errorf("invalid ProposalStatus: %s", v)
 	}
 	return nil
 }
