@@ -23,23 +23,23 @@ const AppRouter: React.FC = () => {
   const wallet = useWallet();
   return (
     <BrowserRouter>
-        <Routes>
-          <Route element={<AppSideBarOutlet />}>
-            <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
-            <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
-            <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
-            <Route
-              path={AppRoutes.NewProposal}
-              element={<CreateProposalScreen />}
-            />
-            <Route
-              path={AppRoutes.ProposalDetail}
-              element={<ProposalDetailScreen />}
-            />
-          </Route>
+      <Routes>
+        <Route element={<AppSideBarOutlet />}>
+          <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
+          <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
+          <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
+          <Route
+            path={AppRoutes.NewProposal}
+            element={<CreateProposalScreen />}
+          />
+          <Route
+            path={AppRoutes.ProposalDetail}
+            element={<ProposalDetailScreen />}
+          />
+        </Route>
 
-          <Route path="*" element={<ErrorView type={ErrorType.NotFound} />} />
-        </Routes>
+        <Route path="*" element={<ErrorView type={ErrorType.NotFound} />} />
+      </Routes>
 
       {wallet.status === ConnectionStatus.Connecting && (
         <WalletConnectingScreen />

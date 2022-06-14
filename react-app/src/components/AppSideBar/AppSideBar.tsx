@@ -95,6 +95,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
         "flex-col",
         "min-h-screen",
         "justify-between",
+        "w-full",
         isMenuActive && "fixed"
       )}
     >
