@@ -4,16 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tailwind sets list-style to none which breaks markdown previewer */
-/* stylelint-disable */
-@layer base {
-  ul,
-  ol {
-    list-style: initial;
-  }
-}
-/* stylelint-enable */
-
 body {
   font-family: "Inter", sans-serif;
 }
