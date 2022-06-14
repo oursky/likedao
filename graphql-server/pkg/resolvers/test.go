@@ -43,6 +43,12 @@ func (r *queryResolver) QueryTestsByIDs(ctx context.Context, ids []models.NodeID
 	return res, nil
 }
 
+func (r *queryResolver) Me(ctx context.Context) (string, error) {
+	address := pkgContext.GetAuthedUserAddress(ctx)
+
+	return address, nil
+}
+
 // Mutation returns graphql1.MutationResolver implementation.
 func (r *Resolver) Mutation() graphql1.MutationResolver { return &mutationResolver{r} }
 
