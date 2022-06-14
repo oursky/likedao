@@ -69,6 +69,7 @@
   "ProposalScreen.proposalType.parameterChange": "Parameter Change",
   "ProposalScreen.proposalType.softwareUpgrade": "Software Upgrade",
   "ProposalScreen.proposalType.text": "Signaling",
+  "ProposalScreen.requestState.error": "Failed to fetch data, please try again later.",
   "ProposalScreen.title": "Proposals",
   "SendTokenModal.fields.amount": "Amount",
   "SendTokenModal.fields.amount.available": "Available: {amount} {denom}",

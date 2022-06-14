@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import cn from "classnames";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import AppButton from "../common/Buttons/AppButton";
@@ -8,11 +9,14 @@ import AppRoutes from "../../navigation/AppRoutes";
 import {
   isRequestStateError,
   isRequestStateInitial,
+  isRequestStateLoaded,
   isRequestStateLoading,
 } from "../../models/RequestState";
 import PageContoller from "../common/PageController/PageController";
 import FilterTabs, { IFilterTabItem } from "../FilterTabs/FilterTabs";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { FilterKey, useProposalsQuery } from "./ProposalScreenAPI";
 import { ProposalList } from "./ProposalList";
 
@@ -39,6 +43,7 @@ const defaultFilterItems: IFilterTabItem<FilterKey>[] = [
 
 const ProposalScreen: React.FC = () => {
   const wallet = useWallet();
+  const { translate } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [offset, filter, searchTerm] = useMemo(() => {
@@ -96,10 +101,15 @@ const ProposalScreen: React.FC = () => {
     fetch(offset, filter, address, searchTerm ?? undefined);
   }, [fetch, offset, filter, searchTerm, wallet]);
 
-  // TODO: Change this to toast(TBC)
-  if (isRequestStateError(requestState)) {
-    return <p>{`Failed to load: ${requestState.error.message}`}</p>;
-  }
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(requestState)) {
+        toast.error(translate("ProposalScreen.requestState.error"));
+      }
+    },
+    () =>
+      isRequestStateError(requestState) || isRequestStateLoaded(requestState)
+  );
 
   return (
     <div
@@ -182,11 +192,21 @@ const ProposalScreen: React.FC = () => {
               selectedTab={filter}
               onSelectTab={setFilter}
             />
-            <ProposalList proposals={requestState.data.proposals} />
+            <ProposalList
+              proposals={
+                !isRequestStateError(requestState)
+                  ? requestState.data.proposals
+                  : []
+              }
+            />
             <PageContoller
               offsetBased={true}
               pageSize={PROPOSAL_LIST_PAGE_SIZE}
-              totalItems={requestState.data.totalCount}
+              totalItems={
+                !isRequestStateError(requestState)
+                  ? requestState.data.totalCount
+                  : 0
+              }
               currentOffset={offset}
               onPageChange={setPage}
             />
