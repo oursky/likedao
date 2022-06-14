@@ -5,8 +5,11 @@ import MDEditor, {
   commands as MDEditorCommands,
   MDEditorProps,
 } from "@uiw/react-md-editor";
+import { MarkdownPreviewProps } from "@uiw/react-markdown-preview";
 import rehypeSanitize from "rehype-sanitize";
 import cn from "classnames";
+
+import "./MarkdownEditor.module.scss";
 
 interface MarkdownEditorProps
   extends Omit<MDEditorProps, "onChange" | "value"> {
@@ -77,6 +80,19 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = (props) => {
         extraCommands={extraCommands}
         previewOptions={{ rehypePlugins: [rehypeSanitize] }}
       />
+    </div>
+  );
+};
+
+export const MarkdownPreview: React.FC<
+  MarkdownPreviewProps & {
+    containerClassName?: string;
+  }
+> = (props) => {
+  const { containerClassName, ...rest } = props;
+  return (
+    <div data-color-mode="light" className={cn("w-full", containerClassName)}>
+      <MDEditor.Markdown {...rest} />
     </div>
   );
 };
