@@ -1,12 +1,17 @@
 package models
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
 
 	abnfparser "github.com/fkgi/abnf"
 	"github.com/oursky/likedao/pkg/abnf"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/ed25519"
+	"github.com/tendermint/tendermint/crypto/secp256k1"
+	"github.com/tendermint/tendermint/crypto/sr25519"
 )
 
 const Delimitor = "|"
@@ -41,6 +46,63 @@ func (m *ExpirableValue) ParseString(str string) error {
 
 func (m *ExpirableValue) IsExpired() bool {
 	return m.ExpiryTime.Before(time.Now())
+}
+
+type Fee struct {
+	Amount []string `json:"amount"`
+	Gas    string   `json:"gas"`
+}
+
+type MessageSignData struct {
+	Data   string `json:"data"` // Base64
+	Signer string `json:"signer"`
+}
+
+type Message struct {
+	Type  string          `json:"type"`
+	Value MessageSignData `json:"value"`
+}
+type PubKey struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+func (p *PubKey) ToPubKey() (crypto.PubKey, error) {
+	decodedPubKey, err := base64.StdEncoding.DecodeString(p.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	switch p.Type {
+	case secp256k1.PubKeyName:
+		pubKey := secp256k1.PubKey(decodedPubKey)
+		return &pubKey, nil
+	case ed25519.PubKeyName:
+		pubKey := ed25519.PubKey(decodedPubKey)
+		return &pubKey, nil
+	case sr25519.PubKeyName:
+		pubKey := sr25519.PubKey(decodedPubKey)
+		return &pubKey, nil
+	}
+	return nil, fmt.Errorf("unknown pubkey type: %s", p.Type)
+}
+
+type SignDoc struct {
+	AccountNumber string    `json:"account_number"`
+	ChainID       string    `json:"chain_id"`
+	Fee           Fee       `json:"fee"`
+	Memo          string    `json:"memo"`
+	Messages      []Message `json:"msgs"`
+	Sequence      string    `json:"sequence"`
+}
+type Signature struct {
+	PubKey    PubKey `json:"pub_key"`
+	Signature string `json:"signature"`
+}
+
+type AuthenticationRequestData struct {
+	SignDoc   SignDoc   `json:"sign_doc"`
+	Signature Signature `json:"signature"`
 }
 
 type AuthenticationMessage struct {
