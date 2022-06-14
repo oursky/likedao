@@ -7,7 +7,8 @@ import (
 )
 
 type ChainConfig struct {
-	CoinDenom string
+	Bech32Prefix string
+	CoinDenom    string
 }
 
 type LogConfig struct {
@@ -116,8 +117,13 @@ func LoadConfigFromEnv() Config {
 	if coinDenom == "" {
 		coinDenom = "nanolike"
 	}
+	bech32Prefix := os.Getenv("CHAIN_BECH32_PREFIX")
+	if bech32Prefix == "" {
+		bech32Prefix = "like"
+	}
 	chainConfig := ChainConfig{
-		CoinDenom: coinDenom,
+		CoinDenom:    coinDenom,
+		Bech32Prefix: bech32Prefix,
 	}
 
 	sessionExpiryStr := os.Getenv("SESSION_EXPIRY")

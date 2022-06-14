@@ -20,6 +20,7 @@ graphqlServer:
   host: api.likedao.example.com
   chain:
     coinDenom: nanolike
+    bech32Prefix: like
 reactApp:
   imageName: ghcr.io/oursky/likedao-react-app
   host: likedao.example.com
