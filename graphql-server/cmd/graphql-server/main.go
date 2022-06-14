@@ -65,7 +65,7 @@ func main() {
 			"message": "pong",
 		})
 	})
-	router.POST("/graphql", handlers.GraphqlHandler(serverDB, chainDB))
+	router.POST("/graphql", middlewares.Authentication(config), handlers.GraphqlHandler(serverDB, chainDB))
 	if gin.Mode() == gin.DebugMode {
 		router.GET("/graphql", handlers.GraphqlPlaygroundHandler())
 	}
