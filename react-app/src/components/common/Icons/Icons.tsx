@@ -20,6 +20,7 @@ import { ReactComponent as ShareIcon } from "../../../assets/ic-share.svg";
 import { ReactComponent as ThinXIcon } from "../../../assets/ic-thin-x.svg";
 import { ReactComponent as ArrowNarrowRightIcon } from "../../../assets/ic-arrow-narrow-right.svg";
 import { ReactComponent as ArrowNarrowLeftIcon } from "../../../assets/ic-arrow-narrow-left.svg";
+import { ReactComponent as AccountIcon } from "../../../assets/ic-account.svg";
 
 enum IconType {
   Home = "Home",
@@ -43,6 +44,7 @@ enum IconType {
   ThinX = "ThinX",
   ArrowNarrowRight = "ArrowNarrowRight",
   ArrowNarrowLeft = "ArrowNarrowLeft",
+  Account = "AccountIcon",
 }
 
 const iconMap = {
@@ -67,6 +69,7 @@ const iconMap = {
   [IconType.ThinX]: ThinXIcon,
   [IconType.ArrowNarrowRight]: ArrowNarrowRightIcon,
   [IconType.ArrowNarrowLeft]: ArrowNarrowLeftIcon,
+  [IconType.Account]: AccountIcon,
 };
 
 function getIcon(icon: IconType) {
