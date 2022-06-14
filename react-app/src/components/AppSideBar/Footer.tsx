@@ -22,8 +22,10 @@ const Footer: React.FC = () => {
         )}
       >
         <p className={cn("sm:grow", "sm:text-left")}>
-          © {new Date().getFullYear()}{" "}
-          <LocalizedText messageID="footer.likecoin" />
+          <LocalizedText
+            messageID="footer.likecoin"
+            messageArgs={{ year: new Date().getFullYear() }}
+          />
         </p>
         <p className={cn("mt-6", "sm:mt-0")}>
           <LocalizedText messageID="footer.getToken" />
