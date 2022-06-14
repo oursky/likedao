@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.5",
-    "@cosmjs/proto-signing": "^0.28.4",
-    "@cosmjs/stargate": "^0.28.4",
+    "@cosmjs/amino": "^0.28.1",
+    "@cosmjs/proto-signing": "^0.28.1",
+    "@cosmjs/stargate": "^0.28.1",
+    "@desmoslabs/desmjs": "^2.0.0-beta.4",
     "@graphql-codegen/introspection": "^2.1.1",
     "@headlessui/react": "^1.6.1",
     "@oursky/react-messageformat": "^2.0.2",

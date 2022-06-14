@@ -1,16 +1,23 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
 import * as Sentry from "@sentry/react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
+import { Profile } from "@desmoslabs/desmjs-types/desmos/profiles/v1beta1/models_profile";
 import AppRoutes from "../../navigation/AppRoutes";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Locale } from "../../i18n/LocaleModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { TestQuery, TestQueryQuery } from "../../generated/graphql";
+import { useQueryClient } from "../../providers/QueryClientProvider";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 
 const DummyScreen: React.FC = () => {
   const { setLocale } = useLocale();
+  const { desmosQuery } = useQueryClient();
+  const wallet = useWallet();
+
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   // Fetch block height every 6 seconds (i.e average block time)
   const { loading, data, error } = useQuery<TestQueryQuery>(TestQuery, {
@@ -38,6 +45,18 @@ const DummyScreen: React.FC = () => {
   const captureDummyError = useCallback(() => {
     Sentry.captureException(new Error("This is my fake error message"));
   }, []);
+
+  useEffect(() => {
+    // test desmos query client on Oursky portfolio
+    if (wallet.status === ConnectionStatus.Connected) {
+      desmosQuery
+        .getProfile("desmos1ze7n3xsfd7na2saj070v0cx0eu7twng9dxxrlt")
+        .then((res) => {
+          setProfile(res);
+        })
+        .catch((err) => console.error("Failed to query desmos profile =", err));
+    }
+  }, [setProfile, wallet, desmosQuery]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -153,6 +172,13 @@ const DummyScreen: React.FC = () => {
           Go to Overview Screen
         </Link>
       </div>
+      <pre>
+        {JSON.stringify(
+          { dtag: profile?.dtag, pictures: profile?.pictures },
+          null,
+          4
+        )}
+      </pre>
     </div>
   );
 };

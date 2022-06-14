@@ -14,6 +14,7 @@ import {
   TxExtension,
 } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { DesmosClient } from "@desmoslabs/desmjs";
 import { ChainInfo } from "../config/Config";
 
 export type ExtendedQueryClient = QueryClient &
@@ -37,4 +38,10 @@ export const newQueryClient = async (
     setupGovExtension,
     setupTxExtension
   );
+};
+
+export const newDesmosQueryClient = async (
+  desmosRpc: string
+): Promise<DesmosClient> => {
+  return DesmosClient.connect(desmosRpc);
 };
