@@ -6,7 +6,7 @@ import LocalizedText from "../common/Localized/LocalizedText";
 
 const Footer: React.FC = () => {
   return (
-    <div className={cn("mx-11", "mt-9", "sm:mt-8", "mb-16")}>
+    <div className={cn("mx-11", "mt-10", "sm:mt-8", "mb-16")}>
       <Divider />
       <div
         className={cn(

@@ -22,7 +22,6 @@ import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
 import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
 import { AddressBar } from "./AddressBar";
-import Footer from "./Footer";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
@@ -88,17 +87,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   );
 
   return (
-    <div
-      className={cn(
-        "h-full",
-        "w-full",
-        "overflow-auto",
-        "bg-gradient-to-b",
-        "from-white",
-        "to-likecoin-primary-bg",
-        "sm:p-8"
-      )}
-    >
+    <div className={cn("w-full", "sm:p-8")}>
       <div
         className={cn(
           "flex",
@@ -201,7 +190,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           <div
             className={cn(
               isMenuActive ? "flex" : "hidden",
-              "h-full",
+              "h-fit",
               "left-0",
               "right-0",
               "bg-gradient-to-b",
@@ -242,7 +231,6 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
           <main className={cn("block", "w-full")}>{children}</main>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
