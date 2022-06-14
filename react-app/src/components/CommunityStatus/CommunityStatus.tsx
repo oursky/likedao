@@ -1,15 +1,14 @@
 import React from "react";
-import BigNumber from "bignumber.js";
 
+import { CommunityStatus as ICommunityStatus } from "../OverviewScreen/OverviewScreenModel";
 import { CommunityStatusRegular } from "./CommunityStatusRegular";
 import { CommunityStatusHeader } from "./CommunityStatusHeader";
 
 export interface CommunityStatusProps {
   className?: string;
   type?: "regular" | "header";
-  inflation: BigNumber;
-  bondedRatio: BigNumber;
-  communityPool: BigNumber;
+  isLoading: boolean;
+  communityStatus: ICommunityStatus | null;
 }
 
 const CommunityStatus: React.FC<CommunityStatusProps> = (props) => {

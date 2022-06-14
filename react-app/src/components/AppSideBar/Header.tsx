@@ -6,7 +6,7 @@ import { ChainHealth } from "../../generated/graphql";
 import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
 
 interface HeaderProps {
-  chainHealth: ChainHealth;
+  chainHealth?: ChainHealth;
 }
 
 const Header: React.FC<HeaderProps> = (props) => {

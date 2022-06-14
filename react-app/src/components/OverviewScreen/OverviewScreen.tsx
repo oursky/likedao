@@ -1,32 +1,46 @@
-import React from "react";
+import React, { useMemo } from "react";
 import cn from "classnames";
+import { toast } from "react-toastify";
 import CommunityStatus from "../CommunityStatus/CommunityStatus";
 import {
   isRequestStateError,
   isRequestStateInitial,
+  isRequestStateLoaded,
   isRequestStateLoading,
 } from "../../models/RequestState";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useCommunityStatusQuery } from "./OverviewScreenAPI";
 
 const OverviewScreen: React.FC = () => {
   const communityStatusRequestState = useCommunityStatusQuery();
+  const { translate } = useLocale();
 
-  if (
-    isRequestStateInitial(communityStatusRequestState) ||
-    isRequestStateLoading(communityStatusRequestState)
-  ) {
-    // TODO: Handle loading state
-    return <span>Loading...</span>;
-  }
+  const [isScreenLoading, screenData] = useMemo(() => {
+    if (
+      isRequestStateInitial(communityStatusRequestState) ||
+      isRequestStateLoading(communityStatusRequestState)
+    ) {
+      return [true, null];
+    }
 
-  if (isRequestStateError(communityStatusRequestState)) {
-    // TODO: Handle error state
-    return (
-      <span>
-        Failed to fetch data: {communityStatusRequestState.error.message}
-      </span>
-    );
-  }
+    if (isRequestStateError(communityStatusRequestState)) {
+      return [false, null];
+    }
+
+    return [false, communityStatusRequestState.data];
+  }, [communityStatusRequestState]);
+
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(communityStatusRequestState)) {
+        toast.error(translate("OverviewScreen.requestState.error"));
+      }
+    },
+    () =>
+      isRequestStateError(communityStatusRequestState) ||
+      isRequestStateLoaded(communityStatusRequestState)
+  );
 
   return (
     <div
@@ -40,9 +54,8 @@ const OverviewScreen: React.FC = () => {
       )}
     >
       <CommunityStatus
-        inflation={communityStatusRequestState.data.inflation}
-        bondedRatio={communityStatusRequestState.data.bondedRatio}
-        communityPool={communityStatusRequestState.data.communityPool.amount}
+        isLoading={isScreenLoading}
+        communityStatus={screenData}
       />
       <p>Other Content</p>
     </div>

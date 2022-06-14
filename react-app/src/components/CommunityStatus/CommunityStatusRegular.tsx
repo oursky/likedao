@@ -8,16 +8,18 @@ import {
   convertBigNumberToFixedPointString,
 } from "../../utils/number";
 import Config from "../../config/Config";
+import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { CommunityStatusProps } from "./CommunityStatus";
 
 interface CommunityStatusPanelProps {
   className?: string;
+  isLoading: boolean;
   titleId: MessageID;
   children?: React.ReactNode;
 }
 
 const CommunityStatusPanel: React.FC<CommunityStatusPanelProps> = (props) => {
-  const { className, titleId, children } = props;
+  const { className, titleId, isLoading, children } = props;
   return (
     <div
       className={cn(
@@ -37,7 +39,11 @@ const CommunityStatusPanel: React.FC<CommunityStatusPanelProps> = (props) => {
       >
         <LocalizedText messageID={titleId} />
       </h1>
-      {children}
+      {isLoading ? (
+        <LoadingSpinner className={cn("h-16", "w-full")} />
+      ) : (
+        children
+      )}
     </div>
   );
 };
@@ -47,7 +53,7 @@ type CommunityStatusRegularProps = Omit<CommunityStatusProps, "type">;
 export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
   props
 ) => {
-  const { className, inflation, bondedRatio, communityPool } = props;
+  const { className, isLoading, communityStatus } = props;
   const chainInfo = Config.chainInfo;
 
   return (
@@ -64,66 +70,86 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
     >
       <CommunityStatusPanel
         className={cn("flex-1")}
+        isLoading={isLoading}
         titleId="CommunityStatus.communityPool"
       >
-        <div className={cn("flex", "flex-col", "gap-y-1")}>
+        {communityStatus?.communityPool != null && (
+          <div className={cn("flex", "flex-col", "gap-y-1")}>
+            <span
+              className={cn(
+                "text-3xl",
+                "leading-9",
+                "font-semibold",
+                "text-gray-900",
+                "break-all"
+              )}
+            >
+              {convertBigNumberToMillifiedIntegerString(
+                communityStatus.communityPool.amount
+              )}
+
+              <span className={cn("ml-1", "text-xs", "leading-3")}>
+                {chainInfo.currency.coinDenom}
+              </span>
+            </span>
+            <span
+              className={cn(
+                "text-xs",
+                "leading-3",
+                "font-semibold",
+                "text-likecoin-darkgrey"
+              )}
+            >
+              {convertBigNumberToLocalizedIntegerString(
+                communityStatus.communityPool.amount
+              )}
+            </span>
+          </div>
+        )}
+      </CommunityStatusPanel>
+      <CommunityStatusPanel
+        className={cn("flex-1")}
+        isLoading={isLoading}
+        titleId="CommunityStatus.bondedRatio"
+      >
+        {communityStatus?.bondedRatio != null && (
           <span
             className={cn(
               "text-3xl",
               "leading-9",
               "font-semibold",
-              "text-gray-900",
-              "break-all"
+              "text-gray-900"
             )}
           >
-            {convertBigNumberToMillifiedIntegerString(communityPool)}
-
-            <span className={cn("ml-1", "text-xs", "leading-3")}>
-              {chainInfo.currency.coinDenom}
-            </span>
-          </span>
-          <span
-            className={cn(
-              "text-xs",
-              "leading-3",
-              "font-semibold",
-              "text-likecoin-darkgrey"
+            {convertBigNumberToFixedPointString(
+              communityStatus.bondedRatio.multipliedBy(100),
+              2
             )}
-          >
-            {convertBigNumberToLocalizedIntegerString(communityPool)}
+            %
           </span>
-        </div>
+        )}
       </CommunityStatusPanel>
       <CommunityStatusPanel
         className={cn("flex-1")}
-        titleId="CommunityStatus.bondedRatio"
-      >
-        <span
-          className={cn(
-            "text-3xl",
-            "leading-9",
-            "font-semibold",
-            "text-gray-900"
-          )}
-        >
-          {convertBigNumberToFixedPointString(bondedRatio.multipliedBy(100), 2)}
-          %
-        </span>
-      </CommunityStatusPanel>
-      <CommunityStatusPanel
-        className={cn("flex-1")}
+        isLoading={isLoading}
         titleId="CommunityStatus.inflation"
       >
-        <span
-          className={cn(
-            "text-3xl",
-            "leading-9",
-            "font-semibold",
-            "text-gray-900"
-          )}
-        >
-          {convertBigNumberToFixedPointString(inflation.multipliedBy(100), 2)}%
-        </span>
+        {communityStatus?.inflation != null && (
+          <span
+            className={cn(
+              "text-3xl",
+              "leading-9",
+              "font-semibold",
+              "text-gray-900"
+            )}
+          >
+            {convertBigNumberToFixedPointString(
+              communityStatus.inflation.multipliedBy(100),
+              2
+            )}
+            %
+          </span>
+        )}
       </CommunityStatusPanel>
     </div>
   );
