@@ -6,6 +6,7 @@ import (
 	gql "github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-gonic/gin"
+	"github.com/oursky/likedao/pkg/directives"
 	"github.com/oursky/likedao/pkg/errors"
 	"github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/logging"
@@ -43,6 +44,7 @@ func (GraphQLOperationLogger) InterceptResponse(ctx context.Context, next gql.Re
 
 func GraphqlHandler(serverDB *bun.DB, chainDB *bun.DB) gin.HandlerFunc {
 	c := graphql.Config{Resolvers: &resolvers.Resolver{ServerDB: serverDB, ChainDB: chainDB}}
+	c.Directives.Authed = directives.Authed
 
 	h := handler.NewDefaultServer(graphql.NewExecutableSchema(c))
 	h.Use(GraphQLOperationLogger{})

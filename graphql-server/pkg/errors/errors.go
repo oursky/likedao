@@ -11,6 +11,7 @@ var (
 	ErrValidationFailure = errors.New("Failed to validate values")
 	ErrNotFound          = errors.New("Not found")
 	ErrInvalidCursor     = errors.New("Invalid cursor")
+	ErrUnauthenticated   = errors.New("Unauthenticated")
 )
 
 type ServerError struct {
