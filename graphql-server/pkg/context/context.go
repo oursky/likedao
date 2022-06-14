@@ -13,11 +13,11 @@ import (
 type contextKey string
 
 const (
-	queryContextKey      contextKey = "queryContextKey"
-	mutatorContextKey    contextKey = "mutatorContextKey"
-	dataLoaderContextKey contextKey = "dataLoaderContextKey"
-	dbContextKey         contextKey = "dbContextKey"
-	configContextKey     contextKey = "configContextKey"
+	QueryContextKey      contextKey = "QueryContextKey"
+	MutatorContextKey    contextKey = "MutatorContextKey"
+	DataLoaderContextKey contextKey = "DataLoaderContextKey"
+	DbContextKey         contextKey = "DbContextKey"
+	ConfigContextKey     contextKey = "ConfigContextKey"
 )
 
 type QueryContext struct {
@@ -76,31 +76,31 @@ func NewRequestContext(
 		ChainDatabase:  chainDB,
 	}
 
-	ctx = context.WithValue(ctx, queryContextKey, queries)
-	ctx = context.WithValue(ctx, mutatorContextKey, mutators)
-	ctx = context.WithValue(ctx, dataLoaderContextKey, dataLoaders)
-	ctx = context.WithValue(ctx, dbContextKey, databases)
-	ctx = context.WithValue(ctx, configContextKey, config)
+	ctx = context.WithValue(ctx, QueryContextKey, queries)
+	ctx = context.WithValue(ctx, MutatorContextKey, mutators)
+	ctx = context.WithValue(ctx, DataLoaderContextKey, dataLoaders)
+	ctx = context.WithValue(ctx, DbContextKey, databases)
+	ctx = context.WithValue(ctx, ConfigContextKey, config)
 
 	return ctx
 }
 
 func GetQueriesFromCtx(ctx context.Context) QueryContext {
-	return ctx.Value(queryContextKey).(QueryContext)
+	return ctx.Value(QueryContextKey).(QueryContext)
 }
 
 func GetMutatorsFromCtx(ctx context.Context) MutatorContext {
-	return ctx.Value(mutatorContextKey).(MutatorContext)
+	return ctx.Value(MutatorContextKey).(MutatorContext)
 }
 
 func GetDataLoadersFromCtx(ctx context.Context) DataLoaderContext {
-	return ctx.Value(dataLoaderContextKey).(DataLoaderContext)
+	return ctx.Value(DataLoaderContextKey).(DataLoaderContext)
 }
 
 func GetDBFromCtx(ctx context.Context) DatabaseContext {
-	return ctx.Value(dbContextKey).(DatabaseContext)
+	return ctx.Value(DbContextKey).(DatabaseContext)
 }
 
 func GetConfigFromCtx(ctx context.Context) config.Config {
-	return ctx.Value(configContextKey).(config.Config)
+	return ctx.Value(ConfigContextKey).(config.Config)
 }
