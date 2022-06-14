@@ -3,11 +3,11 @@ import cn from "classnames";
 import BigNumber from "bignumber.js";
 import { toast } from "react-toastify";
 import Config from "../../config/Config";
-import { convertBigNumberToFixedPointString } from "../../utils/number";
 import CopyableText from "../common/CopyableText/CopyableText";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { IconType } from "../common/Icons/Icons";
 import { BigNumberCoin } from "../../models/coin";
+import CoinBalanceCard from "../common/CoinBalanceCard/CoinBalanceCard";
 import { ShortcutButton } from "./ShotcutButton";
 
 export interface UserInfo {
@@ -40,29 +40,7 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
 
   return (
     <div className={cn("flex", "flex-col", "gap-y-3", className)}>
-      <div className={cn("flex", "flex-col")}>
-        <h3
-          className={cn(
-            "text-2xl",
-            "leading-tight",
-            "font-medium",
-            "text-black",
-            "break-all"
-          )}
-        >
-          {`${convertBigNumberToFixedPointString(balance)} ${coinDenom}`}
-        </h3>
-        <p
-          className={cn(
-            "text-sm",
-            "leading-5",
-            "font-medium",
-            "text-likecoin-lightgreen"
-          )}
-        >
-          {convertBigNumberToFixedPointString(balance, 9)}
-        </p>
-      </div>
+      <CoinBalanceCard balance={balance} denom={coinDenom} />
 
       <CopyableText
         className={cn(
