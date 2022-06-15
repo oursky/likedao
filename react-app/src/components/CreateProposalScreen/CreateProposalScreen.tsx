@@ -8,8 +8,8 @@ import CreateProposalForm from "../forms/CreateProposalForm/CreateProposalForm";
 import { CreateProposalFormValues } from "../forms/CreateProposalForm/CreateProposalFormModel";
 import SubmitProposalModal from "../TransactionModals/SubmitProposalModal";
 import { SubmitProposalFormValues } from "../forms/SubmitProposalForm/SubmitProposalFormModel";
-import { useCosmos } from "../../api/cosmosAPI";
-import { useGov } from "../../api/govAPI";
+import { useCosmosAPI } from "../../api/cosmosAPI";
+import { useGovAPI } from "../../api/govAPI";
 import Config from "../../config/Config";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { ProposalType } from "../../models/cosmos/gov";
@@ -18,8 +18,8 @@ import AppRoutes from "../../navigation/AppRoutes";
 
 const CreateProposalScreen: React.FC = () => {
   const wallet = useWallet();
-  const cosmosAPI = useCosmos();
-  const govAPI = useGov();
+  const cosmosAPI = useCosmosAPI();
+  const govAPI = useGovAPI();
   const { translate } = useLocale();
   const navigate = useNavigate();
   const chainInfo = Config.chainInfo;

@@ -20,7 +20,7 @@ interface ICosmosAPI {
   broadcastTx(tx: SignedTx): Promise<DeliverTxResponse>;
 }
 
-export const useCosmos = (): ICosmosAPI => {
+export const useCosmosAPI = (): ICosmosAPI => {
   const wallet = useWallet();
   const chainInfo = Config.chainInfo;
 

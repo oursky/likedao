@@ -12,7 +12,7 @@ import {
   convertTokenToMinimalToken,
   convertMinimalTokenToToken,
 } from "../utils/coin";
-import { SignedTx, useCosmos } from "./cosmosAPI";
+import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IGovAPI {
   getMinDepositParams(): Promise<BigNumberCoin>;
@@ -23,9 +23,9 @@ interface IGovAPI {
   ): Promise<SignedTx>;
 }
 
-export const useGov = (): IGovAPI => {
+export const useGovAPI = (): IGovAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmos();
+  const cosmos = useCosmosAPI();
   const { query } = useQueryClient();
   const coinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 

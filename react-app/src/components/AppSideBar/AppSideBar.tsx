@@ -12,7 +12,7 @@ import {
   isRequestStateError,
   isRequestStateLoaded,
 } from "../../models/RequestState";
-import { useCosmos } from "../../api/cosmosAPI";
+import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useTransaction } from "../../providers/TransactionProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useLocale } from "../../providers/AppLocaleProvider";
@@ -32,7 +32,7 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { translate } = useLocale();
   const location = useLocation();
   const wallet = useWallet();
-  const cosmosAPI = useCosmos();
+  const cosmosAPI = useCosmosAPI();
   const transaction = useTransaction();
 
   const chainHealthRequestState = useChainHealthQuery();

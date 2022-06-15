@@ -6,16 +6,16 @@ import { newWithdrawDelegatorRewardMessage } from "../models/cosmos/distribution
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { convertMinimalTokenToToken } from "../utils/coin";
 import { BigNumberCoin } from "../models/coin";
-import { SignedTx, useCosmos } from "./cosmosAPI";
+import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IDistributionAPI {
   signWithdrawDelegationRewardsTx(memo?: string): Promise<SignedTx>;
   getTotalDelegationRewards(): Promise<BigNumberCoin>;
 }
 
-export const useDistribution = (): IDistributionAPI => {
+export const useDistributionAPI = (): IDistributionAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmos();
+  const cosmos = useCosmosAPI();
   const { query } = useQueryClient();
   const coinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 

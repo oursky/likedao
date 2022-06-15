@@ -3,7 +3,7 @@ import { newSendMessage } from "../models/cosmos/bank";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import { convertTokenToMinimalToken } from "../utils/coin";
 import Config from "../config/Config";
-import { SignedTx, useCosmos } from "./cosmosAPI";
+import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IBankAPI {
   signSendTokenTx(
@@ -13,9 +13,9 @@ interface IBankAPI {
   ): Promise<SignedTx>;
 }
 
-export const useBank = (): IBankAPI => {
+export const useBankAPI = (): IBankAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmos();
+  const cosmos = useCosmosAPI();
   const chainInfo = Config.chainInfo;
 
   const signSendTokenTx = useCallback(
