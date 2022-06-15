@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import {
   ProposalScreenQuery,
   ProposalScreenQueryQuery,
@@ -47,10 +47,12 @@ export function useProposalsQuery(
   pageSize: number
 ): {
   requestState: RequestState<PaginatedProposals>;
-  currentFilter: FilterKey;
-  fetch: (after?: number) => void;
-  applySearch: (searchTerm: string | null) => void;
-  applyFilter: (filter: FilterKey, address: string | null) => void;
+  fetch: (
+    offset: number,
+    filter: FilterKey,
+    address?: string,
+    searchTerm?: string
+  ) => void;
 } {
   const [fetch, { requestState }] = useLazyGraphQLQuery<
     ProposalScreenQueryQuery,
@@ -64,45 +66,25 @@ export function useProposalsQuery(
     nextFetchPolicy: "cache-first",
   });
 
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
-  const [filter, setFilter] = useState<FilterKey>("voting");
-
   const callFetch = useCallback(
-    (after?: number) => {
+    (
+      offset: number,
+      filter: FilterKey = "voting",
+      address?: string,
+      searchTerm?: string
+    ) => {
       // Errors are handled by the requestState
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetch({
         variables: {
-          after: after ?? initialOffset,
+          after: offset,
           first: pageSize,
           searchTerm,
-          ...getFilterVariables(filter, address),
+          ...getFilterVariables(filter, address ?? null),
         },
       });
     },
-    [address, fetch, filter, initialOffset, pageSize, searchTerm]
-  );
-
-  const applySearch = useCallback(
-    (searchTerm: string | null) => {
-      setSearchTerm(searchTerm);
-      callFetch();
-    },
-    [callFetch]
-  );
-
-  const applyFilter = useCallback(
-    (filter: FilterKey, address: string | null) => {
-      if (address != null) {
-        setAddress(address);
-        setFilter("following");
-      } else {
-        setFilter(filter);
-      }
-      callFetch();
-    },
-    [callFetch]
+    [fetch, pageSize]
   );
 
   const data = useMemo(() => {
@@ -117,9 +99,6 @@ export function useProposalsQuery(
 
   return {
     requestState: data,
-    currentFilter: filter,
     fetch: callFetch,
-    applySearch,
-    applyFilter,
   };
 }

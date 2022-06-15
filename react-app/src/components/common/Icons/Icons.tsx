@@ -18,6 +18,8 @@ import { ReactComponent as EllipseIcon } from "../../../assets/ic-ellipse.svg";
 import { ReactComponent as LinkIcon } from "../../../assets/ic-link.svg";
 import { ReactComponent as ShareIcon } from "../../../assets/ic-share.svg";
 import { ReactComponent as ThinXIcon } from "../../../assets/ic-thin-x.svg";
+import { ReactComponent as ArrowNarrowRightIcon } from "../../../assets/ic-arrow-narrow-right.svg";
+import { ReactComponent as ArrowNarrowLeftIcon } from "../../../assets/ic-arrow-narrow-left.svg";
 
 enum IconType {
   Home = "Home",
@@ -39,6 +41,8 @@ enum IconType {
   Link = "Link",
   Share = "Share",
   ThinX = "ThinX",
+  ArrowNarrowRight = "ArrowNarrowRight",
+  ArrowNarrowLeft = "ArrowNarrowLeft",
 }
 
 const iconMap = {
@@ -61,6 +65,8 @@ const iconMap = {
   [IconType.Link]: LinkIcon,
   [IconType.Share]: ShareIcon,
   [IconType.ThinX]: ThinXIcon,
+  [IconType.ArrowNarrowRight]: ArrowNarrowRightIcon,
+  [IconType.ArrowNarrowLeft]: ArrowNarrowLeftIcon,
 };
 
 function getIcon(icon: IconType) {

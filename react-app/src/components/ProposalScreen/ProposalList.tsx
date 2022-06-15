@@ -22,7 +22,7 @@ const ProposalList: React.FC<ProposalListProps> = (props) => {
   }
 
   return (
-    <div className={cn("flex", "flex-col", "gap-y-16")}>
+    <div className={cn("flex", "flex-col", "gap-y-4")}>
       {proposals.map((proposal) => (
         <ProposalCard key={proposal.proposalId} proposal={proposal} />
       ))}
