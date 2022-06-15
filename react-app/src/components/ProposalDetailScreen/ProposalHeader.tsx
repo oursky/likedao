@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import { Proposal } from "../../generated/graphql";
 import Paper from "../common/Paper/Paper";
 import Badge from "../common/Badge/Badge";
 import AppButton from "../common/Buttons/AppButton";
@@ -8,6 +7,7 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { getProposalStatusBadgeConfig } from "../ProposalScreen/ProposalCard";
+import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
@@ -19,6 +19,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     type,
     proposerAddress,
     submitTime,
+    turnout,
   } = proposal;
 
   const daysRemaining = votingEndTime
@@ -119,7 +120,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           </div>
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
             <LocalizedText messageID="ProposalDetail.turnOut" />
-            <p>16%</p>
+            <p>{turnout}%</p>
           </div>
         </div>
       </div>

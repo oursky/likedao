@@ -1,12 +1,27 @@
 import { useCallback, useMemo } from "react";
+import BigNumber from "bignumber.js";
 import {
   ProposalDetailScreenQuery,
   ProposalDetailScreenQueryQuery,
   ProposalDetailScreenQueryQueryVariables,
-  ProposalDetailScreenProposalFragment as Proposal,
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
+import { Proposal } from "./ProposalDetailScreenModel";
+
+const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
+  if (!tallyResult) {
+    return 0;
+  }
+
+  const { yes, no, noWithVeto, abstain } = tallyResult;
+  const total = BigNumber.sum(yes, no, noWithVeto, abstain);
+  const turnout = new BigNumber(100).minus(
+    abstain.dividedBy(total).multipliedBy(100)
+  );
+
+  return turnout.toNumber();
+};
 
 export function useProposalQuery(id: string): {
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -58,6 +73,7 @@ export function useProposalQuery(id: string): {
           ? new Date(proposal.depositEndTime)
           : null,
         submitTime: new Date(proposal.submitTime),
+        turnout: calculateTurnout(proposal.tallyResult),
       };
     });
   }, [requestState]);
