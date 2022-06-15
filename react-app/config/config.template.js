@@ -15,5 +15,6 @@ window.appConfig = {
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },
+  authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
 };

@@ -27,6 +27,7 @@ export interface IConfig {
   graphql: {
     endpoint: string;
   };
+  authEndpoint: string;
   chainLinks: ChainLink[];
 }
 
@@ -47,6 +48,7 @@ const defaultConfig: IConfig = {
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },
+  authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
 };
 
