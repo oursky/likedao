@@ -6,6 +6,7 @@ import Config from "../config/Config";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import { convertMinimalTokenToToken } from "../utils/coin";
 import { BigNumberCoin } from "../models/coin";
+import { SignDataMessageResponse } from "../models/cosmos/tx";
 
 export type SignedTx = Uint8Array;
 
@@ -14,6 +15,7 @@ const GAS_ADJUSTMENT = 1.3;
 
 interface ICosmosAPI {
   getBalance(): Promise<BigNumberCoin>;
+  signArbitrary(data: string): Promise<SignDataMessageResponse>;
   signTx(messages: EncodeObject[], memo?: string): Promise<SignedTx>;
   broadcastTx(tx: SignedTx): Promise<DeliverTxResponse>;
 }
@@ -72,12 +74,26 @@ export const useCosmos = (): ICosmosAPI => {
     [wallet]
   );
 
+  const signArbitrary = useCallback(
+    async (data: string) => {
+      if (wallet.status !== ConnectionStatus.Connected) {
+        throw new Error("Wallet not connected");
+      }
+
+      const { address } = wallet.account;
+
+      return wallet.provider.signArbitrary(address, data);
+    },
+    [wallet]
+  );
+
   return useMemo(
     () => ({
       getBalance,
+      signArbitrary,
       signTx,
       broadcastTx,
     }),
-    [getBalance, signTx, broadcastTx]
+    [getBalance, signArbitrary, signTx, broadcastTx]
   );
 };
