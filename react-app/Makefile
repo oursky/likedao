@@ -45,6 +45,10 @@ typecheck:
 codegen:
 	yarn codegen
 
+.PHONY: test
+test:
+	yarn test
+
 .PHONY: dev
 dev:
 	cp ./config/config.debug.js ./public/config.js
