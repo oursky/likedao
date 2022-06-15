@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import MDEditor from "@uiw/react-md-editor";
 import cn from "classnames";
 import { toast } from "react-toastify";
 import rehypeSanitize from "rehype-sanitize";
@@ -10,6 +9,7 @@ import { useClipboard } from "../../hooks/useClipboard";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { Proposal } from "../../generated/graphql";
 import useShare from "../../hooks/useShare";
+import { MarkdownPreview } from "../MarkdownEditor/MarkdownEditor";
 
 const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
   proposal,
@@ -40,7 +40,7 @@ const ProposalDescription: React.FC<{ proposal: Proposal }> = ({
 
   return (
     <Paper>
-      <MDEditor.Markdown
+      <MarkdownPreview
         className={cn("!text-black", "font-medium")}
         source={proposal.description}
         rehypePlugins={[[rehypeSanitize]]}

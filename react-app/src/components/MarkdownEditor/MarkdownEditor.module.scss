@@ -1,0 +1,10 @@
+/* stylelint-disable */
+:global {
+  .wmde-markdown {
+    ul,
+    ol {
+      list-style: revert !important;
+    }
+  }
+}
+/* stylelint-enable */

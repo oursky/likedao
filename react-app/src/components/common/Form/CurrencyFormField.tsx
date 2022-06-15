@@ -8,7 +8,7 @@ import {
   FormFieldSize,
 } from "./BaseFormField";
 
-import "./CurrencyFormField.module.css";
+import "./CurrencyFormField.module.scss";
 
 function getInputClassNameBySize(size: FormFieldSize): string {
   switch (size) {
