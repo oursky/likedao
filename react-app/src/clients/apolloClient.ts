@@ -53,7 +53,7 @@ const schema = buildClientSchema(
 
 const link = ApolloLink.from([
   withScalars({ schema, typesMap: scalars }),
-  new HttpLink({ uri: Config.graphql.endpoint }),
+  new HttpLink({ uri: Config.graphql.endpoint, credentials: "include" }),
 ]);
 
 export const createApolloClient = (): ApolloClient<NormalizedCacheObject> => {
