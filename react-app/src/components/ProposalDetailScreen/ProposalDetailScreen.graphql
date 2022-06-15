@@ -1,0 +1,29 @@
+fragment ProposalDetailScreenProposal on Proposal {
+  id
+  proposalId
+  title
+  description
+  type
+  submitTime
+  depositEndTime
+  votingStartTime
+  votingEndTime
+  proposerAddress
+  status
+  depositTotal
+  tallyResult {
+    yes
+    no
+    noWithVeto
+    abstain
+    mostVoted
+  }
+}
+
+query ProposalDetailScreenQuery(
+  $id: ID!
+) {
+  proposalByID(id: $id) {
+    ...ProposalDetailScreenProposal
+  }
+}
