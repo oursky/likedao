@@ -1,7 +1,6 @@
 package dataloaders
 
 import (
-	"time"
 	godataloader "github.com/cychiuae/go-dataloader"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/oursky/likedao/pkg/queries"
@@ -25,7 +24,7 @@ func NewTestDataloader(testQuery queries.ITestQuery) TestDataloader {
 			}
 			return tests, nil
 		},
-		MaxBatch: 1000,
-		Wait:     20 * time.Millisecond,
+		MaxBatch: DefaultMaxBatch,
+		Wait:     DefaultWait,
 	})
 }

@@ -31,6 +31,7 @@ const ProposalDetailScreen: React.FC = () => {
     submitTime: new Date(),
     votingEndTime: new Date("2022-06-20"),
     votingStartTime: new Date("2022-06-01"),
+    depositTotal: 100000,
     tallyResult: {
       yes: 1,
       no: 1,

@@ -38,6 +38,8 @@ type Proposal {
   type: ProposalType!
   submitTime: DateTime!
   depositEndTime: DateTime
+  "Sum of all deposit in chain's coin denom (non chain's coin denom deposits excluded)"
+  depositTotal: BigInt!
   votingStartTime: DateTime
   votingEndTime: DateTime
   proposerAddress: String!
@@ -76,4 +78,5 @@ input QueryProposalsInput {
 
 extend type Query {
   proposals(input: QueryProposalsInput!): ProposalConnection!
+  proposalByID(id: ID!): Proposal
 }

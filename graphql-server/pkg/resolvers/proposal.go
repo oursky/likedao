@@ -27,6 +27,15 @@ func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (mode
 	return *proposalType, nil
 }
 
+func (r *proposalResolver) DepositTotal(ctx context.Context, obj *models.Proposal) (gql_bigint.BigInt, error) {
+	config := pkgContext.GetConfigFromCtx(ctx)
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalDepositTotal(obj.ID, config.Chain.CoinDenom)
+	if err != nil {
+		return 0, err
+	}
+	return gql_bigint.BigInt(res.ToInt64()), nil
+}
+
 func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal) (*models.ProposalTallyResult, error) {
 	if obj.Status == models.ProposalStatusFailed || obj.Status == models.ProposalStatusInvalid || obj.Status == models.ProposalStatusDepositPeriod {
 		return nil, nil
@@ -120,6 +129,14 @@ func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposa
 	conn.PageInfo.HasPreviousPage = res.PaginationInfo.HasPrevious
 
 	return &conn, nil
+}
+
+func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*models.Proposal, error) {
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.Load(id.ID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // Proposal returns graphql1.ProposalResolver implementation.

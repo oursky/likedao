@@ -7,6 +7,7 @@ import (
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/extra/bunbig"
 )
 
 type IProposalQuery interface {
@@ -14,6 +15,8 @@ type IProposalQuery interface {
 	ScopeRelatedAddress(address string) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
+	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
+	QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error)
 }
 
 type ProposalQuery struct {
@@ -120,4 +123,52 @@ func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.Proposal
 	}
 
 	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, error) {
+	if len(ids) == 0 {
+		return []*models.Proposal{}, nil
+	}
+	proposals := make([]*models.Proposal, len(ids))
+	err := q.NewQuery().Where("id IN (?)", bun.In(ids)).Scan(q.ctx, &proposals)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// Reorder query results by order of input ids
+	result := make([]*models.Proposal, 0, len(proposals))
+	idToProposal := make(map[string]models.Proposal, len(proposals))
+	for _, proposal := range proposals {
+		idToProposal[proposal.NodeID().ID] = *proposal
+	}
+
+	for _, id := range ids {
+		proposal, exists := idToProposal[id]
+		if exists {
+			result = append(result, &proposal)
+		} else {
+			result = append(result, nil)
+		}
+	}
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error) {
+	var res bunbig.Int
+	depositCoinsQuery := q.session.NewSelect().
+		Model((*models.ProposalDeposit)(nil)).
+		ColumnExpr("unnest(amount) AS coin").
+		Where("proposal_id = ?", id)
+
+	query := q.session.NewSelect().
+		ColumnExpr("SUM((deposit.coin).amount::BIGINT)").
+		TableExpr("(?) AS deposit", depositCoinsQuery).
+		Where("(deposit.coin).denom = ?", denom).
+		GroupExpr("(deposit.coin).denom")
+
+	err := query.Scan(q.ctx, &res)
+	if err != nil {
+		return bunbig.Int{}, err
+	}
+	return res, nil
 }
