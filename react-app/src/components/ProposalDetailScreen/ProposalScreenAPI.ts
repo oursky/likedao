@@ -41,7 +41,25 @@ export function useProposalQuery(id: string): {
       ProposalDetailScreenQueryQuery,
       // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
       Proposal | null
-    >(requestState, (r) => r.proposalByID ?? null);
+    >(requestState, (r) => {
+      if (!r.proposalByID) {
+        return null;
+      }
+      const proposal = r.proposalByID;
+      return {
+        ...proposal,
+        votingEndTime: proposal.votingEndTime
+          ? new Date(proposal.votingEndTime)
+          : null,
+        votingStartTime: proposal.votingEndTime
+          ? new Date(proposal.votingEndTime)
+          : null,
+        depositEndTime: proposal.depositEndTime
+          ? new Date(proposal.depositEndTime)
+          : null,
+        submitTime: new Date(proposal.submitTime),
+      };
+    });
   }, [requestState]);
 
   return {

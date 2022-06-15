@@ -7,7 +7,7 @@ import IconButton from "../common/Buttons/IconButton";
 import { IconType } from "../common/Icons/Icons";
 import { useClipboard } from "../../hooks/useClipboard";
 import { useLocale } from "../../providers/AppLocaleProvider";
-import { Proposal } from "../../generated/graphql";
+import { ProposalDetailScreenProposalFragment as Proposal } from "../../generated/graphql";
 import useShare from "../../hooks/useShare";
 import { MarkdownPreview } from "../MarkdownEditor/MarkdownEditor";
 
