@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
+import { differenceInDays } from "date-fns";
 import {
   ProposalDetailScreenQuery,
   ProposalDetailScreenQueryQuery,
@@ -74,6 +75,10 @@ export function useProposalQuery(id: string): {
           : null,
         submitTime: new Date(proposal.submitTime),
         turnout: calculateTurnout(proposal.tallyResult),
+        remainingVotingDays:
+          proposal.votingStartTime && proposal.votingEndTime
+            ? differenceInDays(proposal.votingStartTime, proposal.votingEndTime)
+            : -1,
       };
     });
   }, [requestState]);

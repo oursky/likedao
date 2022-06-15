@@ -24,11 +24,8 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     submitTime,
     turnout,
     depositTotal,
+    remainingVotingDays,
   } = proposal;
-
-  const daysRemaining = votingEndTime
-    ? votingEndTime.getDate() - new Date().getDate()
-    : -1;
 
   const [statusMessageID, statusBadgeColor] = useMemo(
     () => getProposalStatusBadgeConfig(status),
@@ -105,11 +102,11 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
               "-"
             )}
           </p>
-          {daysRemaining > 0 && (
+          {remainingVotingDays > 0 && (
             <Badge color="likecoin-yellow">
               <LocalizedText
                 messageID="ProposalDetail.votingDaysRemaining"
-                messageArgs={{ days: daysRemaining }}
+                messageArgs={{ days: remainingVotingDays }}
               />
             </Badge>
           )}
