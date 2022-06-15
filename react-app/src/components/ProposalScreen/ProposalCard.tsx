@@ -14,7 +14,7 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
 import { ProposalInsight } from "./ProposalInsight";
 
-function getProposalStatusBadgeConfig(
+export function getProposalStatusBadgeConfig(
   status: ProposalStatus
 ): [MessageID, BadgeColor] {
   switch (status) {

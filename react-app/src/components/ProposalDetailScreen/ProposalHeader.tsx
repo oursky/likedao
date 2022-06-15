@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import cn from "classnames";
 import { Proposal } from "../../generated/graphql";
 import Paper from "../common/Paper/Paper";
@@ -7,6 +7,7 @@ import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
+import { getProposalStatusBadgeConfig } from "../ProposalScreen/ProposalCard";
 
 const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
@@ -23,6 +24,11 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const daysRemaining = votingEndTime
     ? votingEndTime.getDate() - new Date().getDate()
     : -1;
+
+  const [statusMessageID, statusBadgeColor] = useMemo(
+    () => getProposalStatusBadgeConfig(status),
+    [status]
+  );
 
   return (
     <Paper>
@@ -42,7 +48,9 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         </h1>
       </div>
       <div className={cn("flex", "flex-col", "my-4", "items-center")}>
-        <Badge color="yellow">{status}</Badge>
+        <Badge color={statusBadgeColor}>
+          <LocalizedText messageID={statusMessageID} />
+        </Badge>
       </div>
       <div
         className={cn(
