@@ -7,11 +7,14 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { getProposalStatusBadgeConfig } from "../ProposalScreen/ProposalCard";
+import { convertMinimalTokenToToken } from "../../utils/coin";
+import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
+import Config from "../../config/Config";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
-    id,
+    proposalId,
     title,
     status,
     votingStartTime,
@@ -20,6 +23,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     proposerAddress,
     submitTime,
     turnout,
+    depositTotal,
   } = proposal;
 
   const daysRemaining = votingEndTime
@@ -31,10 +35,20 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     [status]
   );
 
+  const totalDepositString = useMemo(() => {
+    return (
+      convertBigNumberToLocalizedIntegerString(
+        convertMinimalTokenToToken(depositTotal)
+      ) +
+      " " +
+      Config.chainInfo.currency.coinDenom.toUpperCase()
+    );
+  }, [depositTotal]);
+
   return (
     <Paper>
       <div className={cn("flex", "flex-col", "gap-x-2.5", "items-center")}>
-        <div className={cn("text-xs", "mb-4")}>#{id}</div>
+        <div className={cn("text-xs", "mb-4")}>#{proposalId}</div>
         <h1
           className={cn(
             "text-3xl",
@@ -116,7 +130,7 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         >
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
             <LocalizedText messageID="ProposalDetail.deposit" />
-            <p>100,000 LIKE</p>
+            <p>{totalDepositString}</p>
           </div>
           <div className={cn("flex", "flex-col", "items-center", "grow")}>
             <LocalizedText messageID="ProposalDetail.turnOut" />
