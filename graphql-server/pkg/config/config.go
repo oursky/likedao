@@ -4,6 +4,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ChainConfig struct {
@@ -144,8 +146,14 @@ func LoadConfigFromEnv() Config {
 		nonceExpiry = 86400
 	}
 
+	cookieDomain := os.Getenv("COOKIE_DOMAIN")
+	// Should not set domain to localhost in debug mode
+	if gin.Mode() == gin.DebugMode {
+		cookieDomain = ""
+	}
+
 	sessionConfig := SessionConfig{
-		CookieDomain:    os.Getenv("COOKIE_DOMAIN"),
+		CookieDomain:    cookieDomain,
 		SignatureSecret: os.Getenv("SIGNATURE_SECRET"),
 		SessionExpiry:   sessionExpiry,
 		NonceExpiry:     nonceExpiry,

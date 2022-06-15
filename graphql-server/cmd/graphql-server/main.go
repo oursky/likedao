@@ -42,6 +42,7 @@ func main() {
 	logging.ConfigureLogger(config.Log)
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = config.Cors.AllowOrigins
+	corsConfig.AllowCredentials = true
 
 	serverDB, err := database.GetDB(config.ServerDatabase)
 	if err != nil {
