@@ -1,7 +1,11 @@
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { ChainInfo } from "../config/Config";
-import { BaseWallet } from "./baseWallet";
+import {
+  newSignDataMessage,
+  SignDataMessageResponse,
+} from "../models/cosmos/tx";
+import { ArbitrarySigner, BaseWallet } from "./baseWallet";
 
 export class KeplrWallet extends BaseWallet {
   static async connect(chainInfo: ChainInfo): Promise<KeplrWallet> {
@@ -15,12 +19,37 @@ export class KeplrWallet extends BaseWallet {
       chainInfo.chainId
     ) as OfflineSigner;
 
-    const cosmJS = await SigningStargateClient.connectWithSigner(
+    const signArbitrary = async (
+      signer: string,
+      data: string | Uint8Array
+    ): Promise<SignDataMessageResponse> => {
+      // Keplr makes its own signDoc, so we have to replicate one here
+      const base64data = Buffer.from(data).toString("base64");
+      const signDoc = newSignDataMessage({ signer, data: base64data });
+
+      const signature = await window.keplr.signArbitrary(
+        chainInfo.chainId,
+        signer,
+        data
+      );
+
+      return { signed: signDoc, signature };
+    };
+
+    const arbitrarySigner: ArbitrarySigner = {
+      signArbitrary: signArbitrary,
+    };
+
+    const stargateClient = await SigningStargateClient.connectWithSigner(
       chainInfo.chainRpc,
       offlineSigner
     );
 
-    return new KeplrWallet(chainInfo, offlineSigner, cosmJS);
+    return new KeplrWallet(
+      chainInfo,
+      offlineSigner,
+      Object.assign(stargateClient, arbitrarySigner)
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this

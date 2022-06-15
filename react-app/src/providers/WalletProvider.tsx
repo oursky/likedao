@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { SigningStargateClient } from "@cosmjs/stargate";
 import { AccountData } from "@cosmjs/proto-signing";
 import { toast } from "react-toastify";
 import { KeplrWallet } from "../clients/keplrClient";
-import { BaseWallet } from "../clients/baseWallet";
+import {
+  BaseWallet,
+  WalletProvider as IWalletProvider,
+} from "../clients/baseWallet";
 import { WalletConnectWallet } from "../clients/walletConnectClient";
 import ConnectWalletModal from "../components/ConnectWalletModal/ConnectWalletModal";
 import Config from "../config/Config";
@@ -39,7 +41,7 @@ interface DisconnectedWalletContextValue {
 }
 interface ConnectedWalletContextValue {
   status: ConnectionStatus.Connected;
-  provider: SigningStargateClient;
+  provider: IWalletProvider;
   account: AccountData;
   refreshAccounts: () => Promise<void>;
   disconnect: () => void;

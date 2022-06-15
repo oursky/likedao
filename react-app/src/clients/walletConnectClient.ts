@@ -7,7 +7,11 @@ import { payloadId } from "@walletconnect/utils";
 import { SignDoc } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { bech32 } from "bech32";
 import { ChainInfo } from "../config/Config";
-import { BaseWallet } from "./baseWallet";
+import {
+  newSignDataMessage,
+  SignDataMessageResponse,
+} from "../models/cosmos/tx";
+import { ArbitrarySigner, BaseWallet, WalletProvider } from "./baseWallet";
 
 interface WalletConnectWalletConnectOptions {
   onDisconnect: () => void;
@@ -19,10 +23,10 @@ export class WalletConnectWallet extends BaseWallet {
   private constructor(
     chainInfo: ChainInfo,
     offlineSigner: OfflineSigner,
-    cosmJS: SigningStargateClient,
+    provider: WalletProvider,
     connector: WalletConnect
   ) {
-    super(chainInfo, offlineSigner, cosmJS);
+    super(chainInfo, offlineSigner, provider);
     this.connector = connector;
   }
 
@@ -92,12 +96,48 @@ export class WalletConnectWallet extends BaseWallet {
       },
     };
 
-    const cosmJS = await SigningStargateClient.connectWithSigner(
+    const signArbitrary = async (
+      signer: string,
+      data: string | Uint8Array
+    ): Promise<SignDataMessageResponse> => {
+      if (signer !== address) {
+        throw new Error(`Signer ${signer} doesn't match public key address`);
+      }
+
+      // Align with Keplr
+      const base64data = Buffer.from(data).toString("base64");
+
+      const signDocJSON = newSignDataMessage({ signer, data: base64data });
+
+      const resInJSON = await connector.sendCustomRequest({
+        id: payloadId(),
+        jsonrpc: "2.0",
+        method: "cosmos_signAmino",
+        // LikerLand Authcore skips the first param
+        params: ["", signer, signDocJSON],
+      });
+
+      return {
+        signed: resInJSON.signed,
+        signature: resInJSON.signature,
+      };
+    };
+
+    const arbitrarySigner: ArbitrarySigner = {
+      signArbitrary: signArbitrary,
+    };
+
+    const stargateClient = await SigningStargateClient.connectWithSigner(
       chainInfo.chainRpc,
       offlineSigner
     );
 
-    return new WalletConnectWallet(chainInfo, offlineSigner, cosmJS, connector);
+    return new WalletConnectWallet(
+      chainInfo,
+      offlineSigner,
+      Object.assign(stargateClient, arbitrarySigner),
+      connector
+    );
   }
 
   async disconnect(): Promise<void> {
