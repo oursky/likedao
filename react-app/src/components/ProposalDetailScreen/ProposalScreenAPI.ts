@@ -25,8 +25,7 @@ const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
   return turnout.toNumber();
 };
 
-export function useProposalQuery(id: string): {
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+export function useProposalQuery(): {
   requestState: RequestState<Proposal | null>;
   fetch: (id: string) => void;
 } {
@@ -34,9 +33,6 @@ export function useProposalQuery(id: string): {
     ProposalDetailScreenQueryQuery,
     ProposalDetailScreenQueryQueryVariables
   >(ProposalDetailScreenQuery, {
-    variables: {
-      id,
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
@@ -54,35 +50,34 @@ export function useProposalQuery(id: string): {
   );
 
   const data = useMemo(() => {
-    return mapRequestData<
-      ProposalDetailScreenQueryQuery,
-      // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      Proposal | null
-    >(requestState, (r) => {
-      if (!r.proposalByID) {
-        return null;
+    return mapRequestData<ProposalDetailScreenQueryQuery, Proposal | null>(
+      requestState,
+      (r) => {
+        if (!r.proposalByID) {
+          return null;
+        }
+        const proposal = r.proposalByID;
+        return {
+          ...proposal,
+          votingEndTime: proposal.votingEndTime
+            ? new Date(proposal.votingEndTime)
+            : null,
+          votingStartTime: proposal.votingEndTime
+            ? new Date(proposal.votingEndTime)
+            : null,
+          depositEndTime: proposal.depositEndTime
+            ? new Date(proposal.depositEndTime)
+            : null,
+          submitTime: new Date(proposal.submitTime),
+          turnout: calculateTurnout(proposal.tallyResult),
+          remainingVotingDays:
+            proposal.votingStartTime &&
+            proposal.votingEndTime &&
+            differenceInDays(Date.now(), new Date(proposal.votingEndTime)),
+          depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
+        };
       }
-      const proposal = r.proposalByID;
-      return {
-        ...proposal,
-        votingEndTime: proposal.votingEndTime
-          ? new Date(proposal.votingEndTime)
-          : null,
-        votingStartTime: proposal.votingEndTime
-          ? new Date(proposal.votingEndTime)
-          : null,
-        depositEndTime: proposal.depositEndTime
-          ? new Date(proposal.depositEndTime)
-          : null,
-        submitTime: new Date(proposal.submitTime),
-        turnout: calculateTurnout(proposal.tallyResult),
-        remainingVotingDays:
-          proposal.votingStartTime &&
-          proposal.votingEndTime &&
-          differenceInDays(Date.now(), new Date(proposal.votingEndTime)),
-        depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
-      };
-    });
+    );
   }, [requestState]);
 
   return {

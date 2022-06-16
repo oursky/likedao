@@ -15,7 +15,7 @@ import { useProposalQuery } from "./ProposalScreenAPI";
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
-  const { fetch, requestState } = useProposalQuery(`proposal_${id}`);
+  const { fetch, requestState } = useProposalQuery();
   const navigate = useNavigate();
 
   useEffect(() => {
