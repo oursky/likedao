@@ -8,6 +8,7 @@ import {
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
+import { convertMinimalTokenToToken } from "../../utils/coin";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
@@ -79,6 +80,7 @@ export function useProposalQuery(id: string): {
           proposal.votingStartTime && proposal.votingEndTime
             ? differenceInDays(proposal.votingStartTime, proposal.votingEndTime)
             : -1,
+        depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
       };
     });
   }, [requestState]);

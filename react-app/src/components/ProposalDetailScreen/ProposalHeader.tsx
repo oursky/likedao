@@ -6,7 +6,6 @@ import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
-import { convertMinimalTokenToToken } from "../../utils/coin";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
 import {
@@ -58,9 +57,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   } = proposal;
   const totalDepositString = useMemo(() => {
     return (
-      convertBigNumberToLocalizedIntegerString(
-        convertMinimalTokenToToken(depositTotal)
-      ) +
+      convertBigNumberToLocalizedIntegerString(depositTotal) +
       " " +
       Config.chainInfo.currency.coinDenom.toUpperCase()
     );
