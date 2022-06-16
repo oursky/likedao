@@ -102,7 +102,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "-"
           )}
         </p>
-        {remainingVotingDays > 0 && (
+        {remainingVotingDays && remainingVotingDays > 0 && (
           <Badge color="likecoin-yellow">
             <LocalizedText
               messageID="ProposalDetail.votingDaysRemaining"

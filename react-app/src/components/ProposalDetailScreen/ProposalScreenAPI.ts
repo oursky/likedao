@@ -77,9 +77,9 @@ export function useProposalQuery(id: string): {
         submitTime: new Date(proposal.submitTime),
         turnout: calculateTurnout(proposal.tallyResult),
         remainingVotingDays:
-          proposal.votingStartTime && proposal.votingEndTime
-            ? differenceInDays(proposal.votingStartTime, proposal.votingEndTime)
-            : -1,
+          proposal.votingStartTime &&
+          proposal.votingEndTime &&
+          differenceInDays(Date.now(), new Date(proposal.votingEndTime)),
         depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
       };
     });
