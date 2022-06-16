@@ -55,6 +55,11 @@ func main() {
 	router.Use(cors.New(corsConfig))
 	router.Use(middlewares.Services(config, serverDB, chainDB))
 
+	auth := router.Group("/auth")
+	{
+		auth.GET("/nonce", handlers.NonceHandler(config.Session))
+		auth.POST("/verify", handlers.VerificationHandler(config.Session))
+	}
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

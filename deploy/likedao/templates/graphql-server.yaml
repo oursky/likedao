@@ -82,10 +82,24 @@ spec:
                 secretKeyRef:
                   name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: CORS_ALLOW_ORIGINS
+            - name: SIGNATURE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
+                  key: SIGNATURE_SECRET
+            - name: COOKIE_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
+                  key: COOKIE_DOMAIN
             - name: SERVER_DATABASE_POOL_SIZE
               value: {{ .Values.graphqlServer.serverDatabase.poolSize | quote }}
             - name: BDJUNO_DATABASE_POOL_SIZE
               value: {{ .Values.graphqlServer.bdjunoDatabase.poolSize | quote }}
+            - name: NONCE_EXPIRY
+              value: {{ .Values.graphqlServer.session.nonceExpiry | quote }}
+            - name: SESSION_EXPIRY
+              value: {{ .Values.graphqlServer.session.sessionExpiry | quote }}
           readinessProbe:
             httpGet:
               path: /ping
@@ -119,3 +133,5 @@ data:
   BDJUNO_DATABASE_SCHEMA: {{ .Values.graphqlServer.bdjunoDatabase.schema | b64enc }}
   GRAPHQL_SENTRY_DSN: {{ .Values.graphqlServer.sentry.dsn | b64enc }}
   GRAPHQL_SENTRY_ENVIRONMENT: {{ .Values.graphqlServer.sentry.environment | b64enc }}
+  SIGNATURE_SECRET: {{ .Values.graphqlServer.session.signatureSecret | b64enc }}
+  COOKIE_DOMAIN: {{ .Values.graphqlServer.session.cookieDomain | b64enc }}

@@ -1,5 +1,10 @@
 graphqlServer:
   imageName: ghcr.io/oursky/likedao-graphql-server
+  session:
+    cookieDomain: likedao.example.com
+    signatureSecret: "__SESSION_SECRET__"
+    nonceExpiry: 3600
+    sessionExpiry: 86400
   sentry:
     dsn: dsn
     environment: graphql-server

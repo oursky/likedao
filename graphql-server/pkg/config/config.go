@@ -32,12 +32,20 @@ type CorsConfig struct {
 	AllowOrigins []string
 }
 
+type SessionConfig struct {
+	CookieDomain    string
+	SignatureSecret string
+	NonceExpiry     int
+	SessionExpiry   int
+}
+
 type Config struct {
 	ChainDatabase  DatabaseConfig
 	ServerDatabase DatabaseConfig
 	Cors           CorsConfig
 	Log            LogConfig
 	Chain          ChainConfig
+	Session        SessionConfig
 }
 
 func LoadConfigFromEnv() Config {
@@ -112,11 +120,37 @@ func LoadConfigFromEnv() Config {
 		CoinDenom: coinDenom,
 	}
 
+	sessionExpiryStr := os.Getenv("SESSION_EXPIRY")
+	if sessionExpiryStr == "" {
+		sessionExpiryStr = "3600"
+	}
+	sessionExpiry, err := strconv.Atoi(sessionExpiryStr)
+	if err != nil {
+		sessionExpiry = 3600
+	}
+
+	nonceExpiryStr := os.Getenv("NONCE_EXPIRY")
+	if nonceExpiryStr == "" {
+		nonceExpiryStr = "86400"
+	}
+	nonceExpiry, err := strconv.Atoi(nonceExpiryStr)
+	if err != nil {
+		nonceExpiry = 86400
+	}
+
+	sessionConfig := SessionConfig{
+		CookieDomain:    os.Getenv("COOKIE_DOMAIN"),
+		SignatureSecret: os.Getenv("SIGNATURE_SECRET"),
+		SessionExpiry:   sessionExpiry,
+		NonceExpiry:     nonceExpiry,
+	}
+
 	return Config{
 		ServerDatabase: serverDatabaseConfig,
 		ChainDatabase:  chainDatabaseConfig,
 		Cors:           corsConfig,
 		Log:            logConfig,
 		Chain:          chainConfig,
+		Session:        sessionConfig,
 	}
 }
