@@ -3,54 +3,16 @@ import cn from "classnames";
 import BigNumber from "bignumber.js";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
-import {
-  ProposalScreenProposalFragment as Proposal,
-  ProposalStatus,
-  ProposalType,
-} from "../../generated/graphql";
-import Badge, { BadgeColor } from "../common/Badge/Badge";
-import { MessageID } from "../../i18n/LocaleModel";
+import { ProposalScreenProposalFragment as Proposal } from "../../generated/graphql";
+import Badge from "../common/Badge/Badge";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
+import {
+  getProposalStatusBadgeConfig,
+  getProposalTypeMessage,
+} from "../common/Proposal/utils";
 import { ProposalInsight } from "./ProposalInsight";
 
-export function getProposalStatusBadgeConfig(
-  status: ProposalStatus
-): [MessageID, BadgeColor] {
-  switch (status) {
-    case ProposalStatus.Passed:
-      return ["ProposalScreen.proposalStatus.passed", "green"];
-    case ProposalStatus.Rejected:
-      return ["ProposalScreen.proposalStatus.rejected", "red"];
-    case ProposalStatus.DepositPeriod:
-      return ["ProposalScreen.proposalStatus.depositPeriod", "blue"];
-    case ProposalStatus.VotingPeriod:
-      return ["ProposalScreen.proposalStatus.votingPeriod", "yellow"];
-    case ProposalStatus.Invalid:
-      return ["ProposalScreen.proposalStatus.invalid", "grey"];
-    case ProposalStatus.Failed:
-      return ["ProposalScreen.proposalStatus.failed", "purple"];
-    default:
-      throw new Error(`Unsupported proposal status`);
-  }
-}
-
-function getProposalTypeMessage(type: ProposalType): MessageID {
-  switch (type) {
-    case ProposalType.Text:
-      return "ProposalScreen.proposalType.text";
-    case ProposalType.ParameterChange:
-      return "ProposalScreen.proposalType.parameterChange";
-    case ProposalType.CommunityPoolSpend:
-      return "ProposalScreen.proposalType.communityPoolSpend";
-    case ProposalType.SoftwareUpgrade:
-      return "ProposalScreen.proposalType.softwareUpgrade";
-    case ProposalType.CancelSoftwareUpgrade:
-      return "ProposalScreen.proposalType.cancelSoftwareUpgrade";
-    default:
-      throw new Error("Unknown proposal type");
-  }
-}
 interface ProposalCardProps {
   proposal: Proposal;
 }

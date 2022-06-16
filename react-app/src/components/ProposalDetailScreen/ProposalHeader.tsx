@@ -6,10 +6,13 @@ import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
-import { getProposalStatusBadgeConfig } from "../ProposalScreen/ProposalCard";
 import { convertMinimalTokenToToken } from "../../utils/coin";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
+import {
+  getProposalStatusBadgeConfig,
+  getProposalTypeMessage,
+} from "../common/Proposal/utils";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
@@ -157,7 +160,9 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
       <p className={cn("text-sm", "text-likecoin-lightgreen", "mb-1")}>
         <LocalizedText messageID="ProposalDetail.proposalType" />
       </p>
-      <p className={cn("text-sm", "mb-4")}>{type}</p>
+      <p className={cn("text-sm", "mb-4")}>
+        <LocalizedText messageID={getProposalTypeMessage(type)} />
+      </p>
       <p className={cn("text-sm", "text-likecoin-lightgreen", "mb-1")}>
         <LocalizedText messageID="ProposalDetail.publishedBy" />
       </p>
