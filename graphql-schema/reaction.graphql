@@ -1,0 +1,20 @@
+type Reaction implements Node {
+  id: ID!
+  target: Node!
+  reaction: String!
+  address: String!
+}
+
+input SetReactionInput {
+  targetId: ID!
+  reaction: String!
+}
+
+input UnsetReactionInput {
+  targetId: ID!
+}
+
+extend type Mutation {
+  setReaction(input: SetReactionInput!): Reaction! @authed
+  unsetReaction(input: UnsetReactionInput!): Reaction @authed
+}
