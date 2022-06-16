@@ -1,7 +1,10 @@
 import React from "react";
 import cn from "classnames";
 
-const Paper: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+const Paper: React.FC<{ children?: React.ReactNode; className?: string }> = ({
+  children,
+  className,
+}) => (
   <div
     className={cn(
       "flex-1",
@@ -12,7 +15,8 @@ const Paper: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
       "py-6",
       "h-min",
       "w-full",
-      "mb-3"
+      "mb-3",
+      className
     )}
   >
     {children}
