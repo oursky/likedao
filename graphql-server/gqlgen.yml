@@ -89,6 +89,12 @@ models:
   ProposalTallyResult: 
     model: github.com/oursky/likedao/pkg/models.ProposalTallyResult
 
+  Reaction:
+    model: github.com/oursky/likedao/pkg/models.Reaction
+    fields:
+      id:
+        fieldName: NodeID
+
   AverageBlockTime:
     model: github.com/oursky/likedao/pkg/models.AverageBlockTime
 
