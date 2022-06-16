@@ -33,7 +33,8 @@ type QueryContext struct {
 }
 
 type MutatorContext struct {
-	Test mutators.ITestMutator
+	Test     mutators.ITestMutator
+	Reaction mutators.IReactionMutator
 }
 
 type DataLoaderContext struct {
@@ -65,7 +66,8 @@ func NewRequestContext(
 		Gov:           queries.NewGovQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
-		Test: mutators.NewTestMutator(ctx, serverDB),
+		Test:     mutators.NewTestMutator(ctx, serverDB),
+		Reaction: mutators.NewReactionMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{
 		Test:     dataloaders.NewTestDataloader(queries.Test),
