@@ -17,22 +17,26 @@ func init() {
 		}
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 			_, err := tx.Exec(Format(`
-				CREATE TABLE {{.schema}}.test (
+				CREATE TABLE IF NOT EXISTS {{.schema}}.test (
 					id TEXT PRIMARY KEY,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					string TEXT NOT NULL,
 					int INT NOT NULL
-				)
+				);
 			`, values))
 			return err
 		})
 		return err
 	}, func(ctx context.Context, db *bun.DB) error {
+		values := FormatValues{
+			"schema": config.ServerDatabase.Schema,
+		}
+
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
-			_, err := tx.Exec(`
-				DROP TABLE {{.schema}}.test
-			`)
+			_, err := tx.Exec(Format(`
+				DROP TABLE IF EXISTS {{.schema}}.test;
+			`, values))
 			return err
 		})
 		return err
