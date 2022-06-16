@@ -61,7 +61,7 @@ func (q *ReactionMutator) SetReaction(targetID string, targetType models.Reactio
 	err := q.session.RunInTx(q.ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		_, err := q.session.NewInsert().
 			Model(reactionModel).
-			On("CONFLICT (address, target_id, target_type) DO UPDATE").
+			On("CONFLICT (address, target_type, target_id) DO UPDATE").
 			Set("reaction = EXCLUDED.reaction").
 			Returning("*").
 			Exec(q.ctx)
