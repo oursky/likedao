@@ -154,9 +154,9 @@ const ProposalHeader: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           <LocalizedText messageID="ProposalDetail.publishedBy" />
         </p>
         <div>
-          {/* TODO: Get proposer name */}
+          {/* TODO: Get proposer name from Desmos API*/}
           <span className={cn("text-sm", "text-likecoin-green")}>
-            joggerpant23
+            {truncateAddress(proposerAddress)}
           </span>
           <span
             className={cn(
