@@ -42,6 +42,7 @@ type DataLoaderContext struct {
 	Test     dataloaders.TestDataloader
 	Block    dataloaders.BlockDataloader
 	Proposal dataloaders.ProposalDataloader
+	Reaction dataloaders.ReactionDataloader
 }
 
 type DatabaseContext struct {
@@ -75,6 +76,7 @@ func NewRequestContext(
 		Test:     dataloaders.NewTestDataloader(queries.Test),
 		Block:    dataloaders.NewBlockDataloader(queries.Block),
 		Proposal: dataloaders.NewProposalDataloader(queries.Proposal),
+		Reaction: dataloaders.NewReactionDataloader(queries.Reaction),
 	}
 
 	databases := DatabaseContext{
