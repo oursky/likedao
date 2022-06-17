@@ -34,6 +34,7 @@ export interface IConfig {
   graphql: {
     endpoint: string;
   };
+  authEndpoint: string;
   chainLinks: ChainLink[];
   footerLinks: FooterLinks;
 }
@@ -55,6 +56,7 @@ const defaultConfig: IConfig = {
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },
+  authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
   footerLinks: {
     osmosis: "https://app.osmosis.zone/?from=ATOM&to=LIKE",

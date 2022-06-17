@@ -5,6 +5,7 @@ import AppLocaleProvider from "./AppLocaleProvider";
 import WalletProvider from "./WalletProvider";
 import TransactionProvider from "./TransactionProvider";
 import QueryClientProvider from "./QueryClientProvider";
+import AuthProvider from "./AuthProvider";
 
 const apolloClient = createApolloClient();
 
@@ -20,7 +21,9 @@ const AppProviders: React.FC<AppProvidersProps> = (props) => {
       <ApolloProvider client={apolloClient}>
         <WalletProvider>
           <QueryClientProvider>
-            <TransactionProvider>{children}</TransactionProvider>
+            <TransactionProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </TransactionProvider>
           </QueryClientProvider>
         </WalletProvider>
       </ApolloProvider>

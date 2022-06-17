@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: CHAIN_COIN_DENOM
+            - name: CHAIN_BECH32_PREFIX
+              valueFrom:
+                secretKeyRef:
+                  name: graphql-server-config-{{ .Values.deploymentTag }}
+                  key: CHAIN_BECH32_PREFIX
             - name: BDJUNO_DATABASE_SCHEMA
               valueFrom:
                 secretKeyRef:
@@ -126,6 +131,7 @@ metadata:
 type: Opaque
 data:
   CORS_ALLOW_ORIGINS: {{ .Values.graphqlServer.corsAllowOrigins | b64enc }}
+  CHAIN_BECH32_PREFIX: {{ .Values.graphqlServer.chain.bech32Prefix | b64enc }}
   CHAIN_COIN_DENOM: {{ .Values.graphqlServer.chain.coinDenom | b64enc }}
   SERVER_DATABASE_URL: {{ .Values.graphqlServer.serverDatabase.url | b64enc }}
   SERVER_DATABASE_SCHEMA: {{ .Values.graphqlServer.serverDatabase.schema | b64enc }}

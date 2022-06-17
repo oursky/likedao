@@ -8,7 +8,7 @@ import {
 } from "../models/cosmos/staking";
 import { convertTokenToMinimalToken } from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
-import { SignedTx, useCosmos } from "./cosmosAPI";
+import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IStakingAPI {
   signDelegateTokenTx(
@@ -23,9 +23,9 @@ interface IStakingAPI {
   ): Promise<SignedTx>;
 }
 
-export const useStaking = (): IStakingAPI => {
+export const useStakingAPI = (): IStakingAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmos();
+  const cosmos = useCosmosAPI();
   const { query } = useQueryClient();
   const chainInfo = Config.chainInfo;
 

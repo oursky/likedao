@@ -15,6 +15,7 @@ window.appConfig = {
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },
+  authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
   footerLinks: {
     osmosis: "https://app.osmosis.zone/?from=ATOM&to=LIKE",

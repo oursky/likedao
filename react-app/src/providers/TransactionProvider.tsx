@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import { toast } from "react-toastify";
-import { useBank } from "../api/bankAPI";
-import { useCosmos } from "../api/cosmosAPI";
+import { useBankAPI } from "../api/bankAPI";
+import { useCosmosAPI } from "../api/cosmosAPI";
 import { SendTokenFormValues } from "../components/forms/SendTokenForm/SendTokenFormModel";
 import SendTokenModal from "../components/TransactionModals/SendTokenModal";
 import UserAddressModal from "../components/UserAddressModal/UserAddressModal";
 import { CollectRewardsFormValues } from "../components/forms/CollectRewardsForm/CollectRewardsFormModel";
-import { useDistribution } from "../api/distributionAPI";
+import { useDistributionAPI } from "../api/distributionAPI";
 import CollectRewardsModal from "../components/TransactionModals/CollectRewardsModal";
 import { useLocale } from "./AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "./WalletProvider";
@@ -35,9 +35,9 @@ const TransactionContext = React.createContext<TransactionProviderContextValue>(
 const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const { children } = props;
   const wallet = useWallet();
-  const cosmosAPI = useCosmos();
-  const bankAPI = useBank();
-  const distributionAPI = useDistribution();
+  const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
+  const distributionAPI = useDistributionAPI();
 
   const { translate } = useLocale();
 

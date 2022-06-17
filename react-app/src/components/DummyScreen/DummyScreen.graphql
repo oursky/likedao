@@ -3,3 +3,7 @@ query testQuery {
     height
   }
 }
+
+query meQuery {
+  me
+}

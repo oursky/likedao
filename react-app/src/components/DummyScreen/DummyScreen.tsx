@@ -2,18 +2,25 @@ import React, { useCallback, useEffect, useState } from "react";
 import cn from "classnames";
 import * as Sentry from "@sentry/react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 import { Profile } from "@desmoslabs/desmjs-types/desmos/profiles/v1beta1/models_profile";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import AppRoutes from "../../navigation/AppRoutes";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Locale } from "../../i18n/LocaleModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
-import { TestQuery, TestQueryQuery } from "../../generated/graphql";
+import {
+  TestQuery,
+  TestQueryQuery,
+  MeQuery,
+  MeQueryQuery,
+} from "../../generated/graphql";
+import { useAuth } from "../../providers/AuthProvider";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 
 const DummyScreen: React.FC = () => {
   const { setLocale } = useLocale();
+  const auth = useAuth();
   const { desmosQuery } = useQueryClient();
   const wallet = useWallet();
 
@@ -23,6 +30,9 @@ const DummyScreen: React.FC = () => {
   const { loading, data, error } = useQuery<TestQueryQuery>(TestQuery, {
     pollInterval: 6000,
   });
+
+  const [loadMe, { loading: meLoading, data: meData, error: meError }] =
+    useLazyQuery<MeQueryQuery>(MeQuery, {});
 
   const setLocaleToZh = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,6 +51,14 @@ const DummyScreen: React.FC = () => {
     },
     [setLocale]
   );
+
+  const signInWithCosmos = useCallback(async () => {
+    await auth.signInWithCosmos();
+  }, [auth]);
+
+  const loadUserInfo = useCallback(async () => {
+    await loadMe();
+  }, [loadMe]);
 
   const captureDummyError = useCallback(() => {
     Sentry.captureException(new Error("This is my fake error message"));
@@ -179,6 +197,53 @@ const DummyScreen: React.FC = () => {
           4
         )}
       </pre>
+      <div className={cn("flex", "flex-row", "gap-x-2")}>
+        <button
+          type="button"
+          className={cn(
+            "bg-likecoin-green",
+            "text-white",
+            "hover:bg-likecoin-lightgreen",
+            "text-base",
+            "leading-6",
+            "font-medium",
+            "py-3",
+            "px-6",
+            "rounded-md",
+            "shadow-sm",
+            "rounded-md"
+          )}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick={signInWithCosmos}
+        >
+          Sign In With Cosmos
+        </button>
+        <button
+          type="button"
+          className={cn(
+            "bg-likecoin-green",
+            "text-white",
+            "hover:bg-likecoin-lightgreen",
+            "text-base",
+            "leading-6",
+            "font-medium",
+            "py-3",
+            "px-6",
+            "rounded-md",
+            "shadow-sm",
+            "rounded-md"
+          )}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick={loadUserInfo}
+        >
+          Get User Info
+        </button>
+      </div>
+      {meLoading && <div>Signing In...</div>}
+
+      {meData && <div>Signed In As: {meData.me}</div>}
+
+      {meError && <div>Failed to sign in: {meError.message}</div>}
     </div>
   );
 };

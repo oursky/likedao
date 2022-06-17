@@ -4,10 +4,13 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ChainConfig struct {
-	CoinDenom string
+	Bech32Prefix string
+	CoinDenom    string
 }
 
 type LogConfig struct {
@@ -116,8 +119,13 @@ func LoadConfigFromEnv() Config {
 	if coinDenom == "" {
 		coinDenom = "nanolike"
 	}
+	bech32Prefix := os.Getenv("CHAIN_BECH32_PREFIX")
+	if bech32Prefix == "" {
+		bech32Prefix = "like"
+	}
 	chainConfig := ChainConfig{
-		CoinDenom: coinDenom,
+		CoinDenom:    coinDenom,
+		Bech32Prefix: bech32Prefix,
 	}
 
 	sessionExpiryStr := os.Getenv("SESSION_EXPIRY")
@@ -138,8 +146,14 @@ func LoadConfigFromEnv() Config {
 		nonceExpiry = 86400
 	}
 
+	cookieDomain := os.Getenv("COOKIE_DOMAIN")
+	// Should not set domain to localhost in debug mode
+	if gin.Mode() == gin.DebugMode {
+		cookieDomain = ""
+	}
+
 	sessionConfig := SessionConfig{
-		CookieDomain:    os.Getenv("COOKIE_DOMAIN"),
+		CookieDomain:    cookieDomain,
 		SignatureSecret: os.Getenv("SIGNATURE_SECRET"),
 		SessionExpiry:   sessionExpiry,
 		NonceExpiry:     nonceExpiry,
