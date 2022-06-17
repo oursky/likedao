@@ -47,6 +47,7 @@ type Proposal {
   tallyResult: ProposalTallyResult
 
   reactions: [ReactionCount!]!
+  myReaction: String
 }
 
 type ProposalEdge {
