@@ -1,6 +1,5 @@
 import React from "react";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import AppSideBar from "../components/AppSideBar/AppSideBar";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import CreateProposalScreen from "../components/CreateProposalScreen/CreateProposalScreen";
 import DummyScreen from "../components/DummyScreen/DummyScreen";
 import ErrorView, { ErrorType } from "../components/ErrorView/ErrorView";
@@ -10,22 +9,15 @@ import ProposalDetailScreen from "../components/ProposalDetailScreen/ProposalDet
 import ProposalScreen from "../components/ProposalScreen/ProposalScreen";
 import WalletConnectingScreen from "../components/WalletConnectingScreen/WalletConnectingScreen";
 import { useWallet, ConnectionStatus } from "../providers/WalletProvider";
+import AppScaffold from "../components/AppScaffold/AppScaffold";
 import AppRoutes from "./AppRoutes";
-
-const AppSideBarOutlet: React.FC = () => {
-  return (
-    <AppSideBar>
-      <Outlet />
-    </AppSideBar>
-  );
-};
 
 const AppRouter: React.FC = () => {
   const wallet = useWallet();
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppSideBarOutlet />}>
+        <Route element={<AppScaffold />}>
           <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
           <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
           <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
