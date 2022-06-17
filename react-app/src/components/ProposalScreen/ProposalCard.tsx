@@ -4,13 +4,10 @@ import BigNumber from "bignumber.js";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
 import { ProposalScreenProposalFragment as Proposal } from "../../generated/graphql";
-import Badge from "../common/Badge/Badge";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
-import {
-  getProposalStatusBadgeConfig,
-  getProposalTypeMessage,
-} from "../common/Proposal/utils";
+import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
+import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { ProposalInsight } from "./ProposalInsight";
 
 interface ProposalCardProps {
@@ -19,11 +16,6 @@ interface ProposalCardProps {
 
 const ProposalCard: React.FC<ProposalCardProps> = (props) => {
   const { proposal } = props;
-
-  const [statusMessage, statusBadgeColor] = useMemo(
-    () => getProposalStatusBadgeConfig(proposal.status),
-    [proposal]
-  );
 
   const voteData = useMemo(
     (): ColorBarData[] => [
@@ -72,9 +64,7 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
         >
           #{proposal.proposalId}
         </span>
-        <Badge color={statusBadgeColor}>
-          <LocalizedText messageID={statusMessage} />
-        </Badge>
+        <ProposalStatusBadge status={proposal.status} />
       </div>
       <div className={cn("flex", "flex-col", "gap-y-1")}>
         <span

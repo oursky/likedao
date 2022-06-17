@@ -1,6 +1,6 @@
-import { ProposalStatus, ProposalType } from "../../../generated/graphql";
-import { MessageID } from "../../../i18n/LocaleModel";
-import { BadgeColor } from "../Badge/Badge";
+import { ProposalStatus, ProposalType } from "../../generated/graphql";
+import { MessageID } from "../../i18n/LocaleModel";
+import { BadgeColor } from "../common/Badge/Badge";
 
 export function getProposalStatusBadgeConfig(
   status: ProposalStatus

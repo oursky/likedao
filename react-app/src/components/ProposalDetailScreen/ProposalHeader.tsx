@@ -8,18 +8,12 @@ import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
-import {
-  getProposalStatusBadgeConfig,
-  getProposalTypeMessage,
-} from "../common/Proposal/utils";
+import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
+import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const { proposalId, title, status } = proposal;
-  const [statusMessageID, statusBadgeColor] = useMemo(
-    () => getProposalStatusBadgeConfig(status),
-    [status]
-  );
 
   return (
     <div>
@@ -39,9 +33,7 @@ const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         </h1>
       </div>
       <div className={cn("flex", "flex-col", "my-4", "items-center")}>
-        <Badge color={statusBadgeColor}>
-          <LocalizedText messageID={statusMessageID} />
-        </Badge>
+        <ProposalStatusBadge status={status} />
       </div>
     </div>
   );
