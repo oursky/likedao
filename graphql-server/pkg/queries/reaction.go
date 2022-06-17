@@ -10,8 +10,12 @@ import (
 )
 
 type ReactionCounts = map[string]int
+type IUserReactionQuery interface {
+	QueryUserReactions() ([]*models.Reaction, error)
+}
 
 type ITargetReactionQuery interface {
+	ScopeUserAddress(address string) IUserReactionQuery
 	QueryTargetReactions() ([]ReactionCounts, error)
 }
 
@@ -24,6 +28,12 @@ type TargetReactionQuery struct {
 
 	scopedTargetType string
 	scopedTargetIds  []string
+}
+
+type UserReactionQuery struct {
+	TargetReactionQuery
+
+	scopedUserAddress string
 }
 
 type ReactionQuery struct {
@@ -46,6 +56,10 @@ func (q *ReactionQuery) ScopeProposals(proposalIds []int) ITargetReactionQuery {
 		scopedTargetType: string(models.ReactionTargetTypeProposal),
 		scopedTargetIds:  targetIds,
 	}
+}
+
+func (q *TargetReactionQuery) ScopeUserAddress(address string) IUserReactionQuery {
+	return &UserReactionQuery{TargetReactionQuery: *q, scopedUserAddress: address}
 }
 
 func (q *TargetReactionQuery) NewQuery() *bun.SelectQuery {
@@ -100,6 +114,38 @@ func (q *TargetReactionQuery) QueryTargetReactions() ([]ReactionCounts, error) {
 			result = append(result, reactionMap)
 		} else {
 			result = append(result, ReactionCounts{})
+		}
+	}
+
+	return result, nil
+}
+
+func (q *UserReactionQuery) NewQuery() *bun.SelectQuery {
+	return q.session.NewSelect().
+		Model((*models.Reaction)(nil)).
+		Where("address = (?)", q.scopedUserAddress)
+}
+
+func (q *UserReactionQuery) QueryUserReactions() ([]*models.Reaction, error) {
+	query := q.NewQuery()
+
+	var reactions []models.Reaction
+	if err := query.Scan(q.ctx, &reactions); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	result := make([]*models.Reaction, 0, len(q.scopedTargetIds))
+	targetIDToReactions := make(map[string]models.Reaction, len(reactions))
+	for _, reaction := range reactions {
+		targetIDToReactions[reaction.TargetID] = reaction
+	}
+
+	for _, id := range q.scopedTargetIds {
+		reaction, exists := targetIDToReactions[id]
+		if exists {
+			result = append(result, &reaction)
+		} else {
+			result = append(result, nil)
 		}
 	}
 
