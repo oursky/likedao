@@ -49,7 +49,7 @@ const ProposalInsight: React.FC<ProposalInsightProps> = (props) => {
           />
         </div>
       )}
-      {proposal.tallyResult != null && (
+      {proposal.tallyResult?.outstandingOption != null && (
         <div className={cn("flex", "flex-col")}>
           <span
             className={cn("text-2xs", "leading-5", "font-medium", "text-black")}
@@ -59,7 +59,9 @@ const ProposalInsight: React.FC<ProposalInsightProps> = (props) => {
           <span
             className={cn("text-sm", "leading-5", "font-medium", "text-black")}
           >
-            <VoteOptionIndicator option={proposal.tallyResult.mostVoted} />
+            <VoteOptionIndicator
+              option={proposal.tallyResult.outstandingOption}
+            />
           </span>
         </div>
       )}
