@@ -50,6 +50,20 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 	return tally, nil
 }
 
+func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
+	reactionCount, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []models.ReactionCount
+	for reaction, count := range reactionCount {
+		result = append(result, models.ReactionCount{Reaction: reaction, Count: count})
+	}
+
+	return result, nil
+}
+
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
 	if obj.Yes == nil {
 		return 0, nil
