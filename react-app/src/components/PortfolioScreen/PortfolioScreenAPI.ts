@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
@@ -16,9 +16,8 @@ import { Portfolio } from "./PortfolioScreenModel";
 type PortfolioRequestState = RequestState<Portfolio | null>;
 
 export function usePortfolioQuery(): PortfolioRequestState {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Portfolio>();
-  const [error, setError] = useState<Error>();
+  const [requestState, setRequestState] =
+    useState<PortfolioRequestState>(RequestStateInitial);
 
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
@@ -26,9 +25,9 @@ export function usePortfolioQuery(): PortfolioRequestState {
   const { desmosQuery } = useQueryClient();
 
   const fetchPortfolio = useCallback(async () => {
-    setLoading(true);
+    setRequestState(RequestStateLoading);
     if (wallet.status !== ConnectionStatus.Connected) {
-      setError(new Error("Wallet not connected!"));
+      setRequestState(RequestStateError(new Error("Wallet not connected.")));
       return;
     }
     try {
@@ -49,41 +48,29 @@ export function usePortfolioQuery(): PortfolioRequestState {
         denom: balance.denom,
       };
 
-      setData({
-        profile,
-        balance,
-        balanceStaked,
-        balanceUnstaking,
-        balanceAvailable,
-        address: wallet.account.address,
-      });
-      setLoading(false);
+      setRequestState(
+        RequestStateLoaded({
+          profile,
+          balance,
+          balanceStaked,
+          balanceUnstaking,
+          balanceAvailable,
+          address: wallet.account.address,
+        })
+      );
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err);
+        setRequestState(RequestStateError(err));
       }
       console.log("Failed to handle fetch portfolio error =", err);
     }
-  }, [wallet, cosmosAPI, staking, desmosQuery, setError]);
+  }, [wallet, cosmosAPI, staking, desmosQuery, setRequestState]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {
-      setError(err);
+      setRequestState(RequestStateError(err));
     });
   }, [fetchPortfolio]);
-
-  const requestState = useMemo<PortfolioRequestState>(() => {
-    if (data !== undefined) {
-      return RequestStateLoaded(data);
-    }
-    if (error !== undefined) {
-      return RequestStateError(error);
-    }
-    if (loading) {
-      return RequestStateLoading;
-    }
-    return RequestStateInitial;
-  }, [loading, error, data]);
 
   return requestState;
 }
