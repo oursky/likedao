@@ -25,7 +25,7 @@ interface IStakingAPI {
     amount: string,
     memo?: string
   ): Promise<SignedTx>;
-  getAmountUnstaking(account: string): Promise<BigNumberCoin>;
+  getUnstakingAmount(account: string): Promise<BigNumberCoin>;
 }
 
 export const useStakingAPI = (): IStakingAPI => {
@@ -103,7 +103,7 @@ export const useStakingAPI = (): IStakingAPI => {
     [chainInfo, query, cosmos, wallet]
   );
 
-  const getAmountUnstaking = useCallback(
+  const getUnstakingAmount = useCallback(
     async (address: string) => {
       const allDelegations = [];
       let startAtKey: Uint8Array | undefined;
@@ -140,8 +140,8 @@ export const useStakingAPI = (): IStakingAPI => {
     () => ({
       signDelegateTokenTx,
       signUndelegateTokenTx,
-      getAmountUnstaking,
+      getUnstakingAmount,
     }),
-    [signDelegateTokenTx, signUndelegateTokenTx, getAmountUnstaking]
+    [signDelegateTokenTx, signUndelegateTokenTx, getUnstakingAmount]
   );
 };

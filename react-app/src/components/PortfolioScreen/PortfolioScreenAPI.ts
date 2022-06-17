@@ -31,20 +31,20 @@ export function usePortfolioQuery(): PortfolioRequestState {
       return;
     }
     try {
-      const [balance, balanceStaked, balanceUnstaking, profile] =
+      const [balance, stakedBalance, unstakingBalance, profile] =
         await Promise.all([
           cosmosAPI.getBalance(),
-          cosmosAPI.getBalanceStaked(),
-          staking.getAmountUnstaking(wallet.account.address),
+          cosmosAPI.getStakedBalance(),
+          staking.getUnstakingAmount(wallet.account.address),
           desmosQuery.getProfile(
             translateAddress(wallet.account.address, "desmos")
           ),
         ]);
 
-      const balanceAvailable = {
+      const availableBalance = {
         amount: balance.amount
-          .minus(balanceStaked.amount)
-          .minus(balanceUnstaking.amount),
+          .minus(stakedBalance.amount)
+          .minus(unstakingBalance.amount),
         denom: balance.denom,
       };
 
@@ -52,9 +52,9 @@ export function usePortfolioQuery(): PortfolioRequestState {
         RequestStateLoaded({
           profile,
           balance,
-          balanceStaked,
-          balanceUnstaking,
-          balanceAvailable,
+          stakedBalance,
+          unstakingBalance,
+          availableBalance,
           address: wallet.account.address,
         })
       );

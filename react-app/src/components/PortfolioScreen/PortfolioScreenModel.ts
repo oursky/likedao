@@ -4,8 +4,8 @@ import { BigNumberCoin } from "../../models/coin";
 export interface Portfolio {
   profile: Profile | null;
   balance: BigNumberCoin;
-  balanceStaked: BigNumberCoin;
-  balanceUnstaking: BigNumberCoin;
-  balanceAvailable: BigNumberCoin;
+  stakedBalance: BigNumberCoin;
+  unstakingBalance: BigNumberCoin;
+  availableBalance: BigNumberCoin;
   address: string;
 }

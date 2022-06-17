@@ -65,7 +65,7 @@ describe("useStaking", () => {
     it("should sum amount of all unbounding entries", () => {
       const { result } = renderHook(() => useStakingAPI());
 
-      result.current.getAmountUnstaking(WALLET_ADDRESS).then(({ amount }) => {
+      result.current.getUnstakingAmount(WALLET_ADDRESS).then(({ amount }) => {
         expect(amount).toStrictEqual(convertTokenToMinimalToken(4));
       });
     });
