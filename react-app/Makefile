@@ -1,5 +1,5 @@
 .PHONY: ci
-ci: vendor codegen check-format check-sort-translations lint typecheck
+ci: vendor codegen check-format check-sort-translations lint typecheck test
 
 .PHONY: setup
 setup: vendor
