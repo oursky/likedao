@@ -42,11 +42,19 @@ export function usePortfolioQuery(): PortfolioRequestState {
           ),
         ]);
 
+      const balanceAvailable = {
+        amount: balance.amount
+          .minus(balanceStaked.amount)
+          .minus(balanceUnstaking.amount),
+        denom: balance.denom,
+      };
+
       setData({
         profile,
         balance,
         balanceStaked,
         balanceUnstaking,
+        balanceAvailable,
         address: wallet.account.address,
       });
       setLoading(false);

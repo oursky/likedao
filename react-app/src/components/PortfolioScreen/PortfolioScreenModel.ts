@@ -6,5 +6,6 @@ export interface Portfolio {
   balance: BigNumberCoin;
   balanceStaked: BigNumberCoin;
   balanceUnstaking: BigNumberCoin;
+  balanceAvailable: BigNumberCoin;
   address: string;
 }
