@@ -78,28 +78,33 @@ func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.P
 	return gql_bigint.BigInt(obj.Abstain.ToInt64()), nil
 }
 
-func (r *proposalTallyResultResolver) MostVoted(ctx context.Context, obj *models.ProposalTallyResult) (models.ProposalVoteOption, error) {
-	var option models.ProposalVoteOption
+func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj *models.ProposalTallyResult) (*models.ProposalVoteOption, error) {
+	option := new(models.ProposalVoteOption)
 	var votes = int64(0)
 
 	// FIXME: Improve this handling
 	if obj.Yes != nil && obj.Yes.ToInt64() > votes {
-		option = models.ProposalVoteOptionYes
+		*option = models.ProposalVoteOptionYes
 		votes = obj.Yes.ToInt64()
 	}
 
 	if obj.No != nil && obj.No.ToInt64() > votes {
-		option = models.ProposalVoteOptionNo
+		*option = models.ProposalVoteOptionNo
 		votes = obj.No.ToInt64()
 	}
 
 	if obj.NoWithVeto != nil && obj.NoWithVeto.ToInt64() > votes {
-		option = models.ProposalVoteOptionNoWithVeto
+		*option = models.ProposalVoteOptionNoWithVeto
 		votes = obj.NoWithVeto.ToInt64()
 	}
 
 	if obj.Abstain != nil && obj.Abstain.ToInt64() > votes {
-		option = models.ProposalVoteOptionAbstain
+		*option = models.ProposalVoteOptionAbstain
+	}
+
+	// All the votes are the same, no outstanding option
+	if *option == "" {
+		return nil, nil
 	}
 
 	return option, nil
