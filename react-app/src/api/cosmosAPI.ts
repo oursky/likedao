@@ -15,6 +15,7 @@ const GAS_ADJUSTMENT = 1.3;
 
 interface ICosmosAPI {
   getBalance(): Promise<BigNumberCoin>;
+  getStakedBalance(): Promise<BigNumberCoin>;
   signArbitrary(data: string): Promise<SignDataMessageResponse>;
   signTx(messages: EncodeObject[], memo?: string): Promise<SignedTx>;
   broadcastTx(tx: SignedTx): Promise<DeliverTxResponse>;
@@ -39,6 +40,28 @@ export const useCosmosAPI = (): ICosmosAPI => {
     return {
       denom: balance.denom,
       amount,
+    };
+  }, [chainInfo.currency.coinMinimalDenom, wallet]);
+
+  const getStakedBalance = useCallback(async () => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      throw new Error("Wallet not connected");
+    }
+
+    const balance = await wallet.provider.getBalanceStaked(
+      wallet.account.address
+    );
+
+    if (!balance) {
+      return {
+        denom: chainInfo.currency.coinMinimalDenom,
+        amount: convertMinimalTokenToToken(0),
+      };
+    }
+
+    return {
+      denom: balance.denom,
+      amount: convertMinimalTokenToToken(balance.amount),
     };
   }, [chainInfo.currency.coinMinimalDenom, wallet]);
 
@@ -90,10 +113,11 @@ export const useCosmosAPI = (): ICosmosAPI => {
   return useMemo(
     () => ({
       getBalance,
+      getStakedBalance,
       signArbitrary,
       signTx,
       broadcastTx,
     }),
-    [getBalance, signArbitrary, signTx, broadcastTx]
+    [getBalance, getStakedBalance, signArbitrary, signTx, broadcastTx]
   );
 };

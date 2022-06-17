@@ -5,6 +5,7 @@ import CreateProposalScreen from "../components/CreateProposalScreen/CreatePropo
 import DummyScreen from "../components/DummyScreen/DummyScreen";
 import ErrorView, { ErrorType } from "../components/ErrorView/ErrorView";
 import OverviewScreen from "../components/OverviewScreen/OverviewScreen";
+import PortfolioScreen from "../components/PortfolioScreen/PortfolioScreen";
 import ProposalDetailScreen from "../components/ProposalDetailScreen/ProposalDetailScreen";
 import ProposalScreen from "../components/ProposalScreen/ProposalScreen";
 import WalletConnectingScreen from "../components/WalletConnectingScreen/WalletConnectingScreen";
@@ -36,6 +37,7 @@ const AppRouter: React.FC = () => {
             path={AppRoutes.ProposalDetail}
             element={<ProposalDetailScreen />}
           />
+          <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
         </Route>
 
         <Route path="*" element={<ErrorView type={ErrorType.NotFound} />} />

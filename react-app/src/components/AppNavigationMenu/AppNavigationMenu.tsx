@@ -39,7 +39,8 @@ const AppNavigationMenu: React.FC<AppNavigationMenuProps> = (props) => {
       <NavigationMenuItem
         labelId="AppSideBar.navigation.portfolio"
         icon={IconType.PieChart}
-        isActive={false}
+        isActive={activeRoute === AppRoutes.Portfolio}
+        navigateTo={AppRoutes.Portfolio}
         onNavigationItemSelect={onMenuItemSelect}
       />
     </ul>
