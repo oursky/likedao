@@ -45,6 +45,8 @@ type Proposal {
   proposerAddress: String!
   status: ProposalStatus!
   tallyResult: ProposalTallyResult
+
+  reactions: [ReactionCount!]!
 }
 
 type ProposalEdge {

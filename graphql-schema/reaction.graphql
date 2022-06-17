@@ -5,6 +5,11 @@ type Reaction implements Node {
   address: String!
 }
 
+type ReactionCount {
+  reaction: String!
+  count: Int!
+}
+
 input SetReactionInput {
   targetId: ID!
   reaction: String!
