@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useCallback } from "react";
 import cn from "classnames";
+import { toast } from "react-toastify";
 import Paper from "../common/Paper/Paper";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
+import CopyableText from "../common/CopyableText/CopyableText";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import { truncateAddress } from "../../utils/address";
 import { Portfolio } from "./PortfolioScreenModel";
 
 interface PortfolioPanelProps {
@@ -56,6 +60,12 @@ const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
 };
 
 const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
+  const { translate } = useLocale();
+
+  const onAddressCopied = useCallback(() => {
+    toast.success(translate("UserInfoPanel.addressCopied"));
+  }, [translate]);
+
   return (
     <Paper className={cn("py-6", "px-5")}>
       <div className={cn("flex")}>
@@ -78,6 +88,24 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
       </div>
       <div className={cn("mt-11", "mb-6", "sm:flex")}>
         <ProfilePicture profile={portfolio.profile} />
+
+        <div className={cn("flex", "flex-col", "items-start")}>
+          <p className={cn("text-xl", "leading-6", "font-medium", "mb-3")}>
+            {portfolio.profile?.dtag ?? truncateAddress(portfolio.address)}
+          </p>
+
+          <CopyableText
+            className={cn(
+              "text-2xs",
+              "leading-6",
+              "font-medium",
+              "text-likecoin-green"
+            )}
+            containerClassName={cn("shadow-sm", "mb-6")}
+            text={portfolio.address}
+            onCopied={onAddressCopied}
+          />
+        </div>
       </div>
     </Paper>
   );
