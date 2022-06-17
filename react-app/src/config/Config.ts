@@ -17,6 +17,13 @@ export interface ChainInfo {
   };
 }
 
+interface FooterLinks {
+  osmosis: string;
+  liquid: string;
+  emeris: string;
+  contactSupport: string;
+}
+
 export interface IConfig {
   sentry: Pick<
     Sentry.BrowserOptions,
@@ -28,6 +35,7 @@ export interface IConfig {
     endpoint: string;
   };
   chainLinks: ChainLink[];
+  footerLinks: FooterLinks;
 }
 
 const defaultConfig: IConfig = {
@@ -48,6 +56,13 @@ const defaultConfig: IConfig = {
     endpoint: "http://localhost:8080/graphql",
   },
   chainLinks: [],
+  footerLinks: {
+    osmosis: "https://app.osmosis.zone/?from=ATOM&to=LIKE",
+    liquid: "https://app.liquid.com/exchange/LIKEUSDT",
+    emeris: "https://app.emeris.com/welcome",
+    contactSupport:
+      "https://go.crisp.chat/chat/embed/?website_id=5c009125-5863-4059-ba65-43f177ca33f7",
+  },
 };
 
 const appConfig = window.appConfig;
