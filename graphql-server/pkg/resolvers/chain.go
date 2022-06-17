@@ -19,18 +19,17 @@ import (
 func (r *queryResolver) ChainHealth(ctx context.Context) (*models.ChainHealth, error) {
 	currentBlock, err := pkgContext.GetQueriesFromCtx(ctx).Block.QueryLatestBlock()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query latest block: %v", err))
 	}
 	blockTimes, err := pkgContext.GetQueriesFromCtx(ctx).Chain.QueryBlockTime()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query block time: %v", err))
 	}
 
 	averageBlockTime, err := pkgContext.GetQueriesFromCtx(ctx).Chain.QueryAvergeBlockTime()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query average block time: %v", err))
 	}
-	fmt.Printf("%+v\n", blockTimes.IndexerDelay)
 
 	var status models.ChainStatus
 	// If indexer misses blocks for 1 minute, it is considered as halted.
@@ -53,7 +52,7 @@ func (r *queryResolver) CommunityStatus(ctx context.Context) (*models.CommunityS
 	config := pkgContext.GetConfigFromCtx(ctx)
 	communityPool, err := pkgContext.GetQueriesFromCtx(ctx).CommunityPool.QueryCommunityPool()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query community pool: %v", err))
 	}
 
 	var communityPoolCoins []bdjuno.DbDecCoin
@@ -68,7 +67,7 @@ func (r *queryResolver) CommunityStatus(ctx context.Context) (*models.CommunityS
 
 	inflation, err := pkgContext.GetQueriesFromCtx(ctx).Inflation.QueryInflation()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query inflation: %v", err))
 	}
 
 	supply, err := pkgContext.GetQueriesFromCtx(ctx).Supply.QuerySupply()
@@ -83,17 +82,17 @@ func (r *queryResolver) CommunityStatus(ctx context.Context) (*models.CommunityS
 		}
 	}
 	if nativeSupply == nil {
-		return nil, servererrors.Wrapf(servererrors.ErrNotFound, "token not found in supply")
+		return nil, servererrors.NotFound.NewError(ctx, "native supply not found")
 	}
 
 	parsedSupplyAmount, err := strconv.ParseFloat(nativeSupply.Amount, 64)
 	if err != nil {
-		return nil, servererrors.ErrValidationFailure
+		return nil, servererrors.ValidationFailure.NewError(ctx, fmt.Sprintf("failed to parse native supply amount: %v", err))
 	}
 
 	stakingPool, err := pkgContext.GetQueriesFromCtx(ctx).StakingPool.QueryStakingPool()
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query staking pool: %v", err))
 	}
 
 	bondedRatio := new(big.Float).Quo(new(big.Float).SetInt(stakingPool.BondedTokens.ToMathBig()), new(big.Float).SetFloat64(parsedSupplyAmount))

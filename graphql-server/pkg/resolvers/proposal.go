@@ -5,9 +5,11 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	pkgContext "github.com/oursky/likedao/pkg/context"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 	gql_bigint "github.com/xplorfin/gql-bigint"
@@ -43,7 +45,7 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 
 	tally, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTallyResult(obj.ID)
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal tally result: %v", err))
 	}
 	return tally, nil
 }
@@ -113,7 +115,7 @@ func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposa
 
 	res, err := proposalQuery.QueryPaginatedProposals(input.First, input.After)
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposals: %v", err))
 	}
 	proposalCursorMap := make(map[int]string)
 	for index, proposal := range res.Items {

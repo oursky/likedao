@@ -12,6 +12,7 @@ input CreateTest {
 extend type Query {
   queryTestByID(id: ID!): Test
   queryTestsByIDs(ids: [ID!]!): [Test]
+  me: String! @authed
 }
 
 extend type Mutation {

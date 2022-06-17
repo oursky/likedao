@@ -5,8 +5,10 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
 	pkgContext "github.com/oursky/likedao/pkg/context"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 )
@@ -15,7 +17,7 @@ func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTe
 	res, err := pkgContext.GetMutatorsFromCtx(ctx).Test.CreateTest(input.String, input.Int)
 
 	if err != nil {
-		return nil, err
+		return nil, servererrors.MutationError.NewError(ctx, fmt.Sprintf("failed to create test: %v", err))
 	}
 
 	return res, nil
@@ -24,7 +26,7 @@ func (r *mutationResolver) CreateTest(ctx context.Context, input models.CreateTe
 func (r *queryResolver) QueryTestByID(ctx context.Context, id models.NodeID) (*models.Test, error) {
 	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Test.Load(id.ID)
 	if err != nil {
-		return nil, err
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query test: %v", err))
 	}
 
 	return res, nil
@@ -36,11 +38,17 @@ func (r *queryResolver) QueryTestsByIDs(ctx context.Context, ids []models.NodeID
 
 	for _, err := range errs {
 		if err != nil {
-			return nil, err
+			return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query tests: %v", err))
 		}
 	}
 
 	return res, nil
+}
+
+func (r *queryResolver) Me(ctx context.Context) (string, error) {
+	address := pkgContext.GetAuthedUserAddress(ctx)
+
+	return address, nil
 }
 
 // Mutation returns graphql1.MutationResolver implementation.
