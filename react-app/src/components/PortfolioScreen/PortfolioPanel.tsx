@@ -9,7 +9,53 @@ interface PortfolioPanelProps {
   portfolio: Portfolio;
 }
 
-const PortfolioPanel: React.FC<PortfolioPanelProps> = ({}) => {
+const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
+  profile,
+}) => {
+  const profilePicture = profile?.pictures?.profile;
+
+  return (
+    <div className={cn("flex", "justify-center", "mb-9")}>
+      {profilePicture ? (
+        <img
+          className={cn(
+            "rounded-full",
+            "w-[120px]",
+            "h-[120px]",
+            "sm:w-[180px]",
+            "sm:h-[180px]",
+            "sm:mr-9",
+            "object-cover"
+          )}
+          src={profilePicture}
+          alt="profile picture"
+        />
+      ) : (
+        <div
+          className={cn(
+            "flex",
+            "justify-center",
+            "items-center",
+            "bg-likecoin-secondarygreen",
+            "rounded-full",
+            "w-[120px]",
+            "h-[120px]",
+            "sm:w-[180px]",
+            "sm:h-[180px]",
+            "sm:mr-9"
+          )}
+        >
+          <Icon
+            icon={IconType.Account}
+            className={cn("w-11", "h-11", "sm:w-16", "sm:h-16")}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
   return (
     <Paper className={cn("py-6", "px-5")}>
       <div className={cn("flex")}>
@@ -29,6 +75,9 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({}) => {
         >
           <LocalizedText messageID="PortfolioScreen.yourPortfolio" />
         </h2>
+      </div>
+      <div className={cn("mt-11", "mb-6", "sm:flex")}>
+        <ProfilePicture profile={portfolio.profile} />
       </div>
     </Paper>
   );
