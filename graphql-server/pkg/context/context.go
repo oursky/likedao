@@ -30,6 +30,7 @@ type QueryContext struct {
 	Supply        queries.ISupplyQuery
 	Proposal      queries.IProposalQuery
 	Gov           queries.IGovQuery
+	Reaction      queries.IReactionQuery
 }
 
 type MutatorContext struct {
@@ -64,6 +65,7 @@ func NewRequestContext(
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 		Gov:           queries.NewGovQuery(ctx, chainDB),
+		Reaction:      queries.NewReactionQuery(ctx, serverDB),
 	}
 	mutators := MutatorContext{
 		Test:     mutators.NewTestMutator(ctx, serverDB),
