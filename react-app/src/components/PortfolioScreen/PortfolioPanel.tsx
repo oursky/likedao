@@ -3,8 +3,11 @@ import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
+import { Portfolio } from "./PortfolioScreenModel";
 
-interface PortfolioPanelProps {}
+interface PortfolioPanelProps {
+  portfolio: Portfolio;
+}
 
 const PortfolioPanel: React.FC<PortfolioPanelProps> = ({}) => {
   return (
