@@ -3,6 +3,7 @@ import cn from "classnames";
 import { ReactionBarSelector } from "@charkour/react-reactions";
 import { usePopper } from "react-popper";
 import AppButton from "../common/Buttons/AppButton";
+import { useWindowEvent } from "../../hooks/useWindowEvent";
 import {
   DefaultReactionMap,
   getReactionType,
@@ -49,6 +50,15 @@ export const ReactionPicker: React.FC<ReactionPickerProps> = (props) => {
     },
     [onAddNewReaction]
   );
+
+  useWindowEvent("mousedown", (event) => {
+    const target = event.target as HTMLElement;
+    if (!active) return;
+
+    if (buttonRef?.contains(target) || pickerRef?.contains(target)) return;
+
+    setActive(false);
+  });
 
   return (
     <>
