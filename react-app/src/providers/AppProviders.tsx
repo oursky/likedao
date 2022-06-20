@@ -1,13 +1,10 @@
 import React from "react";
-import { ApolloProvider } from "@apollo/client";
-import { createApolloClient } from "../clients/apolloClient";
 import AppLocaleProvider from "./AppLocaleProvider";
 import WalletProvider from "./WalletProvider";
 import TransactionProvider from "./TransactionProvider";
 import QueryClientProvider from "./QueryClientProvider";
 import AuthProvider from "./AuthProvider";
-
-const apolloClient = createApolloClient();
+import AppApolloProvider from "./AppApolloProvider";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -18,15 +15,15 @@ const AppProviders: React.FC<AppProvidersProps> = (props) => {
 
   return (
     <AppLocaleProvider>
-      <ApolloProvider client={apolloClient}>
-        <WalletProvider>
-          <QueryClientProvider>
-            <TransactionProvider>
-              <AuthProvider>{children}</AuthProvider>
-            </TransactionProvider>
-          </QueryClientProvider>
-        </WalletProvider>
-      </ApolloProvider>
+      <WalletProvider>
+        <QueryClientProvider>
+          <TransactionProvider>
+            <AuthProvider>
+              <AppApolloProvider>{children}</AppApolloProvider>
+            </AuthProvider>
+          </TransactionProvider>
+        </QueryClientProvider>
+      </WalletProvider>
     </AppLocaleProvider>
   );
 };
