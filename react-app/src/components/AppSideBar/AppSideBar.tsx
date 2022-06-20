@@ -25,6 +25,8 @@ import { AddressBar } from "./AddressBar";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
+  onMenuOpen: () => void;
+  onMenuClose: () => void;
 }
 
 const MenuPanel: React.FC<{
@@ -52,8 +54,11 @@ const MenuPanel: React.FC<{
   );
 };
 
-const AppSideBar: React.FC<AppSideBarProps> = (props) => {
-  const { children } = props;
+const AppSideBar: React.FC<AppSideBarProps> = ({
+  children,
+  onMenuClose,
+  onMenuOpen,
+}) => {
   const { translate } = useLocale();
 
   const wallet = useWallet();
@@ -66,12 +71,14 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const chainId = Config.chainInfo.chainId;
 
   const openMobileMenu = useCallback(() => {
+    onMenuOpen();
     setIsMenuActive(true);
-  }, [setIsMenuActive]);
+  }, [setIsMenuActive, onMenuOpen]);
 
   const closeMobileMenu = useCallback(() => {
+    onMenuClose();
     setIsMenuActive(false);
-  }, [setIsMenuActive]);
+  }, [setIsMenuActive, onMenuClose]);
 
   const toggleMobileMenuMenu = useCallback(() => {
     if (isMenuActive) {
