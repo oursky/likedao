@@ -5,7 +5,7 @@ import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
 type AppButtonTheme = "primary" | "secondary" | "rounded";
-type AppButtonSize = "regular" | "small";
+type AppButtonSize = "regular" | "small" | "extra-small";
 
 interface AppButtonCommonProps {
   theme: AppButtonTheme;
@@ -80,8 +80,7 @@ function getButtonSizeStyle(size: AppButtonSize): string {
         "py-3",
         "px-6",
         "rounded-md",
-        "shadow-sm",
-        "rounded-md"
+        "shadow-sm"
       );
     case "small":
       return cn(
@@ -91,8 +90,17 @@ function getButtonSizeStyle(size: AppButtonSize): string {
         "py-3",
         "px-4",
         "rounded-md",
-        "shadow-sm",
-        "rounded-md"
+        "shadow-sm"
+      );
+    case "extra-small":
+      return cn(
+        "text-sm",
+        "leading-4",
+        "font-medium",
+        "py-2",
+        "px-3",
+        "rounded-md",
+        "shadow-sm"
       );
     default:
       throw new Error("Unknown button size");
