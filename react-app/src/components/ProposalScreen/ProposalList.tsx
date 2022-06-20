@@ -1,8 +1,8 @@
 import React from "react";
 import cn from "classnames";
-import { ProposalScreenProposalFragment as Proposal } from "../../generated/graphql";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ProposalCard from "./ProposalCard";
+import { Proposal } from "./ProposalScreenModel";
 
 interface ProposalListProps {
   proposals: Proposal[];

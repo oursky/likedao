@@ -1,13 +1,11 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import {
-  ProposalScreenProposalFragment as Proposal,
-  ProposalStatus,
-} from "../../generated/graphql";
+import { ProposalStatus } from "../../generated/graphql";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { MessageID } from "../../i18n/LocaleModel";
 import { VoteOptionIndicator } from "./VoteOptionIndicator";
+import { Proposal } from "./ProposalScreenModel";
 
 interface ProposalInsightProps {
   proposal: Proposal;
