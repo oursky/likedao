@@ -3,6 +3,7 @@ import cn from "classnames";
 import Divider from "../common/Divider/Divider";
 import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
+import Config from "../../config/Config";
 
 const Footer: React.FC = () => {
   return (
@@ -44,7 +45,7 @@ const Footer: React.FC = () => {
             theme="secondary"
             size="small"
             type="anchor"
-            href="https://app.osmosis.zone/?from=ATOM&to=LIKE"
+            href={Config.footerLinks.osmosis}
             className={cn(
               "text-sm",
               "leading-4",
@@ -58,7 +59,7 @@ const Footer: React.FC = () => {
             theme="secondary"
             size="small"
             type="anchor"
-            href="https://app.liquid.com/exchange/LIKEUSDT"
+            href={Config.footerLinks.liquid}
             className={cn(
               "text-sm",
               "leading-4",
@@ -72,7 +73,7 @@ const Footer: React.FC = () => {
             theme="secondary"
             size="small"
             type="anchor"
-            href="https://app.emeris.com/welcome"
+            href={Config.footerLinks.emeris}
             className={cn(
               "text-sm",
               "leading-4",
@@ -99,7 +100,7 @@ const Footer: React.FC = () => {
             theme="secondary"
             size="small"
             type="anchor"
-            href="https://go.crisp.chat/chat/embed/?website_id=5c009125-5863-4059-ba65-43f177ca33f7"
+            href={Config.footerLinks.contactSupport}
             className={cn(
               "text-sm",
               "leading-4",
