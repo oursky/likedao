@@ -13,7 +13,7 @@ import { Icon, IconType } from "../common/Icons/Icons";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
-import { useProposalQuery } from "./ProposalScreenAPI";
+import { useProposalQuery } from "./ProposalDetailScreenAPI";
 import { ProposalData } from "./ProposalData";
 
 const ProposalDetailScreen: React.FC = () => {
