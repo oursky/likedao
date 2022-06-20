@@ -16,13 +16,10 @@ fragment ProposalDetailScreenProposal on Proposal {
     no
     noWithVeto
     abstain
-    mostVoted
   }
 }
 
-query ProposalDetailScreenQuery(
-  $id: ID!
-) {
+query ProposalDetailScreenQuery($id: ID!) {
   proposalByID(id: $id) {
     ...ProposalDetailScreenProposal
   }

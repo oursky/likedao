@@ -19,21 +19,23 @@ const ColorBar: React.FC<ColorBarProps> = (props) => {
     [data]
   );
 
-  if (total === 0) {
-    return null;
-  }
-
   return (
     <div className={cn("flex", "h-1.5", className)}>
-      {data.map((data, index) => (
+      {total !== 0 ? (
+        data.map((data, index) => (
+          <div
+            key={index}
+            className={cn("inline-block", "h-full", data.colorClassName)}
+            style={{
+              width: `${(data.value / total) * 100}%`,
+            }}
+          />
+        ))
+      ) : (
         <div
-          key={index}
-          className={cn("inline-block", "h-full", data.colorClassName)}
-          style={{
-            width: `${(data.value / total) * 100}%`,
-          }}
+          className={cn("inline-block", "h-full", "w-full", "bg-likecoin-grey")}
         />
-      ))}
+      )}
     </div>
   );
 };

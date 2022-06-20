@@ -63,7 +63,7 @@ type ProposalTallyResult {
   no: BigInt!
   noWithVeto: BigInt!
   abstain: BigInt!
-  mostVoted: ProposalVoteOption!
+  outstandingOption: ProposalVoteOption
 }
 
 input QueryProposalsInput {
