@@ -3,12 +3,14 @@ import cn from "classnames";
 import BigNumber from "bignumber.js";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
-import { ProposalScreenProposalFragment as Proposal } from "../../generated/graphql";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
 import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
+import { ReactionList } from "../reactions";
+import { DefaultReactionMap } from "../reactions/ReactionModel";
 import { ProposalInsight } from "./ProposalInsight";
+import { Proposal } from "./ProposalScreenModel";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -38,6 +40,15 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
     ],
     [proposal]
   );
+
+  const reactionItems = useMemo(() => {
+    return proposal.reactions.map((r) => {
+      return {
+        reaction: DefaultReactionMap[r.type],
+        count: r.count,
+      };
+    });
+  }, [proposal]);
 
   return (
     <div
@@ -94,8 +105,8 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
         <ColorBar data={voteData} />
       </div>
 
-      <div className={cn("flex", "flex-row", "justify-end")}>
-        {/* TODO: Add reactions */}
+      <div className={cn("flex", "flex-row", "justify-between")}>
+        <ReactionList items={reactionItems} />
         <AppButton
           className={cn("self-end")}
           type="link"
