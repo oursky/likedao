@@ -10,6 +10,8 @@ import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
 import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
+import { ReactionList, ReactionPicker } from "../reactions";
+import { DefaultReactionMap } from "../reactions/Reaction";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
@@ -176,7 +178,18 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   );
 };
 
-const ProposalActionArea: React.FC = () => {
+const ProposalActionArea: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
+  const { reactions, myReaction } = proposal;
+  const reactionItems = useMemo(() => {
+    return reactions.map((r) => {
+      return {
+        isActive: r.type === myReaction,
+        reaction: DefaultReactionMap[r.type],
+        count: r.count,
+      };
+    });
+  }, [reactions, myReaction]);
+
   return (
     <div
       className={cn(
@@ -185,28 +198,28 @@ const ProposalActionArea: React.FC = () => {
         "sm:flex-row",
         "sm:justify-between",
         "sm:justify-center",
-        "my-4",
-        "p-2"
+        "mt-4"
       )}
     >
-      <div className={cn("inline", "sm:mb-0", "mb-3")}>
-        {/* TODO: Insert reactions here */}
-        <AppButton
-          size="regular"
-          theme="rounded"
-          className={cn(
-            "text-likecoin-green",
-            "text-sm",
-            "leading-5",
-            "font-semibold"
-          )}
-          messageID="ProposalDetail.addReaction"
-        />
+      <div
+        className={cn(
+          "flex",
+          "flex-row",
+          "gap-x-3",
+          "sm:mb-0",
+          "mb-3",
+          "items-center",
+          "flex-wrap",
+          "gap-y-4"
+        )}
+      >
+        <ReactionList items={reactionItems} itemTheme="grey" />
+        <ReactionPicker />
       </div>
       <AppButton
-        size="regular"
+        size="extra-small"
         theme="primary"
-        className={cn("text-base", "leading-6", "font-medium")}
+        className={cn("text-base", "leading-6", "font-medium", "w-36")}
         messageID="ProposalDetail.voteNow"
       />
     </div>
@@ -221,7 +234,7 @@ const ProposalHeader: React.FC<{
       <ProposalTitle proposal={proposal} />
       <ProposalStatistics proposal={proposal} />
       <ProposalTypeAndProposer proposal={proposal} />
-      <ProposalActionArea />
+      <ProposalActionArea proposal={proposal} />
     </Paper>
   );
 };
