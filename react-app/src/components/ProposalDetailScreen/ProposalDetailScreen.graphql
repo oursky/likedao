@@ -17,6 +17,13 @@ fragment ProposalDetailScreenProposal on Proposal {
     noWithVeto
     abstain
   }
+
+  reactions {
+    reaction
+    count
+  }
+
+  myReaction
 }
 
 query ProposalDetailScreenQuery($id: ID!) {
