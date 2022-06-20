@@ -1,12 +1,17 @@
 import React, { useCallback } from "react";
 import cn from "classnames";
 import { toast } from "react-toastify";
+import { BigNumber } from "bignumber.js";
 import Paper from "../common/Paper/Paper";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
 import CopyableText from "../common/CopyableText/CopyableText";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { truncateAddress } from "../../utils/address";
+import CoinBalanceCard from "../common/CoinBalanceCard/CoinBalanceCard";
+import { convertBigNumberToMillifiedIntegerString } from "../../utils/number";
+import Config from "../../config/Config";
+import { MessageID } from "../../i18n/LocaleModel";
 import { Portfolio } from "./PortfolioScreenModel";
 
 interface PortfolioPanelProps {
@@ -19,7 +24,7 @@ const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
   const profilePicture = profile?.pictures?.profile;
 
   return (
-    <div className={cn("flex", "justify-center", "mb-9")}>
+    <div className={cn("flex", "justify-center", "mb-9", "sm:mb-0")}>
       {profilePicture ? (
         <img
           className={cn(
@@ -55,6 +60,30 @@ const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
           />
         </div>
       )}
+    </div>
+  );
+};
+
+const CoinsAmountField: React.FC<{
+  messageID: MessageID;
+  amount: BigNumber;
+}> = ({ messageID, amount }) => {
+  return (
+    <div className={cn("flex", "flex-col", "mr-6")}>
+      <p
+        className={cn(
+          "text-likecoin-lightgreen",
+          "text-sm",
+          "leading-5",
+          "font-medium"
+        )}
+      >
+        <LocalizedText messageID={messageID} />
+      </p>
+      <p className={cn("text-base", "leading-5", "font-medium")}>
+        {convertBigNumberToMillifiedIntegerString(amount)}{" "}
+        {Config.chainInfo.currency.coinDenom}
+      </p>
     </div>
   );
 };
@@ -105,6 +134,26 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
             text={portfolio.address}
             onCopied={onAddressCopied}
           />
+
+          <CoinBalanceCard
+            balance={portfolio.balance.amount}
+            denom={Config.chainInfo.currency.coinDenom}
+          />
+
+          <div className={cn("flex", "justify-between", "mt-3", "w-full")}>
+            <CoinsAmountField
+              messageID="PortfolioScreen.yourPortfolio.stake"
+              amount={portfolio.stakedBalance.amount}
+            />
+            <CoinsAmountField
+              messageID="PortfolioScreen.yourPortfolio.unstaking"
+              amount={portfolio.unstakingBalance.amount}
+            />
+            <CoinsAmountField
+              messageID="PortfolioScreen.yourPortfolio.available"
+              amount={portfolio.availableBalance.amount}
+            />
+          </div>
         </div>
       </div>
     </Paper>
