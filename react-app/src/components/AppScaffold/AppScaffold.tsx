@@ -12,8 +12,8 @@ const AppScaffold: React.FC = () => {
         "flex-col",
         "min-h-screen",
         "justify-between",
-        "w-full"
-        // isMenuActive && "fixed"
+        "w-full",
+        "sm:p-8"
       )}
     >
       <AppSideBar>

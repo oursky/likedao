@@ -27,11 +27,35 @@ interface AppSideBarProps {
   children?: React.ReactNode;
 }
 
-// eslint-disable-next-line complexity
+const MenuPanel: React.FC<{
+  isMenuActive: boolean;
+  className?: string;
+  closeMobileMenu: () => void;
+}> = ({ isMenuActive, closeMobileMenu, className }) => {
+  const location = useLocation();
+  return (
+    <div
+      className={cn(
+        !isMenuActive && "hidden",
+        "sm:flex",
+        "flex-col",
+        className
+      )}
+    >
+      <Divider className={cn("hidden", "sm:block")} />
+      <AppNavigationMenu
+        activeRoute={location.pathname}
+        className={cn("py-6")}
+        onMenuItemSelect={closeMobileMenu}
+      />
+    </div>
+  );
+};
+
 const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   const { children } = props;
   const { translate } = useLocale();
-  const location = useLocation();
+
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
   const transaction = useTransaction();
@@ -88,62 +112,69 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
   );
 
   return (
-    <div className={cn("h-full", "w-full", "overflow-auto", "sm:p-8")}>
+    <div
+      className={cn(
+        "flex",
+        "flex-col",
+        "gap-x-4",
+        "gap-y-6",
+        "justify-center",
+        "sm:gap-y-4",
+        "sm:flex-row",
+        "relative",
+        "sm:w-full",
+        "w-screen"
+      )}
+    >
       <div
         className={cn(
           "flex",
           "flex-col",
-          "gap-x-4",
-          "gap-y-6",
-          "justify-center",
-          "sm:gap-y-4",
-          "sm:flex-row"
+          "px-3",
+          "pt-3",
+          "sm:p-0",
+          "sm:w-72",
+          "w-screen",
+          "sm:static",
+          "sm:bg-transparent",
+          isMenuActive && cn("h-screen", "fixed", "top-0", "z-50", "bg-default")
         )}
       >
-        <div
-          className={cn(
-            "flex-0",
-            "flex",
-            "flex-col",
-            "px-3",
-            "pt-3",
-            "sm:p-0",
-            "sm:w-72"
-          )}
-        >
-          <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
-            <Header
-              chainHealth={
-                isRequestStateLoaded(chainHealthRequestState)
-                  ? chainHealthRequestState.data
-                  : undefined
-              }
-            />
-            <IconButton
-              icon={isMenuActive ? IconType.X : IconType.Menu}
-              size={24}
-              className={cn("sm:hidden")}
-              onClick={toggleMobileMenuMenu}
-            />
-          </div>
-          {wallet.status !== ConnectionStatus.Connected ? (
-            <LoginPanel
-              className={cn("order-2", "my-6")}
-              onConnect={wallet.openConnectWalletModal}
-            />
-          ) : (
+        <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
+          <Header
+            chainHealth={
+              isRequestStateLoaded(chainHealthRequestState)
+                ? chainHealthRequestState.data
+                : undefined
+            }
+          />
+          <IconButton
+            icon={isMenuActive ? IconType.X : IconType.Menu}
+            size={24}
+            className={cn("sm:hidden")}
+            onClick={toggleMobileMenuMenu}
+          />
+        </div>
+
+        {wallet.status !== ConnectionStatus.Connected ? (
+          <LoginPanel
+            className={cn("order-2", "my-6")}
+            onConnect={wallet.openConnectWalletModal}
+          />
+        ) : (
+          <>
             <div
               className={cn(
                 "order-3",
                 "flex-col",
                 "gap-y-6",
-                "hidden",
-                "sm:flex"
+                "sm:flex",
+                !isMenuActive && "hidden"
               )}
             >
               <Divider />
               <UserInfoPanel
-                className={cn("order-3")}
+                className={cn("mt-6", "sm:mt-0")}
                 userInfo={userInfo}
                 onClickSend={transaction.openSendTokenModal}
                 onClickReceive={transaction.openReceiveTokenModal}
@@ -151,87 +182,32 @@ const AppSideBar: React.FC<AppSideBarProps> = (props) => {
                 onClickReinvest={onReinvest}
               />
             </div>
-          )}
-          <div
-            className={cn(
-              "hidden",
-              "sm:flex",
-              "flex-col",
-              "gap-y-4",
-              "mb-6",
-              wallet.status === ConnectionStatus.Connected
-                ? "order-2"
-                : "order-3"
-            )}
-          >
-            {wallet.status === ConnectionStatus.Connected && (
-              <AddressBar
-                address={userInfo?.address ?? ""}
-                onDisconnect={wallet.disconnect}
-              />
-            )}
-            <Divider />
-            <AppNavigationMenu
-              activeRoute={location.pathname}
-              className={cn("pb-6")}
-              onMenuItemSelect={closeMobileMenu}
+            <AddressBar
+              address={userInfo?.address ?? ""}
+              className={cn(
+                "order-4",
+                "sm:order-2",
+                "sm:flex",
+                "sm:items-center",
+                "mt-5",
+                "sm:mt-0",
+                "sm:mb-7",
+                !isMenuActive && "hidden"
+              )}
+              onDisconnect={wallet.disconnect}
             />
-          </div>
-        </div>
-        <div
-          className={cn(
-            "flex-1",
-            "flex",
-            "relative",
-            "px-3",
-            "sm:max-w-screen-2xl",
-            "sm:px-0"
-          )}
-        >
-          <div
-            className={cn(
-              isMenuActive ? "flex" : "hidden",
-              "h-[calc(100vh_-_5.25rem)]",
-              "left-0",
-              "right-0",
-              "bg-gradient-to-b",
-              "from-white",
-              "to-likecoin-primary-bg",
-              "absolute",
-              "flex-col",
-              "gap-y-6",
-              "z-10",
-              "px-3",
-              "sm:hidden"
-            )}
-          >
-            <Divider />
-            <AppNavigationMenu
-              activeRoute={location.pathname}
-              className={cn("pb-6")}
-              onMenuItemSelect={closeMobileMenu}
-            />
-            {wallet.status === ConnectionStatus.Connected && (
-              <div className={cn("flex", "flex-col", "gap-y-6")}>
-                <Divider />
-                <UserInfoPanel
-                  userInfo={userInfo}
-                  onClickSend={transaction.openSendTokenModal}
-                  onClickReceive={transaction.openReceiveTokenModal}
-                  onClickReward={transaction.openCollectRewardsModal}
-                  onClickReinvest={onReinvest}
-                />
-                <AddressBar
-                  address={userInfo?.address ?? ""}
-                  onDisconnect={wallet.disconnect}
-                />
-              </div>
-            )}
-          </div>
+          </>
+        )}
 
-          <main className={cn("block", "w-full")}>{children}</main>
-        </div>
+        <MenuPanel
+          isMenuActive={isMenuActive}
+          className={
+            wallet.status === ConnectionStatus.Connected ? "order-2" : "order-3"
+          }
+          closeMobileMenu={closeMobileMenu}
+        />
       </div>
+      <main className={cn("grow", "px-3", "sm:px-0")}>{children}</main>
     </div>
   );
 };

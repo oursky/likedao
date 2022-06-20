@@ -4,9 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .bg-default {
+    @apply bg-gradient-to-b from-white to-likecoin-primary-bg;
+  }
+}
+
 body {
   font-family: "Inter", sans-serif;
-  @apply bg-gradient-to-b from-white to-likecoin-primary-bg;
+  @apply bg-default;
 }
 
 html,
