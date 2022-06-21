@@ -1,0 +1,24 @@
+type DepositParams {
+  minDeposit: [Coin]!
+  maxDepositPeriod: Int!
+}
+
+type VotingParams {
+  votingPeriod: Int!
+}
+
+type TallyParams {
+  quorum: BigFloat!
+  threshold: BigFloat!
+  vetoThreshold: BigFloat!
+}
+
+type GovParams {
+  depositParams: DepositParams!
+  votingParams: VotingParams!
+  tallyParams: TallyParams!
+}
+
+extend type Query {
+  getGovParams: GovParams!
+}
