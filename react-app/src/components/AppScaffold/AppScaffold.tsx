@@ -5,15 +5,15 @@ import AppSideBar from "../AppSideBar/AppSideBar";
 import Footer from "../Footer/Footer";
 
 const AppScaffold: React.FC = () => {
-  const [isScollLocked, setIsScollLocked] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const lockScroll = useCallback(() => {
-    setIsScollLocked(true);
-  }, [setIsScollLocked]);
+  const handleMenuOpen = useCallback(() => {
+    setIsMenuOpen(true);
+  }, [setIsMenuOpen]);
 
-  const unlockScroll = useCallback(() => {
-    setIsScollLocked(false);
-  }, [setIsScollLocked]);
+  const handleMenuClose = useCallback(() => {
+    setIsMenuOpen(false);
+  }, [setIsMenuOpen]);
 
   return (
     <div
@@ -25,10 +25,14 @@ const AppScaffold: React.FC = () => {
         "w-full",
         "sm:p-8",
         "sm:overflow-auto",
-        isScollLocked && cn("overflow-hidden", "h-screen")
+        isMenuOpen && cn("overflow-hidden", "h-screen")
       )}
     >
-      <AppSideBar onMenuOpen={lockScroll} onMenuClose={unlockScroll}>
+      <AppSideBar
+        isMenuOpen={isMenuOpen}
+        onMenuOpen={handleMenuOpen}
+        onMenuClose={handleMenuClose}
+      >
         <Outlet />
       </AppSideBar>
       <Footer />

@@ -25,6 +25,7 @@ import { AddressBar } from "./AddressBar";
 
 interface AppSideBarProps {
   children?: React.ReactNode;
+  isMenuOpen: boolean;
   onMenuOpen: () => void;
   onMenuClose: () => void;
 }
@@ -56,6 +57,7 @@ const MenuPanel: React.FC<{
 
 const AppSideBar: React.FC<AppSideBarProps> = ({
   children,
+  isMenuOpen,
   onMenuClose,
   onMenuOpen,
 }) => {
@@ -66,27 +68,16 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
   const transaction = useTransaction();
 
   const chainHealthRequestState = useChainHealthQuery();
-  const [isMenuActive, setIsMenuActive] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const chainId = Config.chainInfo.chainId;
 
-  const openMobileMenu = useCallback(() => {
-    onMenuOpen();
-    setIsMenuActive(true);
-  }, [setIsMenuActive, onMenuOpen]);
-
-  const closeMobileMenu = useCallback(() => {
-    onMenuClose();
-    setIsMenuActive(false);
-  }, [setIsMenuActive, onMenuClose]);
-
   const toggleMobileMenuMenu = useCallback(() => {
-    if (isMenuActive) {
-      closeMobileMenu();
+    if (isMenuOpen) {
+      onMenuClose();
     } else {
-      openMobileMenu();
+      onMenuOpen();
     }
-  }, [closeMobileMenu, isMenuActive, openMobileMenu]);
+  }, [onMenuClose, isMenuOpen, onMenuOpen]);
 
   // TODO: Handle shortcuts
   const onReinvest = useCallback(() => {}, []);
@@ -144,7 +135,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           "w-screen",
           "sm:static",
           "sm:bg-transparent",
-          isMenuActive && cn("h-screen", "fixed", "top-0", "z-50", "bg-default")
+          isMenuOpen && cn("h-screen", "fixed", "top-0", "z-50", "bg-default")
         )}
       >
         <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
@@ -156,7 +147,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
             }
           />
           <IconButton
-            icon={isMenuActive ? IconType.X : IconType.Menu}
+            icon={isMenuOpen ? IconType.X : IconType.Menu}
             size={24}
             className={cn("sm:hidden")}
             onClick={toggleMobileMenuMenu}
@@ -176,7 +167,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
                 "flex-col",
                 "gap-y-6",
                 "sm:flex",
-                !isMenuActive && "hidden"
+                !isMenuOpen && "hidden"
               )}
             >
               <Divider />
@@ -199,7 +190,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
                 "mt-5",
                 "sm:mt-0",
                 "sm:mb-7",
-                !isMenuActive && "hidden"
+                !isMenuOpen && "hidden"
               )}
               onDisconnect={wallet.disconnect}
             />
@@ -207,11 +198,11 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
         )}
 
         <MenuPanel
-          isMenuActive={isMenuActive}
+          isMenuActive={isMenuOpen}
           className={
             wallet.status === ConnectionStatus.Connected ? "order-2" : "order-3"
           }
-          closeMobileMenu={closeMobileMenu}
+          closeMobileMenu={onMenuClose}
         />
       </div>
       <main className={cn("grow", "px-3", "sm:px-0")}>{children}</main>
