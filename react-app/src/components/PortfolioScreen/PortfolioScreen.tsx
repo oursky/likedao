@@ -7,18 +7,20 @@ import {
   isRequestStateLoaded,
 } from "../../models/RequestState";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
+import { useLocale } from "../../providers/AppLocaleProvider";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
   const requestState = usePortfolioQuery();
+  const { translate } = useLocale();
 
   useEffectOnce(
     () => {
       if (isRequestStateError(requestState)) {
-        toast.error("Failed to fetch Portfolio");
+        toast.error(translate("PortfolioScreen.requestState.error"));
       } else if (isRequestStateLoaded(requestState) && !requestState.data) {
-        toast.error("No data fetched for portfolio");
+        toast.error(translate("PortfolioScreen.requestState.noData"));
       }
     },
     () =>
