@@ -18,13 +18,14 @@ interface PortfolioPanelProps {
   portfolio: Portfolio;
 }
 
-const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
-  profile,
-}) => {
+const ProfilePicture: React.FC<{
+  profile: Portfolio["profile"];
+  className?: string;
+}> = ({ profile, className }) => {
   const profilePicture = profile?.pictures?.profile;
 
   return (
-    <div className={cn("flex", "justify-center", "mb-9", "sm:mb-0")}>
+    <div className={cn("flex", "justify-center", className)}>
       {profilePicture ? (
         <img
           className={cn(
@@ -33,7 +34,6 @@ const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
             "h-[120px]",
             "sm:w-[180px]",
             "sm:h-[180px]",
-            "sm:mr-9",
             "object-cover"
           )}
           src={profilePicture}
@@ -50,8 +50,7 @@ const ProfilePicture: React.FC<{ profile: Portfolio["profile"] }> = ({
             "w-[120px]",
             "h-[120px]",
             "sm:w-[180px]",
-            "sm:h-[180px]",
-            "sm:mr-9"
+            "sm:h-[180px]"
           )}
         >
           <Icon
@@ -116,7 +115,10 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
         </h2>
       </div>
       <div className={cn("mt-11", "mb-6", "sm:flex")}>
-        <ProfilePicture profile={portfolio.profile} />
+        <ProfilePicture
+          profile={portfolio.profile}
+          className={cn("mb-9", "sm:mb-0", "sm:mr-9")}
+        />
 
         <div className={cn("flex", "flex-col", "items-start")}>
           <p className={cn("text-xl", "leading-6", "font-medium", "mb-3")}>
