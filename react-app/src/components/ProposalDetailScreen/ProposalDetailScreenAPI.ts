@@ -28,7 +28,7 @@ const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
 
 export function useProposalQuery(): {
   requestState: RequestState<Proposal | null>;
-  fetch: (id: string) => void;
+  fetch: (id: number) => void;
 } {
   const [fetch, { requestState }] = useLazyGraphQLQuery<
     ProposalDetailScreenQueryQuery,
@@ -39,7 +39,7 @@ export function useProposalQuery(): {
   });
 
   const callFetch = useCallback(
-    (id: string) => {
+    (id: number) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetch({
         variables: {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -14,17 +14,34 @@ import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { ReactionType } from "../reactions/ReactionModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { useReactionAPI } from "../../api/reactionAPI";
+import VoteProposalModal from "../TransactionModals/VoteProposalModal";
+import { VoteProposalFormValues } from "../forms/VoteProposalForm/VoteProposalFormModel";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
 import { ProposalData } from "./ProposalData";
+
+enum ProposalDetailModal {
+  Vote = "vote",
+  Deposit = "deposit",
+}
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
   const { fetch, requestState } = useProposalQuery();
   const { translate } = useLocale();
   const reactionAPI = useReactionAPI();
+  const wallet = useWallet();
   const navigate = useNavigate();
+
+  const proposalId = useMemo(() => {
+    return id != null ? parseInt(id, 10) : null;
+  }, [id]);
+
+  const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
+    null
+  );
 
   const onSetReaction = useCallback(
     async (type: ReactionType): Promise<void> => {
@@ -51,11 +68,38 @@ const ProposalDetailScreen: React.FC = () => {
     }
   }, [requestState, reactionAPI, translate]);
 
-  useEffect(() => {
-    if (id) {
-      fetch(id);
+  const handleVoteSubmission = useCallback(
+    async (data: VoteProposalFormValues) => {
+      console.log(data);
+    },
+    []
+  );
+
+  const handleOpenVoteModal = useCallback(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      wallet.openConnectWalletModal?.();
+    } else {
+      setActiveModal(ProposalDetailModal.Vote);
     }
-  }, [fetch, id]);
+  }, [wallet]);
+
+  const handleOpenDepositModal = useCallback(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      wallet.openConnectWalletModal?.();
+    } else {
+      setActiveModal(ProposalDetailModal.Deposit);
+    }
+  }, [wallet]);
+
+  const closeModals = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  useEffect(() => {
+    if (proposalId) {
+      fetch(proposalId);
+    }
+  }, [fetch, proposalId]);
 
   useEffectOnce(
     () => {
@@ -83,7 +127,7 @@ const ProposalDetailScreen: React.FC = () => {
       isRequestStateError(requestState) || isRequestStateLoaded(requestState)
   );
 
-  if (!id) return <Navigate to={AppRoutes.Proposals} />;
+  if (!proposalId) return <Navigate to={AppRoutes.Proposals} />;
 
   if (!isRequestStateLoaded(requestState)) {
     return (
@@ -108,18 +152,29 @@ const ProposalDetailScreen: React.FC = () => {
   if (!requestState.data) return null;
 
   return (
-    <div className={cn("flex", "flex-col")}>
-      <ProposalHeader
-        proposal={requestState.data}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSetReaction={onSetReaction}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onUnsetReaction={onUnsetReaction}
-      />
-      <ProposalDescription proposal={requestState.data} />
-      <ProposalData proposal={requestState.data} />
-      <Paper>Comments Placeholder</Paper>
-    </div>
+    <>
+      <div className={cn("flex", "flex-col")}>
+        <ProposalHeader
+          proposal={requestState.data}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onSetReaction={onSetReaction}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onUnsetReaction={onUnsetReaction}
+          onVoteClick={handleOpenVoteModal}
+          onDepositClick={handleOpenDepositModal}
+        />
+        <ProposalDescription proposal={requestState.data} />
+        <ProposalData proposal={requestState.data} />
+        <Paper>Comments Placeholder</Paper>
+      </div>
+      {activeModal === ProposalDetailModal.Vote && (
+        <VoteProposalModal
+          proposalId={proposalId}
+          onSubmit={handleVoteSubmission}
+          onClose={closeModals}
+        />
+      )}
+    </>
   );
 };
 
