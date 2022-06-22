@@ -15,7 +15,7 @@ import { Portfolio } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
 
-export function usePortfolioQuery(): PortfolioRequestState {
+export function usePortfolioQuery(address?: string): PortfolioRequestState {
   const [requestState, setRequestState] =
     useState<PortfolioRequestState>(RequestStateInitial);
 
@@ -27,17 +27,19 @@ export function usePortfolioQuery(): PortfolioRequestState {
   const fetchPortfolio = useCallback(async () => {
     setRequestState(RequestStateLoading);
     if (wallet.status !== ConnectionStatus.Connected) {
-      setRequestState(RequestStateError(new Error("Wallet not connected.")));
+      if (!address) {
+        setRequestState(RequestStateError(new Error("Wallet not connected.")));
+      }
       return;
     }
     try {
       const [balance, stakedBalance, unstakingBalance, profile] =
         await Promise.all([
-          cosmosAPI.getBalance(),
-          cosmosAPI.getStakedBalance(),
-          staking.getUnstakingAmount(wallet.account.address),
+          cosmosAPI.getBalance(address),
+          cosmosAPI.getStakedBalance(address),
+          staking.getUnstakingAmount(address ?? wallet.account.address),
           desmosQuery.getProfile(
-            translateAddress(wallet.account.address, "desmos")
+            translateAddress(address ?? wallet.account.address, "desmos")
           ),
         ]);
 
@@ -55,7 +57,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
           stakedBalance,
           unstakingBalance,
           availableBalance,
-          address: wallet.account.address,
+          address: address ?? wallet.account.address,
         })
       );
     } catch (err: unknown) {
@@ -64,7 +66,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
       }
       console.log("Failed to handle fetch portfolio error =", err);
     }
-  }, [wallet, cosmosAPI, staking, desmosQuery, setRequestState]);
+  }, [wallet, address, cosmosAPI, staking, desmosQuery, setRequestState]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {

@@ -1,6 +1,7 @@
 import React from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
+import { useParams } from "react-router-dom";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
   isRequestStateError,
@@ -12,7 +13,8 @@ import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
-  const requestState = usePortfolioQuery();
+  const { address } = useParams();
+  const requestState = usePortfolioQuery(address);
   const { translate } = useLocale();
 
   useEffectOnce(
