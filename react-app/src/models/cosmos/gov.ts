@@ -1,8 +1,17 @@
-import { Coin, MsgSubmitProposalEncodeObject } from "@cosmjs/stargate";
+import {
+  Coin,
+  MsgSubmitProposalEncodeObject,
+  MsgVoteEncodeObject,
+  MsgDepositEncodeObject,
+} from "@cosmjs/stargate";
 
-import { MsgSubmitProposal } from "cosmjs-types/cosmos/gov/v1beta1/tx";
+import {
+  MsgSubmitProposal,
+  MsgVote,
+  MsgDeposit,
+} from "cosmjs-types/cosmos/gov/v1beta1/tx";
 
-import { TextProposal } from "cosmjs-types/cosmos/gov/v1beta1/gov";
+import { TextProposal, VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import { ParameterChangeProposal } from "cosmjs-types/cosmos/params/v1beta1/params";
 
 import { CommunityPoolSpendProposalWithDeposit } from "cosmjs-types/cosmos/distribution/v1beta1/distribution";
@@ -130,4 +139,38 @@ function makeSubmitProposalMessage(
   };
 }
 
-export { makeSubmitProposalMessage };
+interface VoteMessageBody {
+  proposalId: number;
+  voter: string;
+  option: VoteOption;
+}
+
+function makeVoteMessage(body: VoteMessageBody): MsgVoteEncodeObject {
+  return {
+    typeUrl: "/cosmos.gov.v1beta1.MsgVote",
+    value: MsgVote.fromPartial({
+      proposalId: body.proposalId,
+      voter: body.voter,
+      option: body.option,
+    }),
+  };
+}
+
+interface DepositeMessageBody {
+  proposalId: number;
+  depositor: string;
+  amount: Coin[];
+}
+
+function makeDepositMessage(body: DepositeMessageBody): MsgDepositEncodeObject {
+  return {
+    typeUrl: "/cosmos.gov.v1beta1.MsgDeposit",
+    value: MsgDeposit.fromPartial({
+      proposalId: body.proposalId,
+      depositor: body.depositor,
+      amount: body.amount,
+    }),
+  };
+}
+
+export { makeSubmitProposalMessage, makeVoteMessage, makeDepositMessage };
