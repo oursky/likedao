@@ -32,6 +32,7 @@
   "CreateNewProposalForm.title": "New Proposal",
   "DepositProposalModal.fields.amount": "Amount",
   "DepositProposalModal.fields.amount.available": "Available: {amount} {denom}",
+  "DepositProposalModal.title": "Deposit",
   "ErrorView.backToHome": "Go back to Homepage",
   "ErrorView.notFound": "404 Not Found",
   "ErrorView.unknown": "Unknown Error",
