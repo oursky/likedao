@@ -17,6 +17,8 @@ import { useReactionAPI } from "../../api/reactionAPI";
 import VoteProposalModal from "../TransactionModals/VoteProposalModal";
 import { VoteProposalFormValues } from "../forms/VoteProposalForm/VoteProposalFormModel";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { useCosmosAPI } from "../../api/cosmosAPI";
+import { useGovAPI } from "../../api/govAPI";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
@@ -34,6 +36,8 @@ const ProposalDetailScreen: React.FC = () => {
   const reactionAPI = useReactionAPI();
   const wallet = useWallet();
   const navigate = useNavigate();
+  const govAPI = useGovAPI();
+  const cosmosAPI = useCosmosAPI();
 
   const proposalId = useMemo(() => {
     return id != null ? parseInt(id, 10) : null;
@@ -68,13 +72,6 @@ const ProposalDetailScreen: React.FC = () => {
     }
   }, [requestState, reactionAPI, translate]);
 
-  const handleVoteSubmission = useCallback(
-    async (data: VoteProposalFormValues) => {
-      console.log(data);
-    },
-    []
-  );
-
   const handleOpenVoteModal = useCallback(() => {
     if (wallet.status !== ConnectionStatus.Connected) {
       wallet.openConnectWalletModal?.();
@@ -94,6 +91,34 @@ const ProposalDetailScreen: React.FC = () => {
   const closeModals = useCallback(() => {
     setActiveModal(null);
   }, []);
+
+  const handleVoteSubmission = useCallback(
+    async (values: VoteProposalFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await govAPI.signVoteProposalTx(
+          values.proposalId,
+          values.option,
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, govAPI, translate, wallet]
+  );
 
   useEffect(() => {
     if (proposalId) {
