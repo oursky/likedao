@@ -14,6 +14,7 @@ import { useEffectOnce } from "../../hooks/useEffectOnce";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalScreenAPI";
+import { ProposalData } from "./ProposalData";
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
@@ -80,7 +81,7 @@ const ProposalDetailScreen: React.FC = () => {
     <div className={cn("flex", "flex-col")}>
       <ProposalHeader proposal={requestState.data} />
       <ProposalDescription proposal={requestState.data} />
-      <Paper>Votes and Deposit Placeholder</Paper>
+      <ProposalData proposal={requestState.data} />
       <Paper>Comments Placeholder</Paper>
     </div>
   );
