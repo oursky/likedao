@@ -36,6 +36,7 @@
   "OverviewScreen.requestState.error": "Failed to fetch data, please try again later.",
   "PaginationController.next": "Next",
   "PaginationController.previous": "Previous",
+  "PortfolioScreen.account": "Account",
   "PortfolioScreen.requestState.error": "Failed to fetch portfolio, please check if your wallet is connected or try again later.",
   "PortfolioScreen.requestState.noData": "No data fetched for portfolio",
   "PortfolioScreen.yourPortfolio": "Your Portfolio",

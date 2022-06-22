@@ -127,12 +127,21 @@ const PortfolioPanel: React.FC = () => {
   return (
     <Paper className={cn("py-6", "px-5")}>
       <div className={cn("flex")}>
-        <Icon
-          className={cn("fill-likecoin-black", "mr-3")}
-          icon={IconType.PieChart}
-          height={20}
-          width={20}
-        />
+        {address ? (
+          <Icon
+            className={cn("fill-likecoin-black", "mr-3")}
+            icon={IconType.Account}
+            height={20}
+            width={20}
+          />
+        ) : (
+          <Icon
+            className={cn("fill-likecoin-black", "mr-3")}
+            icon={IconType.PieChart}
+            height={20}
+            width={20}
+          />
+        )}
         <h2
           className={cn(
             "text-lg",
@@ -141,7 +150,11 @@ const PortfolioPanel: React.FC = () => {
             "text-likecoin-black"
           )}
         >
-          <LocalizedText messageID="PortfolioScreen.yourPortfolio" />
+          {address ? (
+            <LocalizedText messageID="PortfolioScreen.account" />
+          ) : (
+            <LocalizedText messageID="PortfolioScreen.yourPortfolio" />
+          )}
         </h2>
       </div>
       <div className={cn("mt-11", "mb-6", "sm:flex")}>
