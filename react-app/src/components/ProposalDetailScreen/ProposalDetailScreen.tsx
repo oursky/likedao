@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import BigNumber from "bignumber.js";
 import AppRoutes from "../../navigation/AppRoutes";
 import Paper from "../common/Paper/Paper";
 import {
@@ -19,6 +20,8 @@ import { VoteProposalFormValues } from "../forms/VoteProposalForm/VoteProposalFo
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useGovAPI } from "../../api/govAPI";
+import { DepositProposalFormValues } from "../forms/DepositProposalForm/DepositProposalFormModel";
+import DepositProposalModal from "../TransactionModals/DepositProposalModal";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
@@ -46,6 +49,7 @@ const ProposalDetailScreen: React.FC = () => {
   const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
     null
   );
+  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
 
   const onSetReaction = useCallback(
     async (type: ReactionType): Promise<void> => {
@@ -120,11 +124,50 @@ const ProposalDetailScreen: React.FC = () => {
     [closeModals, cosmosAPI, govAPI, translate, wallet]
   );
 
+  const handleDepositSubmission = useCallback(
+    async (values: DepositProposalFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await govAPI.signDepositProposalTx(
+          values.proposalId,
+          new BigNumber(values.amount),
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, govAPI, translate, wallet]
+  );
+
   useEffect(() => {
     if (proposalId) {
       fetch(proposalId);
     }
   }, [fetch, proposalId]);
+
+  useEffect(() => {
+    cosmosAPI
+      .getBalance()
+      .then((balance) => {
+        setUserBalance(balance.amount);
+      })
+      .catch((err) => {
+        console.error("Failed to get balance and rewards", err);
+      });
+  }, [cosmosAPI]);
 
   useEffectOnce(
     () => {
@@ -196,6 +239,14 @@ const ProposalDetailScreen: React.FC = () => {
         <VoteProposalModal
           proposalId={proposalId}
           onSubmit={handleVoteSubmission}
+          onClose={closeModals}
+        />
+      )}
+      {activeModal === ProposalDetailModal.Deposit && (
+        <DepositProposalModal
+          proposalId={proposalId}
+          availableTokens={userBalance}
+          onSubmit={handleDepositSubmission}
           onClose={closeModals}
         />
       )}
