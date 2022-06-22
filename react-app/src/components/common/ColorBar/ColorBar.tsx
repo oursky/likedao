@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import BigNumber from "bignumber.js";
+import { useWindowEvent } from "../../../hooks/useWindowEvent";
 
 export interface ColorBarData {
   value: BigNumber;
@@ -23,7 +24,7 @@ const ColorBarSection: React.FC<ColorBarSectionProps> = (props) => {
     return data.value.div(total).shiftedBy(2).toFixed(1);
   }, [data, total]);
 
-  useEffect(() => {
+  const handlePercentageDisplay = useCallback(() => {
     if (percentageEl) {
       const parentEle = percentageEl.parentElement;
       if (
@@ -34,6 +35,12 @@ const ColorBarSection: React.FC<ColorBarSectionProps> = (props) => {
       }
     }
   }, [percentageEl, showPercentage]);
+
+  useEffect(() => {
+    handlePercentageDisplay();
+  }, [handlePercentageDisplay]);
+
+  useWindowEvent("resize", handlePercentageDisplay);
 
   return (
     <div

@@ -20,19 +20,19 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
   const voteData = useMemo(
     (): ColorBarData[] => [
       {
-        value: new BigNumber(proposal.tallyResult?.yes ?? 0).toNumber(),
+        value: new BigNumber(proposal.tallyResult?.yes ?? 0),
         colorClassName: "bg-likecoin-vote-color-yes",
       },
       {
-        value: new BigNumber(proposal.tallyResult?.no ?? 0).toNumber(),
+        value: new BigNumber(proposal.tallyResult?.no ?? 0),
         colorClassName: "bg-likecoin-vote-color-no",
       },
       {
-        value: new BigNumber(proposal.tallyResult?.noWithVeto ?? 0).toNumber(),
+        value: new BigNumber(proposal.tallyResult?.noWithVeto ?? 0),
         colorClassName: "bg-likecoin-vote-color-veto",
       },
       {
-        value: new BigNumber(proposal.tallyResult?.abstain ?? 0).toNumber(),
+        value: new BigNumber(proposal.tallyResult?.abstain ?? 0),
         colorClassName: "bg-likecoin-vote-color-abstain",
       },
     ],
@@ -90,7 +90,9 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
       </div>
       <ProposalInsight proposal={proposal} />
 
-      <ColorBar data={voteData} />
+      <div className={cn("h-1.5")}>
+        <ColorBar data={voteData} />
+      </div>
 
       <div className={cn("flex", "flex-row", "justify-end")}>
         {/* TODO: Add reactions */}
