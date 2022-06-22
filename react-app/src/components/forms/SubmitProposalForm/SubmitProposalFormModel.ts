@@ -37,7 +37,7 @@ export const useSubmitProposalFormModel = (
           isLessThanMax: (v) => {
             const amount = new BigNumber(v);
             return (
-              amount.isLessThan(availableTokens) ||
+              amount.isLessThanOrEqualTo(availableTokens) ||
               translate("form.validation.amount.lessThan", {
                 value: availableTokens.toNumber(),
               })

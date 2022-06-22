@@ -58,6 +58,7 @@ const DepositProposalForm: React.FC<DepositProposalFormProps> = (props) => {
         currencyUnit={coinDenom}
         inputProps={{
           placeholder: "0",
+          max: availableTokens.toFixed(),
         }}
         setValue={setAmount}
         registerReturn={register("amount", registerOptions.amount)}
