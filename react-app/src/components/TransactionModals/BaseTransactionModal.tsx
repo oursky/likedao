@@ -10,7 +10,7 @@ export enum TransactionStep {
   Sign = "sign",
 }
 
-const transactionSteps: StepItem[] = [
+const DefaultTransactionSteps: StepItem[] = [
   {
     label: "TransactionModal.step1.title",
     value: TransactionStep.Details,
@@ -45,6 +45,7 @@ interface BaseTransactionModalProps {
   onClose: () => void;
   currentStep?: TransactionStep;
   children?: React.ReactNode;
+  steps?: StepItem[];
 }
 
 const BaseTransactionModal: React.FC<BaseTransactionModalProps> = (props) => {
@@ -52,6 +53,7 @@ const BaseTransactionModal: React.FC<BaseTransactionModalProps> = (props) => {
     title,
     children,
     onClose,
+    steps,
     currentStep = TransactionStep.Details,
   } = props;
 
@@ -125,7 +127,7 @@ const BaseTransactionModal: React.FC<BaseTransactionModalProps> = (props) => {
                   <LocalizedText messageID={title} />
                 </Dialog.Title>
                 <StepIndicator
-                  steps={transactionSteps}
+                  steps={steps ?? DefaultTransactionSteps}
                   currentStep={currentStep}
                 />
 

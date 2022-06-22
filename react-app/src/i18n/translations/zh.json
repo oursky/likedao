@@ -105,6 +105,7 @@
   "UserInfoPanel.shortcuts.reinvest": "Reinvest",
   "UserInfoPanel.shortcuts.rewards": "Rewards",
   "UserInfoPanel.shortcuts.send": "Send",
+  "VoteProposalModal.step1.title": "Choose option",
   "VoteProposalModal.title": "Vote",
   "auth.loginFailure": "Failed to login, please try again",
   "footer.contactSupport": "Contact Support",
