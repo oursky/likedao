@@ -10,6 +10,7 @@ import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
 import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
+import AppRoutes from "../../navigation/AppRoutes";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
@@ -157,9 +158,12 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
       </p>
       <div>
         {/* TODO: Get proposer name from Desmos API*/}
-        <span className={cn("text-sm", "text-likecoin-green")}>
+        <a
+          href={AppRoutes.Portfolio.replace(":address", proposerAddress)}
+          className={cn("text-sm", "text-likecoin-green")}
+        >
           {truncateAddress(proposerAddress)}
-        </span>
+        </a>
         <span
           className={cn(
             "text-xs",
