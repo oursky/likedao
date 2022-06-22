@@ -4,7 +4,8 @@ const AppRoutes = Object.freeze({
   Proposals: "/proposals",
   ProposalDetail: "/proposals/:id",
   NewProposal: "/proposals/new",
-  Portfolio: "/portfolio",
+  YourPortfolio: "/portfolio",
+  Portfolio: "/portfolio/:address",
 });
 
 export default AppRoutes;
