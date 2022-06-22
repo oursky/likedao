@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import cn from "classnames";
 import { toast } from "react-toastify";
 import { BigNumber } from "bignumber.js";
+import { useParams } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
@@ -12,11 +13,14 @@ import CoinBalanceCard from "../common/CoinBalanceCard/CoinBalanceCard";
 import { convertBigNumberToMillifiedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
 import { MessageID } from "../../i18n/LocaleModel";
+import {
+  isRequestStateError,
+  isRequestStateLoaded,
+} from "../../models/RequestState";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
+import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { Portfolio } from "./PortfolioScreenModel";
-
-interface PortfolioPanelProps {
-  portfolio: Portfolio;
-}
+import { usePortfolioQuery } from "./PortfolioScreenAPI";
 
 const ProfilePicture: React.FC<{
   profile: Portfolio["profile"];
@@ -87,12 +91,38 @@ const CoinsAmountField: React.FC<{
   );
 };
 
-const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
+const PortfolioPanel: React.FC = () => {
   const { translate } = useLocale();
+  const { address } = useParams();
+  const requestState = usePortfolioQuery(address);
 
   const onAddressCopied = useCallback(() => {
     toast.success(translate("UserInfoPanel.addressCopied"));
   }, [translate]);
+
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(requestState)) {
+        toast.error(translate("PortfolioScreen.requestState.error"));
+      } else if (isRequestStateLoaded(requestState) && !requestState.data) {
+        toast.error(translate("PortfolioScreen.requestState.noData"));
+      }
+    },
+    () =>
+      isRequestStateError(requestState) || isRequestStateLoaded(requestState)
+  );
+
+  if (!isRequestStateLoaded(requestState)) {
+    return (
+      <div className={cn("flex", "justify-center", "items-center", "h-full")}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!requestState.data) return null;
+
+  const portfolio = requestState.data;
 
   return (
     <Paper className={cn("py-6", "px-5")}>
