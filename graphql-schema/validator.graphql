@@ -1,0 +1,12 @@
+type Validator implements Node {
+  id: ID!
+  consensusAddress: String!
+  operatorAddress: String
+  selfDelegationAddress: String
+  moniker: String
+  identity: String
+  avatarUrl: String
+  website: String
+  securityContact: String
+  details: String
+}

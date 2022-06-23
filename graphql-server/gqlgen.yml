@@ -104,6 +104,12 @@ models:
   Coin:
     model: github.com/forbole/bdjuno/database/types.DbDecCoin
 
+  Validator:
+    model: github.com/oursky/likedao/pkg/models.Validator
+    fields:
+      id:
+        fieldName: NodeID
+
   GovParams:
     model: github.com/oursky/likedao/pkg/models.GovParams
   DepositParams:
