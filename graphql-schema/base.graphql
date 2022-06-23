@@ -13,3 +13,8 @@ scalar BigFloat
 type StringObject {
   value: String!
 }
+
+enum Sort {
+  ASC
+  DESC
+}

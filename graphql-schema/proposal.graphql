@@ -48,6 +48,8 @@ type Proposal implements Node {
 
   reactions: [ReactionCount!]!
   myReaction: String
+
+  votes(input: QueryProposalVotesInput!): ProposalVoteConnection!
 }
 
 type ProposalEdge {
@@ -88,6 +90,17 @@ type ProposalVote implements Node {
   option: ProposalVoteOption
 }
 
+type ProposalVoteEdge {
+  cursor: String!
+  node: ProposalVote!
+}
+
+type ProposalVoteConnection {
+  pageInfo: PageInfo!
+  edges: [ProposalVoteEdge!]!
+  totalCount: Int!
+}
+
 input QueryProposalsInput {
   "Number of proposals to show in a page (limit)"
   first: Int!
@@ -99,6 +112,20 @@ input QueryProposalsInput {
   address: ProposalAddressFilter
   "filter by proposal title (not implemented)"
   searchTerm: String
+}
+
+input ProposalVoteSort {
+  voter: Sort
+  option: Sort
+}
+
+input QueryProposalVotesInput {
+  # Limit
+  first: Int!
+  # Offset
+  after: Int!
+  pinnedValidators: [String!]
+  order: ProposalVoteSort!
 }
 
 extend type Query {
