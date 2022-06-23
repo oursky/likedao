@@ -114,9 +114,17 @@ const PortfolioPanel: React.FC = () => {
 
   if (!isRequestStateLoaded(requestState)) {
     return (
-      <div className={cn("flex", "justify-center", "items-center", "h-full")}>
+      <Paper
+        className={cn(
+          "flex",
+          "justify-center",
+          "items-center",
+          "min-h-[486px]",
+          "sm:min-h-[330px]"
+        )}
+      >
         <LoadingSpinner />
-      </div>
+      </Paper>
     );
   }
 
