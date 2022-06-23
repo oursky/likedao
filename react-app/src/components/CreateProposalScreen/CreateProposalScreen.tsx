@@ -15,6 +15,7 @@ import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { ProposalType } from "../../models/cosmos/gov";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppRoutes from "../../navigation/AppRoutes";
+import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
 
 const CreateProposalScreen: React.FC = () => {
   const wallet = useWallet();
@@ -101,19 +102,10 @@ const CreateProposalScreen: React.FC = () => {
   }, [chainInfo, cosmosAPI, govAPI, wallet]);
 
   return (
-    <div
-      className={cn(
-        "flex",
-        "flex-col",
-        "flex-1",
-        "bg-white",
-        "rounded-lg",
-        "drop-shadow",
-        "px-5",
-        "py-6"
-      )}
-    >
+    <div className={cn("flex", "flex-col")}>
       <CreateProposalForm onSubmit={onSubmitCreateProposal} />
+      <GovernanceInfoPanel />
+
       {isSubmissionModalActive && !!createProposalFormValues && (
         <SubmitProposalModal
           availableTokens={userBalance}
