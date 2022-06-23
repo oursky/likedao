@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import cn from "classnames";
 import { toast } from "react-toastify";
 import { BigNumber } from "bignumber.js";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
@@ -19,6 +19,7 @@ import {
 } from "../../models/RequestState";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
+import AppRoutes from "../../navigation/AppRoutes";
 import { Portfolio } from "./PortfolioScreenModel";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 
@@ -95,6 +96,7 @@ const PortfolioPanel: React.FC = () => {
   const { translate } = useLocale();
   const { address } = useParams();
   const requestState = usePortfolioQuery(address);
+  const navigate = useNavigate();
 
   const onAddressCopied = useCallback(() => {
     toast.success(translate("UserInfoPanel.addressCopied"));
@@ -103,7 +105,11 @@ const PortfolioPanel: React.FC = () => {
   useEffectOnce(
     () => {
       if (isRequestStateError(requestState)) {
-        toast.error(translate("PortfolioScreen.requestState.error"));
+        if (requestState.error.message === "Invalid address.") {
+          navigate(AppRoutes.ErrorInvalidAddress);
+        } else {
+          toast.error(translate("PortfolioScreen.requestState.error"));
+        }
       } else if (isRequestStateLoaded(requestState) && !requestState.data) {
         toast.error(translate("PortfolioScreen.requestState.noData"));
       }

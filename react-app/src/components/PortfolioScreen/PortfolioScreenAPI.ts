@@ -23,7 +23,19 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
   const staking = useStakingAPI();
-  const { desmosQuery } = useQueryClient();
+  const { desmosQuery, stargateQuery } = useQueryClient();
+
+  const isValidAddress = useCallback(
+    async (address: string) => {
+      try {
+        await stargateQuery.getAccount(address);
+      } catch {
+        return false;
+      }
+      return true;
+    },
+    [stargateQuery]
+  );
 
   const fetchPortfolio = useCallback(async () => {
     setRequestState(RequestStateLoading);
@@ -31,6 +43,10 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
       if (!address) {
         setRequestState(RequestStateError(new Error("Wallet not connected.")));
       }
+      return;
+    }
+    if (address && !(await isValidAddress(address))) {
+      setRequestState(RequestStateError(new Error("Invalid address.")));
       return;
     }
     try {
@@ -69,7 +85,7 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
       }
       console.log("Failed to handle fetch portfolio error =", err);
     }
-  }, [wallet, address, cosmosAPI, staking, desmosQuery, setRequestState]);
+  }, [wallet, address, isValidAddress, cosmosAPI, staking, desmosQuery]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {

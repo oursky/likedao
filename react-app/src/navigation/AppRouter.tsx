@@ -33,6 +33,10 @@ const AppRouter: React.FC = () => {
           <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
         </Route>
 
+        <Route
+          path={AppRoutes.ErrorInvalidAddress}
+          element={<ErrorView type={ErrorType.InvalidAddress} />}
+        />
         <Route path="*" element={<ErrorView type={ErrorType.NotFound} />} />
       </Routes>
 

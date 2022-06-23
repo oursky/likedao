@@ -31,6 +31,7 @@
   "CreateNewProposalForm.submit": "Submit Proposal",
   "CreateNewProposalForm.title": "New Proposal",
   "ErrorView.backToHome": "Go back to Homepage",
+  "ErrorView.invalidAddress": "Invalid Address",
   "ErrorView.notFound": "404 Not Found",
   "ErrorView.unknown": "Unknown Error",
   "OverviewScreen.requestState.error": "Failed to fetch data, please try again later.",
