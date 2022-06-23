@@ -12,6 +12,9 @@ import {
 } from "cosmjs-types/cosmos/gov/v1beta1/tx";
 
 import { TextProposal, VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
+
+import { Duration } from "cosmjs-types/google/protobuf/duration";
+
 import { ParameterChangeProposal } from "cosmjs-types/cosmos/params/v1beta1/params";
 
 import { CommunityPoolSpendProposalWithDeposit } from "cosmjs-types/cosmos/distribution/v1beta1/distribution";
@@ -21,6 +24,8 @@ import {
   CancelSoftwareUpgradeProposal,
 } from "cosmjs-types/cosmos/upgrade/v1beta1/upgrade";
 import { Any } from "cosmjs-types/google/protobuf/any";
+import { Decimal } from "@cosmjs/math";
+import { BigNumberCoin } from "../coin";
 
 export enum ProposalStatus {
   Unspecified = "PROPOSAL_STATUS_UNSPECIFIED",
@@ -174,3 +179,36 @@ function makeDepositMessage(body: DepositeMessageBody): MsgDepositEncodeObject {
 }
 
 export { makeSubmitProposalMessage, makeVoteMessage, makeDepositMessage };
+export interface DepositParams {
+  minDeposit: BigNumberCoin;
+  maxDepositPeriod: Duration;
+}
+
+/**
+ * TallyParams defines the params for tallying votes on governance proposals.
+ * results are returned in percentages
+ */
+export interface TallyParams {
+  /**
+   * Minimum percentage of total stake needed to vote for a result to be
+   *  considered valid.
+   */
+  quorum: Decimal;
+  /** Minimum proportion of Yes votes for proposal to pass. Default value: 0.5. */
+  threshold: Decimal;
+  /**
+   * Minimum value of Veto votes to Total votes ratio for proposal to be
+   *  vetoed. Default value: 1/3.
+   */
+  vetoThreshold: Decimal;
+}
+
+export interface VotingParams {
+  votingPeriod: Duration;
+}
+
+export interface GovParams {
+  deposit: DepositParams;
+  tally: TallyParams;
+  voting: VotingParams;
+}
