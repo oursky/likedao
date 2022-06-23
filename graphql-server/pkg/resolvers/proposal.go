@@ -147,6 +147,25 @@ func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj
 	return option, nil
 }
 
+func (r *proposalVoteResolver) Voter(ctx context.Context, obj *models.ProposalVote) (models.ProposalVoter, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoBySelfDelegationAddress(obj.VoterAddress)
+	if err == nil && validator != nil {
+		return validator, nil
+	}
+
+	return models.StringObject{
+		Value: obj.VoterAddress,
+	}, nil
+}
+
+func (r *proposalVoteResolver) Option(ctx context.Context, obj *models.ProposalVote) (*models.ProposalVoteOption, error) {
+	if obj.Option == "" {
+		return nil, nil
+	}
+
+	return &obj.Option, nil
+}
+
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
 	if input.Address != nil && input.Address.Address != "" {
@@ -191,5 +210,9 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 	return &proposalTallyResultResolver{r}
 }
 
+// ProposalVote returns graphql1.ProposalVoteResolver implementation.
+func (r *Resolver) ProposalVote() graphql1.ProposalVoteResolver { return &proposalVoteResolver{r} }
+
 type proposalResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
+type proposalVoteResolver struct{ *Resolver }

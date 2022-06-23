@@ -80,6 +80,14 @@ input ProposalAddressFilter {
   isSubmitter: Boolean!
 }
 
+union ProposalVoter = StringObject | Validator
+type ProposalVote implements Node {
+  id: ID!
+  proposalId: Int!
+  voter: ProposalVoter!
+  option: ProposalVoteOption
+}
+
 input QueryProposalsInput {
   "Number of proposals to show in a page (limit)"
   first: Int!

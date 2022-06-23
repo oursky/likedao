@@ -88,6 +88,19 @@ models:
     model: github.com/oursky/likedao/pkg/models.ProposalConnection
   ProposalTallyResult: 
     model: github.com/oursky/likedao/pkg/models.ProposalTallyResult
+  ProposalVoteOption:
+    model: github.com/oursky/likedao/pkg/models.ProposalVoteOption
+  ProposalVote:
+    model: github.com/oursky/likedao/pkg/models.ProposalVote
+    fields:
+      id:
+        fieldName: NodeID
+      option:
+        resolver: true
+  ProposalVoteEdge:
+    model: github.com/oursky/likedao/pkg/models.ProposalVoteEdge
+  ProposalVoteConnection:
+    model: github.com/oursky/likedao/pkg/models.ProposalVoteConnection
 
   Reaction:
     model: github.com/oursky/likedao/pkg/models.Reaction

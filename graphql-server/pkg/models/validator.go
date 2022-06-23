@@ -12,7 +12,8 @@ type Validator struct {
 	Info        *ValidatorInfo        `bun:"rel:has-one,join:consensus_address=consensus_address"`
 }
 
-func (p Validator) IsNode() {}
+func (p Validator) IsNode()          {}
+func (p Validator) IsProposalVoter() {}
 func (p Validator) NodeID() NodeID {
 	return GetNodeID(p)
 }
