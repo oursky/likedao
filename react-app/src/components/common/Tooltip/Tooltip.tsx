@@ -1,32 +1,18 @@
-import React, { useState, Fragment } from "react";
+import React, { Fragment } from "react";
 import cn from "classnames";
 import { Transition } from "@headlessui/react";
 
-const Tooltip: React.FC<{
-  children: React.ReactNode;
-  content?: React.ReactNode | string;
-}> = ({ children, content }) => {
-  const [show, setShow] = useState(false);
+interface TooltipProps extends React.HTMLAttributes<HTMLDivElement> {
+  content: React.ReactNode | string;
+}
 
-  const handleMouseEnter = () => {
-    if (content) {
-      setShow(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setShow(false);
-  };
-
+const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>((props, ref) => {
+  const { content, ...rest } = props;
   return (
-    <div
-      className={cn("relative", "w-min", "h-min")}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {children}
+    <div ref={ref} {...rest}>
       <Transition
-        show={show}
+        show={true}
+        static={true}
         as={Fragment}
         enter="transition-opacity duration-150"
         enterFrom="opacity-0"
@@ -38,18 +24,13 @@ const Tooltip: React.FC<{
         <div
           role="tooltip"
           className={cn(
-            "absolute",
             "bg-gray-600",
             "text-white",
             "text-xs",
-            "w-max",
+            "h-min",
             "py-1",
             "px-2",
             "rounded-md",
-            "left-1/2",
-            "transform",
-            "-translate-x-1/2",
-            "translate-y-2",
             "z-50",
             "transition-opacity"
           )}
@@ -59,6 +40,6 @@ const Tooltip: React.FC<{
       </Transition>
     </div>
   );
-};
+});
 
 export default Tooltip;
