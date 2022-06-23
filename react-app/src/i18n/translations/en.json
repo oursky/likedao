@@ -36,6 +36,7 @@
   "ErrorView.backToHome": "Go back to Homepage",
   "ErrorView.notFound": "404 Not Found",
   "ErrorView.unknown": "Unknown Error",
+  "GovernanceInfoPanel.error": "Failed to fetch governance parameters, please try again later.",
   "OverviewScreen.requestState.error": "Failed to fetch data, please try again later.",
   "PaginationController.next": "Next",
   "PaginationController.previous": "Previous",
