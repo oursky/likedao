@@ -121,19 +121,16 @@ export const useStakingAPI = (): IStakingAPI => {
       let amount = new BigNumber(0);
       allDelegations.forEach((unbondingDelegation) => {
         unbondingDelegation.entries.forEach((entry) => {
-          amount = BigNumber.sum(
-            convertMinimalTokenToToken(entry.balance),
-            amount
-          );
+          amount = BigNumber.sum(new BigNumber(entry.balance), amount);
         });
       });
 
       return {
-        denom: chainInfo.currency.coinMinimalDenom,
+        denom: chainInfo.currency.coinDenom,
         amount: convertMinimalTokenToToken(amount),
       };
     },
-    [chainInfo.currency.coinMinimalDenom, query.staking]
+    [chainInfo.currency.coinDenom, query.staking]
   );
 
   return useMemo(

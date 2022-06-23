@@ -50,7 +50,7 @@ export const useCosmosAPI = (): ICosmosAPI => {
       const amount = convertMinimalTokenToToken(balance.amount);
 
       return {
-        denom: balance.denom,
+        denom: chainInfo.currency.coinDenom,
         amount,
       };
     },
@@ -75,17 +75,17 @@ export const useCosmosAPI = (): ICosmosAPI => {
 
       if (!balance) {
         return {
-          denom: chainInfo.currency.coinMinimalDenom,
+          denom: chainInfo.currency.coinDenom,
           amount: convertMinimalTokenToToken(0),
         };
       }
 
       return {
-        denom: balance.denom,
+        denom: chainInfo.currency.coinDenom,
         amount: convertMinimalTokenToToken(balance.amount),
       };
     },
-    [chainInfo.currency.coinMinimalDenom, wallet, stargateQuery]
+    [chainInfo.currency.coinDenom, wallet, stargateQuery]
   );
 
   const signTx = useCallback(
