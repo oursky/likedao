@@ -20,5 +20,5 @@ type GovParams {
 }
 
 extend type Query {
-  getGovParams: GovParams!
+  govParams: GovParams!
 }

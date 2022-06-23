@@ -10,7 +10,7 @@ import (
 	"github.com/oursky/likedao/pkg/models"
 )
 
-func (r *queryResolver) GetGovParams(ctx context.Context) (*models.GovParams, error) {
+func (r *queryResolver) GovParams(ctx context.Context) (*models.GovParams, error) {
 	govParams, err := pkgContext.GetQueriesFromCtx(ctx).Gov.QueryGovParams()
 	if err != nil {
 		return nil, err

@@ -23,7 +23,6 @@ type VotingParams struct {
 type GovParams struct {
 	bun.BaseModel `bun:"table:gov_params"`
 
-	OneRowID      bool          `bun:"column:one_row_id"`
 	DepositParams DepositParams `bun:"column:deposit_params,type:jsonb"`
 	TallyParams   TallyParams   `bun:"column:tally_params,type:jsonb"`
 	VotingParams  VotingParams  `bun:"column:voting_params,type:jsonb"`
