@@ -52,14 +52,15 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 }
 
 func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
-	reactionCount, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
+	reactionCounts, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []models.ReactionCount
-	for reaction, count := range reactionCount {
-		result = append(result, models.ReactionCount{Reaction: reaction, Count: count})
+	for _, reactionCount := range reactionCounts {
+		result = append(result, models.ReactionCount{Reaction: reactionCount.Reaction, Count: reactionCount.Count})
+
 	}
 
 	return result, nil

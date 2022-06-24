@@ -7,13 +7,13 @@ import (
 )
 
 type ReactionDataloader interface {
-	LoadProposalReactionCount(id int) (queries.ReactionCounts, error)
+	LoadProposalReactionCount(id int) ([]models.DBReactionCount, error)
 	LoadUserProposalReactions(key UserProposalReactionKey) (*models.Reaction, error)
 }
 
 type ProposalReactionCountDataloader interface {
-	Load(id int) (queries.ReactionCounts, error)
-	LoadAll(ids []int) ([]queries.ReactionCounts, []error)
+	Load(id int) ([]models.DBReactionCount, error)
+	LoadAll(ids []int) ([][]models.DBReactionCount, []error)
 }
 
 type UserProposalReactionKey struct {
@@ -32,10 +32,10 @@ type IReactionDataloader struct {
 }
 
 func NewReactionDataloader(reactionQuery queries.IReactionQuery) ReactionDataloader {
-	proposalReactionCountLoader := godataloader.NewDataLoader(godataloader.DataLoaderConfig[int, queries.ReactionCounts]{
+	proposalReactionCountLoader := godataloader.NewDataLoader(godataloader.DataLoaderConfig[int, []models.DBReactionCount]{
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
-		Fetch: func(ids []int) ([]queries.ReactionCounts, []error) {
+		Fetch: func(ids []int) ([][]models.DBReactionCount, []error) {
 			reactionCounts, err := reactionQuery.ScopeProposals(ids).QueryTargetReactions()
 			if err != nil {
 				errors := make([]error, 0, len(ids))
@@ -94,7 +94,7 @@ func NewReactionDataloader(reactionQuery queries.IReactionQuery) ReactionDataloa
 	}
 }
 
-func (d *IReactionDataloader) LoadProposalReactionCount(id int) (queries.ReactionCounts, error) {
+func (d *IReactionDataloader) LoadProposalReactionCount(id int) ([]models.DBReactionCount, error) {
 	return d.proposalReactionCountLoader.Load(id)
 }
 

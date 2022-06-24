@@ -9,14 +9,13 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type ReactionCounts = map[string]int
 type IUserReactionQuery interface {
 	QueryUserReactions() ([]*models.Reaction, error)
 }
 
 type ITargetReactionQuery interface {
 	ScopeUserAddress(address string) IUserReactionQuery
-	QueryTargetReactions() ([]ReactionCounts, error)
+	QueryTargetReactions() ([][]models.DBReactionCount, error)
 }
 
 type IReactionQuery interface {
@@ -72,10 +71,10 @@ func (q *TargetReactionQuery) NewQuery() *bun.SelectQuery {
 	return query
 }
 
-func (q *TargetReactionQuery) QueryTargetReactions() ([]ReactionCounts, error) {
+func (q *TargetReactionQuery) QueryTargetReactions() ([][]models.DBReactionCount, error) {
 	type TargetReactions struct {
 		TargetID  string
-		Reactions ReactionCounts
+		Reactions []models.DBReactionCount
 	}
 
 	query := q.NewQuery()
@@ -93,7 +92,7 @@ func (q *TargetReactionQuery) QueryTargetReactions() ([]ReactionCounts, error) {
 		OrderExpr("earliestDate ASC")
 
 	err := q.session.NewSelect().
-		ColumnExpr("c.target_id, json_object_agg(c.reaction, c.count)::jsonb as reactions").
+		ColumnExpr("c.target_id, json_agg(json_build_object('reaction', c.reaction, 'count', c.count))::jsonb as reactions").
 		TableExpr("(?) as c", reactionCountQuery).
 		Group("c.target_id").
 		Scan(q.ctx, &res)
@@ -102,8 +101,8 @@ func (q *TargetReactionQuery) QueryTargetReactions() ([]ReactionCounts, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	result := make([]ReactionCounts, 0, len(res))
-	targetIDToReactions := make(map[string]ReactionCounts, len(res))
+	result := make([][]models.DBReactionCount, 0, len(res))
+	targetIDToReactions := make(map[string][]models.DBReactionCount, len(res))
 	for _, reactionMap := range res {
 		targetIDToReactions[reactionMap.TargetID] = reactionMap.Reactions
 	}
@@ -113,7 +112,7 @@ func (q *TargetReactionQuery) QueryTargetReactions() ([]ReactionCounts, error) {
 		if exists {
 			result = append(result, reactionMap)
 		} else {
-			result = append(result, ReactionCounts{})
+			result = append(result, []models.DBReactionCount{})
 		}
 	}
 

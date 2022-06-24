@@ -46,3 +46,8 @@ func (r Reaction) IsNode() {}
 func (r Reaction) NodeID() NodeID {
 	return GetNodeID(r)
 }
+
+type DBReactionCount struct {
+	Reaction string `json:"reaction"`
+	Count    int    `json:"count"`
+}
