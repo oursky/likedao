@@ -226,3 +226,12 @@ type ProposalTallyResult struct {
 	NoWithVeto *bunbig.Int `bun:"column:no_with_veto,notnull"`
 	Height     int64       `bun:"column:height,notnull"`
 }
+
+type ProposalStakingPool struct {
+	bun.BaseModel `bun:"table:proposal_staking_pool_snapshot"`
+
+	ProposalID      int         `bun:"column:proposal_id,pk"`
+	BondedTokens    *bunbig.Int `bun:"column:bonded_tokens"`
+	NotBondedTokens *bunbig.Int `bun:"column:not_bonded_tokens"`
+	Height          int64       `bun:"column:height"`
+}

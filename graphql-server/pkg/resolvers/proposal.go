@@ -14,6 +14,7 @@ import (
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
+	"github.com/uptrace/bun/extra/bunbig"
 	gql_bigint "github.com/xplorfin/gql-bigint"
 )
 
@@ -65,6 +66,33 @@ func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) 
 	}
 
 	return result, nil
+}
+
+func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*string, error) {
+	stakingPool, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalStakingPool(obj.ID)
+	if stakingPool == nil {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	bondedTokens, err := bunbig.NewFloat().FromString(stakingPool.BondedTokens.String())
+	if err != nil {
+		return nil, err
+	}
+	tallyResult, err := r.TallyResult(ctx, obj)
+	if err != nil {
+		return nil, err
+	}
+
+	voted := tallyResult.Yes.Add(tallyResult.No).Add(tallyResult.NoWithVeto).Add(tallyResult.Abstain)
+	votedFloat, err := bunbig.NewFloat().FromString(voted.String())
+	if err != nil {
+		return nil, err
+	}
+
+	turnout := votedFloat.Div(bondedTokens).String()
+	return &turnout, nil
 }
 
 func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal) (*string, error) {

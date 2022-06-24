@@ -20,6 +20,7 @@ type IProposalQuery interface {
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 	QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error)
+	QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error)
 }
 
 type ProposalQuery struct {
@@ -324,4 +325,17 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.
 		return bunbig.Int{}, err
 	}
 	return res, nil
+}
+
+func (q *ProposalQuery) QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error) {
+	stakingPool := new(models.ProposalStakingPool)
+	err := q.session.NewSelect().
+		Model(stakingPool).
+		Where("proposal_id = ?", id).
+		Limit(1).
+		Scan(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return stakingPool, nil
 }
