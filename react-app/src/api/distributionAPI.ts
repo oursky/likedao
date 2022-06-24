@@ -86,16 +86,29 @@ export const useDistributionAPI = (): IDistributionAPI => {
   const getTotalCommission = useCallback(
     async (address?: string) => {
       let commission;
-      if (address) {
-        commission = (await query.distribution.validatorCommission(address))
-          .commission;
-      } else {
-        if (wallet.status !== ConnectionStatus.Connected) {
-          throw new Error("Wallet not connected");
+      try {
+        if (address) {
+          commission = (await query.distribution.validatorCommission(address))
+            .commission;
+        } else {
+          if (wallet.status !== ConnectionStatus.Connected) {
+            throw new Error("Wallet not connected");
+          }
+          commission = (
+            await query.distribution.validatorCommission(wallet.account.address)
+          ).commission;
         }
-        commission = (
-          await query.distribution.validatorCommission(wallet.account.address)
-        ).commission;
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          err.message.includes("invalid Bech32 prefix")
+        ) {
+          return {
+            denom: CoinDenom,
+            amount: convertMinimalTokenToToken(0),
+          };
+        }
+        throw err;
       }
       if (!commission) {
         return {

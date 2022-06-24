@@ -199,7 +199,18 @@ const PortfolioPanel: React.FC = () => {
             denom={Config.chainInfo.currency.coinDenom}
           />
 
-          <div className={cn("flex", "justify-between", "mt-3", "w-full")}>
+          <div
+            className={cn(
+              "flex",
+              "sm:flex-row",
+              "flex-col",
+              "justify-between",
+              "mt-3",
+              "w-full",
+              "gap-4",
+              "sm:gap-0"
+            )}
+          >
             <CoinsAmountField
               messageID="PortfolioScreen.yourPortfolio.stake"
               amount={portfolio.stakedBalance.amount}
@@ -207,6 +218,14 @@ const PortfolioPanel: React.FC = () => {
             <CoinsAmountField
               messageID="PortfolioScreen.yourPortfolio.unstaking"
               amount={portfolio.unstakingBalance.amount}
+            />
+            <CoinsAmountField
+              messageID="PortfolioScreen.yourPortfolio.commission"
+              amount={portfolio.commission.amount}
+            />
+            <CoinsAmountField
+              messageID="PortfolioScreen.yourPortfolio.reward"
+              amount={portfolio.reward.amount}
             />
             <CoinsAmountField
               messageID="PortfolioScreen.yourPortfolio.available"

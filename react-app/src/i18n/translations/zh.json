@@ -42,6 +42,8 @@
   "PortfolioScreen.requestState.noData": "No data fetched for portfolio",
   "PortfolioScreen.yourPortfolio": "Your Portfolio",
   "PortfolioScreen.yourPortfolio.available": "Available",
+  "PortfolioScreen.yourPortfolio.commission": "Commission",
+  "PortfolioScreen.yourPortfolio.reward": "Reward",
   "PortfolioScreen.yourPortfolio.stake": "Stake",
   "PortfolioScreen.yourPortfolio.unstaking": "Unstaking",
   "Proposal.status.depositPeriod": "Deposit Period",
