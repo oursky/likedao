@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/forbole/bdjuno/database/types"
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	"github.com/oursky/likedao/pkg/dataloaders"
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
+	"github.com/oursky/likedao/pkg/utils"
 	"github.com/uptrace/bun/extra/bunbig"
 	gql_bigint "github.com/xplorfin/gql-bigint"
 )
@@ -93,6 +93,34 @@ func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*
 
 	turnout := votedFloat.Div(bondedTokens).String()
 	return &turnout, nil
+}
+
+func (r *proposalResolver) MyVote(ctx context.Context, obj *models.Proposal) (*models.ProposalVote, error) {
+	address, err := utils.GetOperationArgumentValue(ctx, "input.address.address")
+	if err != nil {
+		return nil, nil
+	}
+
+	key := dataloaders.ProposalVoteKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalVote(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
+}
+
+func (r *proposalResolver) MyDeposit(ctx context.Context, obj *models.Proposal) (*models.ProposalDeposit, error) {
+	address, err := utils.GetOperationArgumentValue(ctx, "input.address.address")
+	if err != nil {
+		return nil, nil
+	}
+
+	key := dataloaders.ProposalDepositKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalDeposit(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
 }
 
 func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal) (*string, error) {
@@ -325,17 +353,6 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 	}
 
 	return nil, nil
-}
-
-func (r *proposalDepositResolver) Amount(ctx context.Context, obj *models.ProposalDeposit) ([]types.DbDecCoin, error) {
-	coins := make([]types.DbDecCoin, 0, len(obj.Amount))
-	for _, coin := range obj.Amount {
-		coins = append(coins, types.DbDecCoin{
-			Denom:  coin.Denom,
-			Amount: coin.Amount,
-		})
-	}
-	return coins, nil
 }
 
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {

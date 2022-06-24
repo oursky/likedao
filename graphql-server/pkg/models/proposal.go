@@ -111,10 +111,10 @@ type ProposalEdge = Edge[Proposal]
 type ProposalDeposit struct {
 	bun.BaseModel `bun:"table:proposal_deposit"`
 
-	ProposalID       int               `bun:"column:proposal_id,pk"`
-	DepositorAddress string            `bun:"column:depositor_address,notnull"`
-	Amount           bdjuno.DbDecCoins `bun:"column:amount,notnull"`
-	Height           int64             `bun:"column:height,notnull"`
+	ProposalID       int                `bun:"column:proposal_id,pk"`
+	DepositorAddress string             `bun:"column:depositor_address,notnull"`
+	Amount           []bdjuno.DbDecCoin `bun:"column:amount,notnull,array"`
+	Height           int64              `bun:"column:height,notnull"`
 
 	Proposal      *Proposal      `bun:"rel:belongs-to,join:proposal_id=id"`
 	ValidatorInfo *ValidatorInfo `bun:"rel:has-one,join:depositor_address=self_delegate_address"`

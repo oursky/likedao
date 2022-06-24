@@ -49,6 +49,8 @@ type Proposal implements Node {
   myReaction: String
   "all tally over total staking pool"
   turnout: BigFloat
+  myVote: ProposalVote
+  myDeposit: ProposalDeposit
 
   votes(input: QueryProposalVotesInput!): ProposalVoteConnection!
   deposits(input: QueryProposalDepositsInput!): ProposalDepositConnection!

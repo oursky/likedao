@@ -21,6 +21,8 @@ type IProposalQuery interface {
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 	QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error)
 	QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error)
+	QueryProposalVotes(proposalIDs []int, addresses []string) ([]*models.ProposalVote, error)
+	QueryProposalDeposits(proposalIDs []int, addresses []string) ([]*models.ProposalDeposit, error)
 }
 
 type ProposalQuery struct {
@@ -338,4 +340,52 @@ func (q *ProposalQuery) QueryProposalStakingPool(id int) (*models.ProposalStakin
 		return nil, err
 	}
 	return stakingPool, nil
+}
+
+func (q *ProposalQuery) QueryProposalVotes(proposalIDs []int, addresses []string) ([]*models.ProposalVote, error) {
+	if len(proposalIDs) == 0 || len(addresses) == 0 {
+		return nil, nil
+	}
+	// (proposal, address)
+	query := q.session.NewSelect().
+		Model((*models.ProposalVote)(nil)).
+		Where("(proposal_id) IN (?)", bun.In(proposalIDs)).
+		Where("voter_address IN (?)", bun.In(addresses))
+
+	count, err := query.Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	votes := make([]*models.ProposalVote, count)
+	err = query.Scan(q.ctx, &votes)
+	if err != nil {
+		return nil, err
+	}
+
+	return votes, nil
+}
+
+func (q *ProposalQuery) QueryProposalDeposits(proposalIDs []int, addresses []string) ([]*models.ProposalDeposit, error) {
+	if len(proposalIDs) == 0 || len(addresses) == 0 {
+		return nil, nil
+	}
+	// (proposal, address)
+	query := q.session.NewSelect().
+		Model((*models.ProposalDeposit)(nil)).
+		Where("proposal_id IN (?)", bun.In(proposalIDs)).
+		Where("depositor_address IN (?)", bun.In(addresses))
+
+	count, err := query.Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	deposits := make([]*models.ProposalDeposit, count)
+	err = query.Scan(q.ctx, &deposits)
+	if err != nil {
+		return nil, err
+	}
+
+	return deposits, nil
 }
