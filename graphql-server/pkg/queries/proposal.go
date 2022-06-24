@@ -13,9 +13,9 @@ import (
 
 type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
-	ScopeRelatedAddress(address string) IProposalQuery
 	QueryPaginatedProposalDeposits(proposalID int, first int, after int, orderBy *models.ProposalDepositSort, excludeAddresses []string) (*Paginated[models.ProposalDeposit], error)
 	QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error)
+	ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
@@ -28,13 +28,17 @@ type ProposalQuery struct {
 	session *bun.DB
 
 	scopedProposalStatus models.ProposalStatus
-	scopedRelatedAddress string
+	scopedAddressFilter  *models.ProposalAddressFilter
 }
 
 func NewProposalQuery(ctx context.Context, config config.Config, session *bun.DB) IProposalQuery {
 	return &ProposalQuery{ctx: ctx, config: config, session: session}
 }
 
+// generate new select query with filters applied.
+// when both status and address filters are applied, results satisfying both filters are returned.
+// when multiple sub-filters in address filter (ie. isDepositor, IsSubmitter, IsVoter), results satisfying
+// any one of the sub-filters are returned
 func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 	query := q.session.NewSelect().Model((*models.Proposal)(nil))
 
@@ -42,16 +46,46 @@ func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 		query = query.Where("status = ?", q.scopedProposalStatus)
 	}
 
-	if q.scopedRelatedAddress != "" {
+	if q.scopedAddressFilter != nil {
+		relatedDeposits := q.session.NewSelect().
+			Model((*models.ProposalDeposit)(nil)).
+			Column("proposal_id").
+			Where("depositor_address = ?", q.scopedAddressFilter.Address)
 
-		relatedDeposits := q.session.NewSelect().Model((*models.ProposalDeposit)(nil)).Column("proposal_id").Where("depositor_address = ?", q.scopedRelatedAddress)
-		relatedVotes := q.session.NewSelect().Model((*models.ProposalVote)(nil)).Column("proposal_id").Where("voter_address = ?", q.scopedRelatedAddress)
+		relatedVotes := q.session.NewSelect().
+			Model((*models.ProposalVote)(nil)).
+			Column("proposal_id").
+			Where("voter_address = ?", q.scopedAddressFilter.Address)
 
-		relatedProposals := relatedDeposits.Union(relatedVotes)
-
-		query = query.
-			WhereOr("id IN (?)", relatedProposals).
-			WhereOr("proposal.proposer_address = ?", q.scopedRelatedAddress)
+		isFirstAddressFilter := true
+		if q.scopedAddressFilter.IsDepositor {
+			if isFirstAddressFilter {
+				query = query.Where("id IN (?)", relatedDeposits)
+				isFirstAddressFilter = false
+			} else {
+				query = query.WhereOr("id IN (?)", relatedDeposits)
+			}
+		}
+		if q.scopedAddressFilter.IsVoter {
+			if isFirstAddressFilter {
+				query = query.Where("id IN (?)", relatedVotes)
+				isFirstAddressFilter = false
+			} else {
+				query = query.WhereOr("id IN (?)", relatedVotes)
+			}
+		}
+		if q.scopedAddressFilter.IsSubmitter {
+			if isFirstAddressFilter {
+				query = query.Where("proposal.proposer_address = ?", q.scopedAddressFilter.Address)
+				isFirstAddressFilter = false
+			} else {
+				query = query.WhereOr("proposal.proposer_address = ?", q.scopedAddressFilter.Address)
+			}
+		}
+		if isFirstAddressFilter {
+			// none of the is* field are marked as true
+			query = query.Where("id IN (null)")
+		}
 	}
 
 	return query
@@ -63,9 +97,9 @@ func (q *ProposalQuery) ScopeProposalStatus(status models.ProposalStatus) IPropo
 	return &newQuery
 }
 
-func (q *ProposalQuery) ScopeRelatedAddress(address string) IProposalQuery {
+func (q *ProposalQuery) ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery {
 	var newQuery = *q
-	newQuery.scopedRelatedAddress = address
+	newQuery.scopedAddressFilter = filter
 	return &newQuery
 }
 
