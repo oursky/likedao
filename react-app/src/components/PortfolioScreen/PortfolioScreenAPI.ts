@@ -12,6 +12,7 @@ import {
   RequestStateLoaded,
   RequestStateLoading,
 } from "../../models/RequestState";
+import { useDistributionAPI } from "../../api/distributionAPI";
 import { Portfolio } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
@@ -23,6 +24,7 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
   const staking = useStakingAPI();
+  const distribution = useDistributionAPI();
   const { desmosQuery, stargateQuery } = useQueryClient();
 
   const isValidAddress = useCallback(
@@ -50,21 +52,31 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
       return;
     }
     try {
-      const [availableBalance, stakedBalance, unstakingBalance, profile] =
-        await Promise.all([
-          cosmosAPI.getBalance(address),
-          cosmosAPI.getStakedBalance(address),
-          staking.getUnstakingAmount(address ?? wallet.account.address),
-          desmosQuery.getProfile(
-            translateAddress(address ?? wallet.account.address, "desmos")
-          ),
-        ]);
+      const [
+        availableBalance,
+        stakedBalance,
+        unstakingBalance,
+        commission,
+        reward,
+        profile,
+      ] = await Promise.all([
+        cosmosAPI.getBalance(address),
+        cosmosAPI.getStakedBalance(address),
+        staking.getUnstakingAmount(address ?? wallet.account.address),
+        distribution.getTotalCommission(),
+        distribution.getTotalDelegationRewards(),
+        desmosQuery.getProfile(
+          translateAddress(address ?? wallet.account.address, "desmos")
+        ),
+      ]);
 
       const balance = {
         amount: BigNumber.sum(
           availableBalance.amount,
           stakedBalance.amount,
-          unstakingBalance.amount
+          unstakingBalance.amount,
+          commission.amount,
+          reward.amount
         ),
         denom: availableBalance.denom,
       };
@@ -75,6 +87,8 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
           balance,
           stakedBalance,
           unstakingBalance,
+          commission,
+          reward,
           availableBalance,
           address: address ?? wallet.account.address,
         })
@@ -85,7 +99,15 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
       }
       console.log("Failed to handle fetch portfolio error =", err);
     }
-  }, [wallet, address, isValidAddress, cosmosAPI, staking, desmosQuery]);
+  }, [
+    wallet,
+    address,
+    isValidAddress,
+    cosmosAPI,
+    staking,
+    desmosQuery,
+    distribution,
+  ]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {
