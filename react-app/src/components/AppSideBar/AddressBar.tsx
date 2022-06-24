@@ -7,14 +7,15 @@ import { truncateAddress } from "../../utils/address";
 
 interface AddressBarProps {
   address: string;
+  className?: string;
   onDisconnect: () => void;
 }
 
 const AddressBar: React.FC<AddressBarProps> = (props) => {
-  const { address, onDisconnect } = props;
+  const { address, className, onDisconnect } = props;
 
   return (
-    <div className={cn("flex", "flex-row", "items-center")}>
+    <div className={cn("flex", "flex-row", "items-center", className)}>
       <span
         className={cn(
           "flex-0",

@@ -43,16 +43,7 @@ const OverviewScreen: React.FC = () => {
   );
 
   return (
-    <div
-      className={cn(
-        "flex-1",
-        "bg-white",
-        "rounded-lg",
-        "flex",
-        "flex-col",
-        "gap-y-3"
-      )}
-    >
+    <div className={cn("flex-1", "rounded-lg", "flex", "flex-col", "gap-y-3")}>
       <CommunityStatus
         isLoading={isScreenLoading}
         communityStatus={screenData}
