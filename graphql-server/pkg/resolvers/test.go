@@ -9,7 +9,6 @@ import (
 
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	servererrors "github.com/oursky/likedao/pkg/errors"
-	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 )
 
@@ -50,8 +49,3 @@ func (r *queryResolver) Me(ctx context.Context) (string, error) {
 
 	return address, nil
 }
-
-// Mutation returns graphql1.MutationResolver implementation.
-func (r *Resolver) Mutation() graphql1.MutationResolver { return &mutationResolver{r} }
-
-type mutationResolver struct{ *Resolver }

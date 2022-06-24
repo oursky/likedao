@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	pkgContext "github.com/oursky/likedao/pkg/context"
+	"github.com/oursky/likedao/pkg/dataloaders"
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
@@ -48,6 +49,42 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal tally result: %v", err))
 	}
 	return tally, nil
+}
+
+func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
+	reactionCounts, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []models.ReactionCount
+	for _, reactionCount := range reactionCounts {
+		result = append(result, models.ReactionCount{Reaction: reactionCount.Reaction, Count: reactionCount.Count})
+
+	}
+
+	return result, nil
+}
+
+func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal) (*string, error) {
+	userAddress := pkgContext.GetAuthedUserAddress(ctx)
+	if userAddress == "" {
+		return nil, nil
+	}
+
+	reaction, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadUserProposalReactions(dataloaders.UserProposalReactionKey{
+		ProposalID:  obj.ID,
+		UserAddress: userAddress,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if reaction == nil {
+		return nil, nil
+	}
+
+	return &reaction.Reaction, nil
 }
 
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {

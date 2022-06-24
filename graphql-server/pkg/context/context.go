@@ -30,16 +30,19 @@ type QueryContext struct {
 	Supply        queries.ISupplyQuery
 	Proposal      queries.IProposalQuery
 	Gov           queries.IGovQuery
+	Reaction      queries.IReactionQuery
 }
 
 type MutatorContext struct {
-	Test mutators.ITestMutator
+	Test     mutators.ITestMutator
+	Reaction mutators.IReactionMutator
 }
 
 type DataLoaderContext struct {
 	Test     dataloaders.TestDataloader
 	Block    dataloaders.BlockDataloader
 	Proposal dataloaders.ProposalDataloader
+	Reaction dataloaders.ReactionDataloader
 }
 
 type DatabaseContext struct {
@@ -63,14 +66,17 @@ func NewRequestContext(
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 		Gov:           queries.NewGovQuery(ctx, chainDB),
+		Reaction:      queries.NewReactionQuery(ctx, serverDB),
 	}
 	mutators := MutatorContext{
-		Test: mutators.NewTestMutator(ctx, serverDB),
+		Test:     mutators.NewTestMutator(ctx, serverDB),
+		Reaction: mutators.NewReactionMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{
 		Test:     dataloaders.NewTestDataloader(queries.Test),
 		Block:    dataloaders.NewBlockDataloader(queries.Block),
 		Proposal: dataloaders.NewProposalDataloader(queries.Proposal),
+		Reaction: dataloaders.NewReactionDataloader(queries.Reaction),
 	}
 
 	databases := DatabaseContext{
