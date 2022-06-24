@@ -28,9 +28,9 @@ export const useDistributionAPI = (): IDistributionAPI => {
         throw new Error("Wallet not connected");
       }
 
-      const { address } = wallet.account;
-
-      const rewards = await query.distribution.delegationTotalRewards(address);
+      const rewards = await query.distribution.delegationTotalRewards(
+        wallet.account.address
+      );
 
       const relatedRewards = rewards.rewards.filter((r) =>
         r.reward.some((rr) => rr.denom === CoinMinimalDenom)
@@ -42,7 +42,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
 
       const requests = relatedRewards.map((r) =>
         newWithdrawDelegatorRewardMessage({
-          delegatorAddress: address,
+          delegatorAddress: wallet.account.address,
           validatorAddress: r.validatorAddress,
         })
       );
@@ -52,57 +52,73 @@ export const useDistributionAPI = (): IDistributionAPI => {
     [cosmos, query, wallet]
   );
 
-  const getTotalDelegationRewards = useCallback(async () => {
-    if (wallet.status !== ConnectionStatus.Connected) {
-      throw new Error("Wallet not connected");
-    }
-    const rewards = await query.distribution.delegationTotalRewards(
-      wallet.account.address
-    );
+  const getTotalDelegationRewards = useCallback(
+    async (address?: string) => {
+      let rewards;
+      if (address) {
+        rewards = await query.distribution.delegationTotalRewards(address);
+      } else {
+        if (wallet.status !== ConnectionStatus.Connected) {
+          throw new Error("Wallet not connected");
+        }
+        rewards = await query.distribution.delegationTotalRewards(
+          wallet.account.address
+        );
+      }
 
-    const totalRewards = rewards.total.find(
-      (r) => r.denom === CoinMinimalDenom
-    );
+      const totalRewards = rewards.total.find(
+        (r) => r.denom === CoinMinimalDenom
+      );
 
-    // Default cosmos decimal places is 18
-    const rewardAmount = new BigNumber(totalRewards?.amount ?? 0).shiftedBy(
-      -18
-    );
+      // Default cosmos decimal places is 18
+      const rewardAmount = new BigNumber(totalRewards?.amount ?? 0).shiftedBy(
+        -18
+      );
 
-    return {
-      denom: CoinDenom,
-      amount: convertMinimalTokenToToken(rewardAmount),
-    };
-  }, [wallet, query]);
-
-  const getTotalCommission = useCallback(async () => {
-    if (wallet.status !== ConnectionStatus.Connected) {
-      throw new Error("Wallet not connected");
-    }
-    const commission = (
-      await query.distribution.validatorCommission(wallet.account.address)
-    ).commission;
-
-    if (!commission) {
       return {
         denom: CoinDenom,
-        amount: convertMinimalTokenToToken(0),
+        amount: convertMinimalTokenToToken(rewardAmount),
       };
-    }
-    const totalCommission = commission.commission.find(
-      (r) => r.denom === CoinMinimalDenom
-    );
+    },
+    [wallet, query]
+  );
 
-    // Default cosmos decimal places is 18
-    const commissionAmount = new BigNumber(
-      totalCommission?.amount ?? 0
-    ).shiftedBy(-18);
+  const getTotalCommission = useCallback(
+    async (address?: string) => {
+      let commission;
+      if (address) {
+        commission = (await query.distribution.validatorCommission(address))
+          .commission;
+      } else {
+        if (wallet.status !== ConnectionStatus.Connected) {
+          throw new Error("Wallet not connected");
+        }
+        commission = (
+          await query.distribution.validatorCommission(wallet.account.address)
+        ).commission;
+      }
+      if (!commission) {
+        return {
+          denom: CoinDenom,
+          amount: convertMinimalTokenToToken(0),
+        };
+      }
+      const totalCommission = commission.commission.find(
+        (r) => r.denom === CoinMinimalDenom
+      );
 
-    return {
-      denom: CoinDenom,
-      amount: convertMinimalTokenToToken(commissionAmount),
-    };
-  }, [wallet, query]);
+      // Default cosmos decimal places is 18
+      const commissionAmount = new BigNumber(
+        totalCommission?.amount ?? 0
+      ).shiftedBy(-18);
+
+      return {
+        denom: CoinDenom,
+        amount: convertMinimalTokenToToken(commissionAmount),
+      };
+    },
+    [wallet, query]
+  );
 
   return useMemo(
     () => ({
