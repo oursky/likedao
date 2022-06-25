@@ -165,7 +165,15 @@ input QueryProposalDepositsInput {
   order: ProposalDepositSort!
 }
 
+type ProposalVotesDistribution {
+  yes: Float!
+  no: Float!
+  abstain: Float!
+  noWithVeto: Float!
+}
+
 extend type Query {
   proposals(input: QueryProposalsInput!): ProposalConnection!
   proposalByID(id: ID!): Proposal
+  proposalVotesDistribution(address: String!): ProposalVotesDistribution!
 }

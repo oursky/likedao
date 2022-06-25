@@ -22,6 +22,7 @@ type IProposalQuery interface {
 	QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error)
 	QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error)
 	QueryProposalVotes(proposalIDs []int, addresses []string) ([]*models.ProposalVote, error)
+	QueryProposalVotesByAddress(address string) ([]*models.ProposalVote, error)
 	QueryProposalDeposits(proposalIDs []int, addresses []string) ([]*models.ProposalDeposit, error)
 }
 
@@ -363,6 +364,24 @@ func (q *ProposalQuery) QueryProposalVotes(proposalIDs []int, addresses []string
 		return nil, err
 	}
 
+	return votes, nil
+}
+
+func (q *ProposalQuery) QueryProposalVotesByAddress(address string) ([]*models.ProposalVote, error) {
+	query := q.session.NewSelect().
+		Model((*models.ProposalVote)(nil)).
+		Where("voter_address = ?", address)
+
+	count, err := query.Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+	votes := make([]*models.ProposalVote, count)
+
+	err = query.Scan(q.ctx, &votes)
+	if err != nil {
+		return nil, err
+	}
 	return votes, nil
 }
 

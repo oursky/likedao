@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -68,6 +69,27 @@ func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) 
 	return result, nil
 }
 
+func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal) (*string, error) {
+	userAddress := pkgContext.GetAuthedUserAddress(ctx)
+	if userAddress == "" {
+		return nil, nil
+	}
+
+	reaction, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadUserProposalReactions(dataloaders.UserProposalReactionKey{
+		ProposalID:  obj.ID,
+		UserAddress: userAddress,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if reaction == nil {
+		return nil, nil
+	}
+
+	return &reaction.Reaction, nil
+}
+
 func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*string, error) {
 	stakingPool, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalStakingPool(obj.ID)
 	if stakingPool == nil {
@@ -121,27 +143,6 @@ func (r *proposalResolver) MyDeposit(ctx context.Context, obj *models.Proposal) 
 		return nil, err
 	}
 	return vote, nil
-}
-
-func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal) (*string, error) {
-	userAddress := pkgContext.GetAuthedUserAddress(ctx)
-	if userAddress == "" {
-		return nil, nil
-	}
-
-	reaction, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadUserProposalReactions(dataloaders.UserProposalReactionKey{
-		ProposalID:  obj.ID,
-		UserAddress: userAddress,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if reaction == nil {
-		return nil, nil
-	}
-
-	return &reaction.Reaction, nil
 }
 
 func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, input models.QueryProposalVotesInput) (*models.Connection[models.ProposalVote], error) {
@@ -469,6 +470,42 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 		return nil, err
 	}
 	return res, nil
+}
+
+func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address string) (*models.ProposalVotesDistribution, error) {
+	votes, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalVotesByAddress(address)
+	if err != nil {
+		return nil, err
+	}
+
+	yesCount := float64(0)
+	noCount := float64(0)
+	abstainCount := float64(0)
+	noWithVetoCount := float64(0)
+
+	for _, vote := range votes {
+		switch vote.Option {
+		case models.ProposalVoteOptionYes:
+			yesCount++
+		case models.ProposalVoteOptionNo:
+			noCount++
+		case models.ProposalVoteOptionAbstain:
+			abstainCount++
+		case models.ProposalVoteOptionNoWithVeto:
+			noWithVetoCount++
+		default:
+			return nil, errors.New("invalid proposal option")
+		}
+	}
+
+	totalCount := yesCount + noCount + abstainCount + noWithVetoCount
+
+	return &models.ProposalVotesDistribution{
+		Yes:        yesCount / totalCount,
+		No:         noCount / totalCount,
+		Abstain:    abstainCount / totalCount,
+		NoWithVeto: noWithVetoCount / totalCount,
+	}, nil
 }
 
 // Proposal returns graphql1.ProposalResolver implementation.
