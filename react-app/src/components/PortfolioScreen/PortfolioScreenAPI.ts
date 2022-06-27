@@ -1,11 +1,19 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
+import {
+  PortfolioScreenQuery,
+  PortfolioScreenQueryQuery,
+  PortfolioScreenQueryQueryVariables,
+} from "../../generated/graphql";
+import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { translateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
+  isRequestStateError,
+  isRequestStateLoaded,
   RequestState,
   RequestStateError,
   RequestStateInitial,
@@ -13,7 +21,10 @@ import {
   RequestStateLoading,
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
-import { Portfolio } from "./PortfolioScreenModel";
+import PortfolioScreenModel, {
+  Portfolio,
+  PortfolioScreenGraphql,
+} from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
 
@@ -21,6 +32,23 @@ interface UsePortfolioQuery {
   (): {
     requestState: PortfolioRequestState;
     fetch: (address?: string) => Promise<void>;
+  };
+}
+
+interface UsePortfolioScreenGraphqlQuery {
+  (initialOffset: number, pageSize: number): {
+    requestState: RequestState<PortfolioScreenGraphql>;
+    fetch: (variables: PortfolioScreenQueryQueryVariables) => void;
+  };
+}
+
+interface UsePortfolioScreenQuery {
+  (initialOffset: number, pageSize: number, address?: string): {
+    requestState: RequestState<PortfolioScreenModel>;
+    fetch: (
+      variables: PortfolioScreenQueryQueryVariables,
+      address?: string
+    ) => void;
   };
 }
 
@@ -162,4 +190,81 @@ export const usePortfolioQuery: UsePortfolioQuery = () => {
   );
 
   return { requestState, fetch };
+};
+
+export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery = (
+  initialOffset,
+  pageSize
+) => {
+  const [fetch, { requestState }] = useLazyGraphQLQuery<
+    PortfolioScreenQueryQuery,
+    PortfolioScreenQueryQueryVariables
+  >(PortfolioScreenQuery, {
+    variables: {
+      after: initialOffset,
+      first: pageSize,
+      address: "",
+    },
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+  });
+
+  const callFetch = useCallback(
+    (variables: PortfolioScreenQueryQueryVariables) => {
+      // Errors are handled by the requestState
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetch({
+        variables,
+      });
+    },
+    [fetch]
+  );
+
+  return {
+    requestState,
+    fetch: callFetch,
+  };
+};
+
+export const usePortfolioScreenQuery: UsePortfolioScreenQuery = (
+  initialOffset,
+  pageSize
+) => {
+  const gqlQuery = usePortfolioScreenGraphqlQuery(initialOffset, pageSize);
+  const portfolioQuery = usePortfolioQuery();
+
+  const fetch = useCallback(
+    (variables: PortfolioScreenQueryQueryVariables, address?: string) => {
+      gqlQuery.fetch(variables);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      portfolioQuery.fetch(address);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gqlQuery.fetch, portfolioQuery.fetch]
+  );
+
+  const requestState = useMemo(() => {
+    if (
+      isRequestStateLoaded(gqlQuery.requestState) &&
+      isRequestStateLoaded(portfolioQuery.requestState)
+    ) {
+      return RequestStateLoaded<PortfolioScreenModel>({
+        ...gqlQuery.requestState.data,
+        portfolio: portfolioQuery.requestState.data,
+      });
+    }
+
+    if (isRequestStateError(gqlQuery.requestState)) {
+      return RequestStateError(gqlQuery.requestState.error);
+    } else if (isRequestStateError(portfolioQuery.requestState)) {
+      return RequestStateError(portfolioQuery.requestState.error);
+    }
+
+    return RequestStateLoading;
+  }, [gqlQuery.requestState, portfolioQuery]);
+
+  return {
+    requestState,
+    fetch,
+  };
 };

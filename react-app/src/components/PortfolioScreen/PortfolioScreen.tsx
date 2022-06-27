@@ -11,14 +11,14 @@ import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import AppRoutes from "../../navigation/AppRoutes";
-import { usePortfolioQuery } from "./PortfolioScreenAPI";
+import { usePortfolioScreenQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
+  const { requestState, fetch } = usePortfolioScreenQuery(0, 2);
+
   const { address } = useParams();
   const navigate = useNavigate();
-
-  const { requestState, fetch } = usePortfolioQuery();
   const { translate } = useLocale();
   const wallet = useWallet();
 
@@ -34,8 +34,6 @@ const PortfolioScreen: React.FC = () => {
         } else {
           toast.error(translate("PortfolioScreen.requestState.error"));
         }
-      } else if (isRequestStateLoaded(requestState) && !requestState.data) {
-        toast.error(translate("PortfolioScreen.requestState.noData"));
       }
     },
     () =>
@@ -43,8 +41,14 @@ const PortfolioScreen: React.FC = () => {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetch(address);
+    fetch(
+      {
+        first: 2,
+        after: 0,
+        address: "",
+      },
+      address
+    );
   }, [address, fetch]);
 
   if (!isRequestStateLoaded(requestState)) {
@@ -55,14 +59,13 @@ const PortfolioScreen: React.FC = () => {
     );
   }
 
-  if (!requestState.data) return null;
+  if (!requestState.data.portfolio) return null;
+
+  const { portfolio } = requestState.data;
 
   return (
     <div className={cn("flex", "flex-col")}>
-      <PortfolioPanel
-        portfolio={requestState.data}
-        isYourPortfolio={isYourPortfolio}
-      />
+      <PortfolioPanel portfolio={portfolio} isYourPortfolio={isYourPortfolio} />
     </div>
   );
 };

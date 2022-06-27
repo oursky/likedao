@@ -1,0 +1,21 @@
+query PortfolioScreenQuery(
+  $first: Int!
+  $after: Int!
+  $addressFilter: ProposalAddressFilter
+  $address: String!
+  $searchTerm: String
+) {
+  proposalVotesDistribution(address: $address) {
+    ...PortfolioHistoryProposalVotesDistribution
+  }
+  proposals(
+    input: {
+      first: $first
+      after: $after
+      address: $addressFilter
+      searchTerm: $searchTerm
+    }
+  ) {
+    ...PortfolioHistoryProposalConnection
+  }
+}

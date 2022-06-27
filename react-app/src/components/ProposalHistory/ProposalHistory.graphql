@@ -1,0 +1,26 @@
+fragment PortfolioHistoryProposalConnection on ProposalConnection {
+  pageInfo {
+    startCursor
+    endCursor
+  }
+  totalCount
+  edges {
+    node {
+      proposalId
+      title
+      type
+      status
+      turnout
+      myVote {
+        option
+      }
+    }
+  }
+}
+
+fragment PortfolioHistoryProposalVotesDistribution on ProposalTallyResult {
+  yes
+  no
+  abstain
+  noWithVeto
+}
