@@ -75,6 +75,14 @@ export function useProposalQuery(): {
             proposal.votingEndTime &&
             differenceInDays(Date.now(), new Date(proposal.votingEndTime)),
           depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
+          tallyResult: proposal.tallyResult && {
+            yes: convertMinimalTokenToToken(proposal.tallyResult.yes),
+            no: convertMinimalTokenToToken(proposal.tallyResult.no),
+            noWithVeto: convertMinimalTokenToToken(
+              proposal.tallyResult.noWithVeto
+            ),
+            abstain: convertMinimalTokenToToken(proposal.tallyResult.abstain),
+          },
         };
       }
     );
