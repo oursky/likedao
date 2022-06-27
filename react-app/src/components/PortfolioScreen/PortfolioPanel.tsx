@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import cn from "classnames";
 import { toast } from "react-toastify";
 import { BigNumber } from "bignumber.js";
@@ -17,9 +17,9 @@ import {
   isRequestStateError,
   isRequestStateLoaded,
 } from "../../models/RequestState";
-import { useEffectOnce } from "../../hooks/useEffectOnce";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import AppRoutes from "../../navigation/AppRoutes";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { Portfolio } from "./PortfolioScreenModel";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 
@@ -97,26 +97,36 @@ const PortfolioPanel: React.FC = () => {
   const { address } = useParams();
   const requestState = usePortfolioQuery(address);
   const navigate = useNavigate();
+  const wallet = useWallet();
 
   const onAddressCopied = useCallback(() => {
     toast.success(translate("UserInfoPanel.addressCopied"));
   }, [translate]);
 
-  useEffectOnce(
-    () => {
-      if (isRequestStateError(requestState)) {
-        if (requestState.error.message === "Invalid address.") {
-          navigate(AppRoutes.ErrorInvalidAddress);
-        } else {
-          toast.error(translate("PortfolioScreen.requestState.error"));
-        }
-      } else if (isRequestStateLoaded(requestState) && !requestState.data) {
-        toast.error(translate("PortfolioScreen.requestState.noData"));
+  useEffect(() => {
+    if (wallet.status === ConnectionStatus.Idle) {
+      // open connect wallet dialog
+      wallet.openConnectWalletModal();
+    }
+  }, [wallet]);
+
+  useEffect(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      return;
+    }
+
+    if (isRequestStateError(requestState)) {
+      if (requestState.error.message === "Invalid address.") {
+        navigate(AppRoutes.ErrorInvalidAddress);
+      } else if (requestState.error.message.includes("Wallet not connected")) {
+        // do nothing
+      } else {
+        toast.error(translate("PortfolioScreen.requestState.error"));
       }
-    },
-    () =>
-      isRequestStateError(requestState) || isRequestStateLoaded(requestState)
-  );
+    } else if (isRequestStateLoaded(requestState) && !requestState.data) {
+      toast.error(translate("PortfolioScreen.requestState.noData"));
+    }
+  }, [navigate, requestState, translate, wallet]);
 
   if (!isRequestStateLoaded(requestState)) {
     return (
