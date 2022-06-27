@@ -9,6 +9,7 @@ import (
 )
 
 type IValidatorQuery interface {
+	WithProposalDeposits(proposalID int) IValidatorQuery
 	WithProposalVotes(proposalID int) IValidatorQuery
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
 	QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error)
@@ -19,7 +20,8 @@ type ValidatorQuery struct {
 	ctx     context.Context
 	session *bun.DB
 
-	withProposalVotesByProposalID int
+	withProposalVotesByProposalID    int
+	withProposalDepositsByProposalID int
 }
 
 func NewValidatorQuery(ctx context.Context, session *bun.DB) IValidatorQuery {
@@ -29,6 +31,12 @@ func NewValidatorQuery(ctx context.Context, session *bun.DB) IValidatorQuery {
 func (q *ValidatorQuery) WithProposalVotes(proposalID int) IValidatorQuery {
 	var newQuery = *q
 	newQuery.withProposalVotesByProposalID = proposalID
+	return &newQuery
+}
+
+func (q *ValidatorQuery) WithProposalDeposits(proposalID int) IValidatorQuery {
+	var newQuery = *q
+	newQuery.withProposalDepositsByProposalID = proposalID
 	return &newQuery
 }
 
@@ -49,6 +57,12 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 		query = query.Relation("Info.ProposalVotes", func(sq *bun.SelectQuery) *bun.SelectQuery {
 			// Get the latest vote of a proposal
 			return sq.Where("proposal_id = ?", q.withProposalVotesByProposalID).Limit(1)
+		})
+	}
+
+	if q.withProposalDepositsByProposalID > 0 {
+		query = query.Relation("Info.ProposalDeposits", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			return sq.Where("proposal_id IN (?)", q.withProposalDepositsByProposalID).Order("proposal_deposit.height DESC")
 		})
 	}
 
