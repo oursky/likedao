@@ -10,8 +10,8 @@ import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IDistributionAPI {
   signWithdrawDelegationRewardsTx(memo?: string): Promise<SignedTx>;
-  getTotalDelegationRewards(): Promise<BigNumberCoin>;
-  getTotalCommission(): Promise<BigNumberCoin>;
+  getTotalDelegationRewards(address?: string): Promise<BigNumberCoin>;
+  getTotalCommission(address?: string): Promise<BigNumberCoin>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;

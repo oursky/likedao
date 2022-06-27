@@ -40,17 +40,21 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
   );
 
   const fetchPortfolio = useCallback(async () => {
+    let walletAddress = "";
     setRequestState(RequestStateLoading);
     if (wallet.status !== ConnectionStatus.Connected) {
       if (!address) {
         setRequestState(RequestStateError(new Error("Wallet not connected.")));
+        return;
       }
-      return;
+    } else {
+      walletAddress = wallet.account.address;
     }
     if (address && !(await isValidAddress(address))) {
       setRequestState(RequestStateError(new Error("Invalid address.")));
       return;
     }
+
     try {
       const [
         availableBalance,
@@ -62,11 +66,11 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
       ] = await Promise.all([
         cosmosAPI.getBalance(address),
         cosmosAPI.getStakedBalance(address),
-        staking.getUnstakingAmount(address ?? wallet.account.address),
-        distribution.getTotalCommission(),
-        distribution.getTotalDelegationRewards(),
+        staking.getUnstakingAmount(address ?? walletAddress),
+        distribution.getTotalCommission(address),
+        distribution.getTotalDelegationRewards(address),
         desmosQuery.getProfile(
-          translateAddress(address ?? wallet.account.address, "desmos")
+          translateAddress(address ?? walletAddress, "desmos")
         ),
       ]);
 
@@ -90,7 +94,7 @@ export function usePortfolioQuery(address?: string): PortfolioRequestState {
           commission,
           reward,
           availableBalance,
-          address: address ?? wallet.account.address,
+          address: address ?? walletAddress,
         })
       );
     } catch (err: unknown) {
