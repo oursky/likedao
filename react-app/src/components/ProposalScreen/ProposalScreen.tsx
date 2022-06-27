@@ -20,6 +20,10 @@ type ProposalTabItem = IFilterTabItem<FilterKey>;
 
 const defaultTabItems: ProposalTabItem[] = [
   {
+    label: "ProposalScreen.filters.all",
+    value: "all",
+  },
+  {
     label: "ProposalScreen.filters.voting",
     value: "voting",
   },

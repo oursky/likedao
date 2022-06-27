@@ -16,6 +16,7 @@ type ProposalFilter = Omit<
 >;
 
 export type FilterKey =
+  | "all"
   | "voting"
   | "deposit"
   | "passed"
@@ -36,6 +37,8 @@ function getFilterVariables(tab: FilterKey, address?: string): ProposalFilter {
     };
   }
   switch (tab) {
+    case "all":
+      return {};
     case "voting":
       return { status: ProposalStatusFilter.Voting };
     case "deposit":
