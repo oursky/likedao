@@ -62,18 +62,18 @@ export function useProposalQuery(): {
           votingEndTime: proposal.votingEndTime
             ? new Date(proposal.votingEndTime)
             : null,
-          votingStartTime: proposal.votingEndTime
-            ? new Date(proposal.votingEndTime)
+          votingStartTime: proposal.votingStartTime
+            ? new Date(proposal.votingStartTime)
             : null,
           depositEndTime: proposal.depositEndTime
             ? new Date(proposal.depositEndTime)
             : null,
           submitTime: new Date(proposal.submitTime),
-          turnout: calculateTurnout(proposal.tallyResult),
+          turnout: calculateTurnout(proposal.tallyResult), // TODO: fetch from grahpql api instead
           remainingVotingDays:
             proposal.votingStartTime &&
             proposal.votingEndTime &&
-            differenceInDays(Date.now(), new Date(proposal.votingEndTime)),
+            differenceInDays(new Date(proposal.votingEndTime), Date.now()),
           depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
         };
       }
