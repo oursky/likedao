@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import Badge from "../common/Badge/Badge";
@@ -11,7 +11,7 @@ import Config from "../../config/Config";
 import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { ReactionList, ReactionPicker } from "../reactions";
-import { DefaultReactionMap } from "../reactions/Reaction";
+import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
@@ -178,7 +178,10 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   );
 };
 
-const ProposalActionArea: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
+const ProposalActionArea: React.FC<{
+  proposal: Proposal;
+  handleReactionSelect: (type: ReactionType) => void;
+}> = ({ proposal, handleReactionSelect }) => {
   const { reactions, myReaction } = proposal;
   const reactionItems = useMemo(() => {
     return reactions.map((r) => {
@@ -213,8 +216,12 @@ const ProposalActionArea: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           "gap-y-4"
         )}
       >
-        <ReactionList items={reactionItems} itemTheme="grey" />
-        <ReactionPicker />
+        <ReactionList
+          items={reactionItems}
+          itemTheme="grey"
+          onItemClick={handleReactionSelect}
+        />
+        <ReactionPicker onAddNewReaction={handleReactionSelect} />
       </div>
       <AppButton
         size="extra-small"
@@ -228,13 +235,28 @@ const ProposalActionArea: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
 
 const ProposalHeader: React.FC<{
   proposal: Proposal;
-}> = ({ proposal }) => {
+  onSetReaction: (type: ReactionType) => void;
+  onUnsetReaction: () => void;
+}> = ({ proposal, onSetReaction, onUnsetReaction }) => {
+  const handleRectionSelect = useCallback(
+    (type: ReactionType) => {
+      if (type === proposal.myReaction) {
+        onUnsetReaction();
+      } else {
+        onSetReaction(type);
+      }
+    },
+    [onSetReaction, onUnsetReaction, proposal.myReaction]
+  );
   return (
     <Paper>
       <ProposalTitle proposal={proposal} />
       <ProposalStatistics proposal={proposal} />
       <ProposalTypeAndProposer proposal={proposal} />
-      <ProposalActionArea proposal={proposal} />
+      <ProposalActionArea
+        proposal={proposal}
+        handleReactionSelect={handleRectionSelect}
+      />
     </Paper>
   );
 };
