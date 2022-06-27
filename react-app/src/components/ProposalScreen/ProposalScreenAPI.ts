@@ -3,11 +3,17 @@ import {
   ProposalScreenQuery,
   ProposalScreenQueryQuery,
   ProposalScreenQueryQueryVariables,
-  ProposalFilter,
+  ProposalStatusFilter,
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { PaginatedProposals } from "./ProposalScreenModel";
+
+type ProposalFilter = Omit<
+  ProposalScreenQueryQueryVariables,
+  "first" | "after"
+>;
 
 export type FilterKey =
   | "voting"
@@ -16,44 +22,50 @@ export type FilterKey =
   | "rejected"
   | "following";
 
-function getFilterVariables(
-  filter: FilterKey,
-  address: string | null
-): {
-  filter?: ProposalFilter;
-  followingAddress?: string;
-} {
-  if (filter === "following") {
+function getFilterVariables(tab: FilterKey, address?: string): ProposalFilter {
+  if (tab === "following") {
     return {
-      followingAddress: address ?? undefined,
+      address: address
+        ? {
+            address,
+            isVoter: true,
+            isDepositor: true,
+            isSubmitter: true,
+          }
+        : undefined,
     };
   }
-  switch (filter) {
+  switch (tab) {
     case "voting":
-      return { filter: ProposalFilter.Voting };
+      return { status: ProposalStatusFilter.Voting };
     case "deposit":
-      return { filter: ProposalFilter.Deposit };
+      return { status: ProposalStatusFilter.Deposit };
     case "passed":
-      return { filter: ProposalFilter.Passed };
+      return { status: ProposalStatusFilter.Passed };
     case "rejected":
-      return { filter: ProposalFilter.Rejected };
+      return { status: ProposalStatusFilter.Rejected };
     default:
       throw new Error(`Unknown filter state`);
   }
 }
 
-export function useProposalsQuery(
-  initialOffset: number,
-  pageSize: number
-): {
-  requestState: RequestState<PaginatedProposals>;
-  fetch: (
-    offset: number,
-    filter: FilterKey,
-    address?: string,
-    searchTerm?: string
-  ) => void;
-} {
+interface UseProposalsQuery {
+  (initialOffset: number, pageSize: number): {
+    requestState: RequestState<PaginatedProposals>;
+    fetch: (variables: {
+      first: number;
+      after: number;
+      tab: FilterKey;
+    }) => void;
+  };
+}
+
+export const useProposalsQuery: UseProposalsQuery = (
+  initialOffset,
+  pageSize
+) => {
+  const wallet = useWallet();
+
   const [fetch, { requestState }] = useLazyGraphQLQuery<
     ProposalScreenQueryQuery,
     ProposalScreenQueryQueryVariables
@@ -67,24 +79,30 @@ export function useProposalsQuery(
   });
 
   const callFetch = useCallback(
-    (
-      offset: number,
-      filter: FilterKey = "voting",
-      address?: string,
-      searchTerm?: string
-    ) => {
+    ({
+      first,
+      after,
+      tab,
+    }: {
+      first: number;
+      after: number;
+      tab: FilterKey;
+    }) => {
+      let address;
+      if (wallet.status === ConnectionStatus.Connected) {
+        address = wallet.account.address;
+      }
       // Errors are handled by the requestState
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetch({
         variables: {
-          after: offset,
-          first: pageSize,
-          searchTerm,
-          ...getFilterVariables(filter, address ?? null),
+          first,
+          after,
+          ...getFilterVariables(tab, address),
         },
       });
     },
-    [fetch, pageSize]
+    [fetch, wallet]
   );
 
   const data = useMemo(() => {
@@ -101,4 +119,4 @@ export function useProposalsQuery(
     requestState: data,
     fetch: callFetch,
   };
-}
+};
