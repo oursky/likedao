@@ -31,6 +31,7 @@ type QueryContext struct {
 	Proposal      queries.IProposalQuery
 	Gov           queries.IGovQuery
 	Reaction      queries.IReactionQuery
+	Validator     queries.IValidatorQuery
 }
 
 type MutatorContext struct {
@@ -67,6 +68,7 @@ func NewRequestContext(
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 		Gov:           queries.NewGovQuery(ctx, chainDB),
 		Reaction:      queries.NewReactionQuery(ctx, serverDB),
+		Validator:     queries.NewValidatorQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
 		Test:     mutators.NewTestMutator(ctx, serverDB),

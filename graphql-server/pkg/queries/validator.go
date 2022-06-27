@@ -1,0 +1,86 @@
+package queries
+
+import (
+	"context"
+
+	"github.com/oursky/likedao/pkg/models"
+	"github.com/pkg/errors"
+	"github.com/uptrace/bun"
+)
+
+type IValidatorQuery interface {
+	WithProposalVotes(proposalID int) IValidatorQuery
+	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
+}
+
+type ValidatorQuery struct {
+	ctx     context.Context
+	session *bun.DB
+
+	withProposalVotesByProposalID int
+}
+
+func NewValidatorQuery(ctx context.Context, session *bun.DB) IValidatorQuery {
+	return &ValidatorQuery{ctx: ctx, session: session}
+}
+
+func (q *ValidatorQuery) WithProposalVotes(proposalID int) IValidatorQuery {
+	var newQuery = *q
+	newQuery.withProposalVotesByProposalID = proposalID
+	return &newQuery
+}
+
+func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) *bun.SelectQuery {
+	query := q.session.NewSelect().
+		// https://github.com/uptrace/bun/issues/410
+		// Using model interface to avoid a bug where has-many fields are scanned as nil when using a nil model
+		Model(model).
+		Relation("Description").
+		// To handle gql resolving when info is provided but validator isn't
+		Relation("Info.Validator")
+
+	if len(includeAddresses) > 0 {
+		query = query.Where("info.operator_address IN (?)", bun.In(includeAddresses))
+	}
+
+	if q.withProposalVotesByProposalID > 0 {
+		query = query.Relation("Info.ProposalVotes", func(sq *bun.SelectQuery) *bun.SelectQuery {
+			// Get the latest vote of a proposal
+			return sq.Where("proposal_id = ?", q.withProposalVotesByProposalID).Limit(1)
+		})
+	}
+
+	return query
+}
+
+func (q *ValidatorQuery) QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error) {
+	var validators []models.Validator
+	query := q.NewQuery(&validators, includeAddresses)
+
+	totalCount, err := q.NewQuery((*models.Validator)(nil), includeAddresses).Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	query.Order("moniker ASC").Order("operator_address ASC").Limit(first + 1).Offset(after)
+
+	if err := query.Scan(q.ctx); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	hasNextPage := len(validators) > first
+	hasPreviousPage := after > 0
+
+	if len(validators) > first {
+		validators = validators[:first]
+	}
+
+	return &Paginated[models.Validator]{
+		Items: validators,
+		PaginationInfo: PaginationInfo{
+			HasNext:     hasNextPage,
+			HasPrevious: hasPreviousPage,
+			TotalCount:  totalCount,
+		},
+	}, nil
+}
