@@ -17,6 +17,59 @@ import {
 import { useAuth } from "../../providers/AuthProvider";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import * as SectionedTable from "../SectionedTable/SectionedTable";
+import AppButton from "../common/Buttons/AppButton";
+
+interface DummyTableItem {
+  identity: {
+    name: string;
+    role: string;
+  };
+  value: string;
+}
+
+const dummyTableItems: SectionedTable.SectionItem<DummyTableItem>[] = [
+  {
+    titleId: "AppSideBar.navigation.overview",
+    className: cn("bg-likecoin-secondarygreen", "text-likecoin-green"),
+    items: [
+      {
+        identity: {
+          name: "John Doe",
+          role: "Developer",
+        },
+        value: "NO",
+      },
+      {
+        identity: {
+          name: "Sam Tsui",
+          role: "Developer",
+        },
+        value: "Yes",
+      },
+    ],
+  },
+  {
+    titleId: "AppSideBar.navigation.portfolio",
+    className: cn("bg-[#F0ECDA]", "text-[#666666]"),
+    items: [
+      {
+        identity: {
+          name: "John Doe",
+          role: "Developer",
+        },
+        value: "NO",
+      },
+      {
+        identity: {
+          name: "Sam Tsui",
+          role: "Developer",
+        },
+        value: "Yes",
+      },
+    ],
+  },
+];
 
 const DummyScreen: React.FC = () => {
   const { setLocale } = useLocale();
@@ -25,11 +78,19 @@ const DummyScreen: React.FC = () => {
   const wallet = useWallet();
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [dummyTableSort, setDummyTableSort] =
+    useState<SectionedTable.ColumnOrder | null>(null);
 
   // Fetch block height every 6 seconds (i.e average block time)
-  const { loading, data, error } = useQuery<TestQueryQuery>(TestQuery, {
+  const { data } = useQuery<TestQueryQuery>(TestQuery, {
     pollInterval: 6000,
   });
+
+  const onDummyItemClick = useCallback((item: DummyTableItem) => {
+    return () => {
+      console.log(item);
+    };
+  }, []);
 
   const [loadMe, { loading: meLoading, data: meData, error: meError }] =
     useLazyQuery<MeQueryQuery>(MeQuery, {});
@@ -76,14 +137,6 @@ const DummyScreen: React.FC = () => {
     }
   }, [setProfile, wallet, desmosQuery]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Failed to fetch data</div>;
-  }
-
   return (
     <div
       className={cn(
@@ -105,9 +158,11 @@ const DummyScreen: React.FC = () => {
       >
         <LocalizedText messageID="App.title" />
 
-        <h1>
-          Block Height: <span>{data?.latestBlock?.height ?? -1}</span>
-        </h1>
+        {data && (
+          <h1>
+            Block Height: <span>{data.latestBlock?.height ?? -1}</span>
+          </h1>
+        )}
       </div>
       <div className={cn("flex", "flex-col", "gap-y-5")}>
         <button
@@ -244,6 +299,47 @@ const DummyScreen: React.FC = () => {
       {meData && <div>Signed In As: {meData.me}</div>}
 
       {meError && <div>Failed to sign in: {meError.message}</div>}
+
+      <SectionedTable.Table
+        sections={dummyTableItems}
+        sortOrder={dummyTableSort ?? undefined}
+        onSort={setDummyTableSort}
+      >
+        <SectionedTable.Column<DummyTableItem>
+          id="title"
+          titleId="App.title"
+          sortable={true}
+        >
+          {(item) => (
+            <div className={cn("flex", "flex-col", "gap-y-2")}>
+              <span className={cn("font-bold")}>{item.identity.name}</span>
+              <span>{item.identity.role}</span>
+            </div>
+          )}
+        </SectionedTable.Column>
+        <SectionedTable.Column<DummyTableItem>
+          id="name"
+          titleId="App.title"
+          sortable={true}
+        >
+          {(item) => (
+            <span className={cn("text-likecoin-green")}>{item.value}</span>
+          )}
+        </SectionedTable.Column>
+        <SectionedTable.Column<DummyTableItem>
+          id="action"
+          className={cn("text-right")}
+        >
+          {(item) => (
+            <AppButton
+              theme="primary"
+              size="regular"
+              messageID="AppSideBar.title"
+              onClick={onDummyItemClick(item)}
+            />
+          )}
+        </SectionedTable.Column>
+      </SectionedTable.Table>
     </div>
   );
 };
