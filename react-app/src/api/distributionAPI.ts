@@ -18,6 +18,7 @@ interface IDistributionAPI {
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 const CoinDenom = Config.chainInfo.currency.coinDenom;
+const Bech32PrefixValAddr = Config.chainInfo.bech32Config.bech32PrefixValAddr;
 
 export const useDistributionAPI = (): IDistributionAPI => {
   const wallet = useWallet();
@@ -83,7 +84,10 @@ export const useDistributionAPI = (): IDistributionAPI => {
       throw new Error("Wallet not connected");
     }
 
-    const address = translateAddress(wallet.account.address, "likevaloper");
+    const address = translateAddress(
+      wallet.account.address,
+      Bech32PrefixValAddr
+    );
     const commission = (await query.distribution.validatorCommission(address))
       .commission;
 

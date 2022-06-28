@@ -6,7 +6,14 @@ export interface ChainLink {
 }
 
 export interface ChainInfo {
-  bech32Prefix: string;
+  bech32Config: {
+    bech32PrefixAccAddr: string;
+    bech32PrefixAccPub: string;
+    bech32PrefixValAddr: string;
+    bech32PrefixValPub: string;
+    bech32PrefixConsAddr: string;
+    bech32PrefixConsPub: string;
+  };
   gasPrice: string;
   chainId: string;
   chainRpc: string;
@@ -43,7 +50,14 @@ const defaultConfig: IConfig = {
   sentry: null,
   chainInfo: {
     gasPrice: "200000nanolike",
-    bech32Prefix: "like",
+    bech32Config: {
+      bech32PrefixAccAddr: "like",
+      bech32PrefixAccPub: "likepub",
+      bech32PrefixValAddr: "likevaloper",
+      bech32PrefixValPub: "likevaloperpub",
+      bech32PrefixConsAddr: "likevalcons",
+      bech32PrefixConsPub: "likevalconspub",
+    },
     chainId: "",
     chainRpc: "",
     currency: {

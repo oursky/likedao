@@ -72,7 +72,7 @@ export class WalletConnectWallet extends BaseWallet {
     }
 
     const address = bech32.encode(
-      chainInfo.bech32Prefix,
+      chainInfo.bech32Config.bech32PrefixAccAddr,
       bech32.toWords(Buffer.from(hexAddress, "hex"))
     );
 
