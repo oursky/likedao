@@ -5,7 +5,7 @@ import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
 type AppButtonTheme = "primary" | "secondary" | "rounded";
-type AppButtonSize = "regular" | "small";
+type AppButtonSize = "regular" | "small" | "extra-small";
 
 interface AppButtonCommonProps {
   theme: AppButtonTheme;
@@ -80,8 +80,7 @@ function getButtonSizeStyle(size: AppButtonSize): string {
         "py-3",
         "px-6",
         "rounded-md",
-        "shadow-sm",
-        "rounded-md"
+        "shadow-sm"
       );
     case "small":
       return cn(
@@ -91,81 +90,117 @@ function getButtonSizeStyle(size: AppButtonSize): string {
         "py-3",
         "px-4",
         "rounded-md",
-        "shadow-sm",
-        "rounded-md"
+        "shadow-sm"
+      );
+    case "extra-small":
+      return cn(
+        "text-sm",
+        "leading-4",
+        "font-medium",
+        "py-2",
+        "px-3",
+        "rounded-md",
+        "shadow-sm"
       );
     default:
       throw new Error("Unknown button size");
   }
 }
 
-const Button: React.FC<Omit<ButtonProps, "type">> = (props) => {
-  const { messageID, onClick: onClick_, ...rest } = props;
+const Button = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "type">>(
+  (props, ref) => {
+    const { messageID, onClick: onClick_, ...rest } = props;
 
-  const onClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClick_?.();
-    },
-    [onClick_]
-  );
+    const onClick = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick_?.();
+      },
+      [onClick_]
+    );
 
-  return (
-    <button type="button" onClick={onClick} {...rest}>
-      <LocalizedText messageID={messageID} />
-    </button>
-  );
-};
+    return (
+      <button ref={ref} type="button" onClick={onClick} {...rest}>
+        <LocalizedText messageID={messageID} />
+      </button>
+    );
+  }
+);
 
-const Link: React.FC<Omit<LinkProps, "type">> = (props) => {
-  const { messageID, ...rest } = props;
+const Link = React.forwardRef<HTMLAnchorElement, Omit<LinkProps, "type">>(
+  (props, ref) => {
+    const { messageID, ...rest } = props;
 
-  return (
-    <RouterLink {...rest}>
-      <LocalizedText messageID={messageID} />
-    </RouterLink>
-  );
-};
+    return (
+      <RouterLink ref={ref} {...rest}>
+        <LocalizedText messageID={messageID} />
+      </RouterLink>
+    );
+  }
+);
 
 /**
  * Anchor link to external websites
  *
  * Open in new tab by default
  */
-const AnchorLink: React.FC<Omit<AnchorProps, "type">> = (props) => {
+const AnchorLink = React.forwardRef<
+  HTMLAnchorElement,
+  Omit<AnchorProps, "type">
+>((props, ref) => {
   const { messageID, ...rest } = props;
 
   return (
-    <a target="_blank" {...rest}>
+    <a ref={ref} target="_blank" {...rest}>
       <LocalizedText messageID={messageID} />
     </a>
   );
-};
+});
 
-const AppButton: React.FC<AppButtonProps> = (props) => {
-  const { type = "button", theme, size, className, ...rest } = props;
+const AppButton = React.forwardRef<HTMLElement, AppButtonProps>(
+  (props, ref) => {
+    const { type = "button", theme, size, className, ...rest } = props;
 
-  const computedClassName = useMemo(
-    () =>
-      cn(getButtonThemeClassNames(theme), getButtonSizeStyle(size), className),
-    [className, theme, size]
-  );
+    const computedClassName = useMemo(
+      () =>
+        cn(
+          getButtonThemeClassNames(theme),
+          getButtonSizeStyle(size),
+          className
+        ),
+      [className, theme, size]
+    );
 
-  switch (type) {
-    case "button":
-      return (
-        <Button {...(rest as ButtonProps)} className={computedClassName} />
-      );
-    case "link":
-      return <Link {...(rest as LinkProps)} className={computedClassName} />;
-    case "anchor":
-      return (
-        <AnchorLink {...(rest as AnchorProps)} className={computedClassName} />
-      );
-    default:
-      throw new Error("Unknown button type");
+    switch (type) {
+      case "button":
+        return (
+          <Button
+            ref={ref as any}
+            {...(rest as ButtonProps)}
+            className={computedClassName}
+          />
+        );
+      case "link":
+        return (
+          <Link
+            ref={ref as any}
+            {...(rest as LinkProps)}
+            className={computedClassName}
+          />
+        );
+      case "anchor":
+        return (
+          <AnchorLink
+            ref={ref as any}
+            {...(rest as AnchorProps)}
+            className={computedClassName}
+          />
+        );
+      default:
+        throw new Error("Unknown button type");
+    }
   }
-};
+);
 
 export default AppButton;

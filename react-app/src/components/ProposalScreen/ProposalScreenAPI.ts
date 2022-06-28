@@ -8,7 +8,8 @@ import {
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { PaginatedProposals } from "./ProposalScreenModel";
+import { getReactionType } from "../reactions/ReactionModel";
+import { PaginatedProposals, ReactionItem } from "./ProposalScreenModel";
 
 type ProposalFilter = Omit<
   ProposalScreenQueryQueryVariables,
@@ -112,7 +113,15 @@ export const useProposalsQuery: UseProposalsQuery = (
     return mapRequestData<ProposalScreenQueryQuery, PaginatedProposals>(
       requestState,
       (r) => ({
-        proposals: r.proposals.edges.map((p) => p.node),
+        proposals: r.proposals.edges.map((p) => ({
+          ...p.node,
+          reactions: p.node.reactions
+            .map((r) => ({
+              type: getReactionType(r.reaction),
+              count: r.count,
+            }))
+            .filter((r): r is ReactionItem => r.type != null),
+        })),
         totalCount: r.proposals.totalCount,
       })
     );

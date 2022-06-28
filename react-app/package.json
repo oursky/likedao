@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.5",
+    "@apollo/link-error": "^2.0.0-beta.3",
+    "@charkour/react-reactions": "^0.8.0",
     "@cosmjs/amino": "^0.28.4",
     "@cosmjs/crypto": "^0.28.4",
     "@cosmjs/encoding": "^0.28.4",

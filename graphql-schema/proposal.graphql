@@ -30,7 +30,7 @@ enum ProposalVoteOption {
   NoWithVeto
 }
 
-type Proposal {
+type Proposal implements Node {
   id: ID!
   proposalId: Int!
   title: String!

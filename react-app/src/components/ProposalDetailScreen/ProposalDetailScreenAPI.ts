@@ -9,7 +9,8 @@ import {
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
 import { convertMinimalTokenToToken } from "../../utils/coin";
-import { Proposal } from "./ProposalDetailScreenModel";
+import { getReactionType } from "../reactions/ReactionModel";
+import { Proposal, ReactionItem } from "./ProposalDetailScreenModel";
 
 const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
   if (!tallyResult) {
@@ -83,6 +84,12 @@ export function useProposalQuery(): {
             ),
             abstain: convertMinimalTokenToToken(proposal.tallyResult.abstain),
           },
+          reactions: proposal.reactions
+            .map((r) => ({
+              type: getReactionType(r.reaction),
+              count: r.count,
+            }))
+            .filter((r): r is ReactionItem => r.type != null),
         };
       }
     );

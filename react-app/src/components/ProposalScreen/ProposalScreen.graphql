@@ -17,6 +17,10 @@ fragment ProposalScreenProposal on Proposal {
     abstain
     outstandingOption
   }
+  reactions {
+    reaction
+    count
+  }
 }
 
 query ProposalScreenQuery(
