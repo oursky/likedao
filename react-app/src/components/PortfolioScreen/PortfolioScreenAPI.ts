@@ -25,15 +25,74 @@ export function usePortfolioQuery(): PortfolioRequestState {
   const cosmosAPI = useCosmosAPI();
   const staking = useStakingAPI();
   const distribution = useDistributionAPI();
-  const { desmosQuery } = useQueryClient();
+  const { desmosQuery, stargateQuery } = useQueryClient();
 
-  const fetchPortfolio = useCallback(async () => {
-    setRequestState(RequestStateLoading);
+  const isValidAddress = useCallback(
+    async (address: string) => {
+      try {
+        await stargateQuery.getAccount(address);
+      } catch {
+        return false;
+      }
+      return true;
+    },
+    [stargateQuery]
+  );
+
+  const fetchWalletPortfolio = useCallback<
+    () => Promise<Portfolio>
+  >(async () => {
     if (wallet.status !== ConnectionStatus.Connected) {
-      setRequestState(RequestStateError(new Error("Wallet not connected.")));
-      return;
+      throw new Error("Wallet not connected.");
     }
-    try {
+
+    const [
+      availableBalance,
+      stakedBalance,
+      unstakingBalance,
+      commission,
+      reward,
+      profile,
+    ] = await Promise.all([
+      cosmosAPI.getBalance(),
+      cosmosAPI.getStakedBalance(),
+      staking.getUnstakingAmount(wallet.account.address),
+      distribution.getTotalCommission(),
+      distribution.getTotalDelegationRewards(),
+      desmosQuery.getProfile(
+        translateAddress(wallet.account.address, "desmos")
+      ),
+    ]);
+
+    const balance = {
+      amount: BigNumber.sum(
+        availableBalance.amount,
+        stakedBalance.amount,
+        unstakingBalance.amount
+      ),
+      denom: availableBalance.denom,
+    };
+
+    return {
+      profile,
+      balance,
+      stakedBalance,
+      unstakingBalance,
+      availableBalance,
+      commission,
+      reward,
+      address: wallet.account.address,
+    };
+  }, [wallet, cosmosAPI, staking, desmosQuery, distribution]);
+
+  const fetchAddressPortfolio = useCallback<
+    (address: string) => Promise<Portfolio>
+  >(
+    async (address) => {
+      if (!(await isValidAddress(address))) {
+        throw new Error("Invalid address");
+      }
+
       const [
         availableBalance,
         stakedBalance,
@@ -42,14 +101,12 @@ export function usePortfolioQuery(): PortfolioRequestState {
         reward,
         profile,
       ] = await Promise.all([
-        cosmosAPI.getBalance(),
-        cosmosAPI.getStakedBalance(),
-        staking.getUnstakingAmount(wallet.account.address),
-        distribution.getTotalCommission(),
-        distribution.getTotalDelegationRewards(),
-        desmosQuery.getProfile(
-          translateAddress(wallet.account.address, "desmos")
-        ),
+        cosmosAPI.getAddressBalance(address),
+        cosmosAPI.getAddressStakedBalance(address),
+        staking.getUnstakingAmount(address),
+        distribution.getAddressTotalCommission(address),
+        distribution.getAddressTotalDelegationRewards(address),
+        desmosQuery.getProfile(translateAddress(address, "desmos")),
       ]);
 
       const balance = {
@@ -61,25 +118,41 @@ export function usePortfolioQuery(): PortfolioRequestState {
         denom: availableBalance.denom,
       };
 
-      setRequestState(
-        RequestStateLoaded({
-          profile,
-          balance,
-          stakedBalance,
-          unstakingBalance,
-          availableBalance,
-          commission,
-          reward,
-          address: wallet.account.address,
-        })
-      );
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setRequestState(RequestStateError(err));
+      return {
+        profile,
+        balance,
+        stakedBalance,
+        unstakingBalance,
+        availableBalance,
+        commission,
+        reward,
+        address,
+      };
+    },
+    [isValidAddress, cosmosAPI, staking, distribution, desmosQuery]
+  );
+
+  const fetchPortfolio = useCallback(
+    async (address?: string) => {
+      setRequestState(RequestStateLoading);
+
+      try {
+        if (address) {
+          const portfolio = await fetchAddressPortfolio(address);
+          setRequestState(RequestStateLoaded(portfolio));
+        } else {
+          const portfolio = await fetchWalletPortfolio();
+          setRequestState(RequestStateLoaded(portfolio));
+        }
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setRequestState(RequestStateError(err));
+        }
+        console.error("Failed to handle fetch portfolio error =", err);
       }
-      console.log("Failed to handle fetch portfolio error =", err);
-    }
-  }, [wallet, cosmosAPI, staking, desmosQuery, setRequestState, distribution]);
+    },
+    [fetchAddressPortfolio, fetchWalletPortfolio]
+  );
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {
