@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
+import { Delegation } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import {
@@ -26,6 +27,9 @@ interface IStakingAPI {
     memo?: string
   ): Promise<SignedTx>;
   getUnstakingAmount(account: string): Promise<BigNumberCoin>;
+  getDelegatorStakes(
+    account: string
+  ): Promise<{ delegation: Delegation; balance: BigNumberCoin }[]>;
 }
 
 export const useStakingAPI = (): IStakingAPI => {
@@ -133,12 +137,42 @@ export const useStakingAPI = (): IStakingAPI => {
     [chainInfo.currency.coinDenom, query.staking]
   );
 
+  const getDelegatorStakes = useCallback(
+    async (address: string) => {
+      const allDelegations = [];
+      let startAtKey: Uint8Array | undefined;
+      do {
+        const { delegationResponses, pagination } =
+          await query.staking.delegatorDelegations(address, startAtKey);
+        allDelegations.push(...delegationResponses);
+        startAtKey = pagination?.nextKey;
+      } while (startAtKey?.length !== 0 && startAtKey !== undefined);
+
+      return allDelegations.map((delegationRespond) => ({
+        delegation: delegationRespond.delegation as Delegation,
+        balance: {
+          denom: chainInfo.currency.coinDenom,
+          amount: convertMinimalTokenToToken(
+            delegationRespond.balance?.amount ?? 0
+          ),
+        },
+      }));
+    },
+    [chainInfo.currency.coinDenom, query.staking]
+  );
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
       signUndelegateTokenTx,
       getUnstakingAmount,
+      getDelegatorStakes,
     }),
-    [signDelegateTokenTx, signUndelegateTokenTx, getUnstakingAmount]
+    [
+      signDelegateTokenTx,
+      signUndelegateTokenTx,
+      getUnstakingAmount,
+      getDelegatorStakes,
+    ]
   );
 };
