@@ -7,6 +7,7 @@ import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import { convertMinimalTokenToToken } from "../utils/coin";
 import { BigNumberCoin } from "../models/coin";
 import { SignDataMessageResponse } from "../models/cosmos/tx";
+import { useQueryClient } from "../providers/QueryClientProvider";
 
 export type SignedTx = Uint8Array;
 
@@ -16,6 +17,8 @@ const GAS_ADJUSTMENT = 1.3;
 interface ICosmosAPI {
   getBalance(): Promise<BigNumberCoin>;
   getStakedBalance(): Promise<BigNumberCoin>;
+  getAddressBalance(address: string): Promise<BigNumberCoin>;
+  getAddressStakedBalance(address: string): Promise<BigNumberCoin>;
   signArbitrary(data: string): Promise<SignDataMessageResponse>;
   signTx(messages: EncodeObject[], memo?: string): Promise<SignedTx>;
   broadcastTx(tx: SignedTx): Promise<DeliverTxResponse>;
@@ -23,6 +26,7 @@ interface ICosmosAPI {
 
 export const useCosmosAPI = (): ICosmosAPI => {
   const wallet = useWallet();
+  const { stargateQuery } = useQueryClient();
   const chainInfo = Config.chainInfo;
 
   const getBalance = useCallback(async () => {
@@ -64,6 +68,42 @@ export const useCosmosAPI = (): ICosmosAPI => {
       amount: convertMinimalTokenToToken(balance.amount),
     };
   }, [chainInfo.currency.coinMinimalDenom, wallet]);
+
+  const getAddressBalance = useCallback(
+    async (address: string) => {
+      const balance = await stargateQuery.getBalance(
+        address,
+        chainInfo.currency.coinMinimalDenom
+      );
+
+      const amount = convertMinimalTokenToToken(balance.amount);
+
+      return {
+        denom: balance.denom,
+        amount,
+      };
+    },
+    [chainInfo.currency.coinMinimalDenom, stargateQuery]
+  );
+
+  const getAddressStakedBalance = useCallback(
+    async (address: string) => {
+      const balance = await stargateQuery.getBalanceStaked(address);
+
+      if (!balance) {
+        return {
+          denom: chainInfo.currency.coinMinimalDenom,
+          amount: convertMinimalTokenToToken(0),
+        };
+      }
+
+      return {
+        denom: balance.denom,
+        amount: convertMinimalTokenToToken(balance.amount),
+      };
+    },
+    [chainInfo.currency.coinMinimalDenom, stargateQuery]
+  );
 
   const signTx = useCallback(
     async (messages: EncodeObject[], memo?: string) => {
@@ -114,10 +154,20 @@ export const useCosmosAPI = (): ICosmosAPI => {
     () => ({
       getBalance,
       getStakedBalance,
+      getAddressBalance,
+      getAddressStakedBalance,
       signArbitrary,
       signTx,
       broadcastTx,
     }),
-    [getBalance, getStakedBalance, signArbitrary, signTx, broadcastTx]
+    [
+      getBalance,
+      getStakedBalance,
+      getAddressBalance,
+      getAddressStakedBalance,
+      signArbitrary,
+      signTx,
+      broadcastTx,
+    ]
   );
 };
