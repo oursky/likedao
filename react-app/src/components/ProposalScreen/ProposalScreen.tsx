@@ -55,7 +55,6 @@ const ProposalScreen: React.FC = () => {
   const [after, setAfter] = useState(0);
 
   const [searchParams, setSearchParams] = useSearchParams({
-    first: PROPOSAL_LIST_PAGE_SIZE.toString(),
     after: after.toString(),
     tab: defaultTabItem.value,
   });
@@ -87,7 +86,6 @@ const ProposalScreen: React.FC = () => {
 
   useEffect(() => {
     setSearchParams({
-      first: PROPOSAL_LIST_PAGE_SIZE.toString(),
       after: after.toString(),
       tab: selectedTab,
     });
