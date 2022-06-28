@@ -5,6 +5,7 @@ const AppRoutes = Object.freeze({
   ProposalDetail: "/proposals/:id",
   NewProposal: "/proposals/new",
   Portfolio: "/portfolio",
+  ErrorInvalidAddress: "/error/invalid-address",
 });
 
 export default AppRoutes;

@@ -34,6 +34,7 @@
   "DepositProposalModal.fields.amount.available": "Available: {amount} {denom}",
   "DepositProposalModal.title": "Deposit",
   "ErrorView.backToHome": "Go back to Homepage",
+  "ErrorView.invalidAddress": "Invalid Address",
   "ErrorView.notFound": "404 Not Found",
   "ErrorView.unknown": "Unknown Error",
   "GovernanceInfoPanel.error": "Failed to fetch governance parameters, please try again later.",
