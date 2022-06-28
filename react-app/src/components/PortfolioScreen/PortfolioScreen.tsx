@@ -8,16 +8,20 @@ import {
 } from "../../models/RequestState";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { useLocale } from "../../providers/AppLocaleProvider";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
   const requestState = usePortfolioQuery();
   const { translate } = useLocale();
+  const wallet = useWallet();
 
   useEffectOnce(
     () => {
-      if (isRequestStateError(requestState)) {
+      if (wallet.status === ConnectionStatus.Idle) {
+        wallet.openConnectWalletModal();
+      } else if (isRequestStateError(requestState)) {
         toast.error(translate("PortfolioScreen.requestState.error"));
       } else if (isRequestStateLoaded(requestState) && !requestState.data) {
         toast.error(translate("PortfolioScreen.requestState.noData"));
