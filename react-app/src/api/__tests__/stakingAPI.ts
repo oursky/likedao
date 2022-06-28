@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { renderHook } from "@testing-library/react-hooks";
-import { convertTokenToMinimalToken } from "../../utils/coin";
+import BigNumber from "bignumber.js";
 import { useStakingAPI } from "../stakingAPI";
 const WALLET_ADDRESS = "like1ewpwcdfgsdfdu0jj2unwhjjl58yshm9xnvr9c2";
 
@@ -66,7 +66,7 @@ describe("useStaking", () => {
       const { result } = renderHook(() => useStakingAPI());
 
       result.current.getUnstakingAmount(WALLET_ADDRESS).then(({ amount }) => {
-        expect(amount).toStrictEqual(convertTokenToMinimalToken(4));
+        expect(amount).toStrictEqual(new BigNumber(4000000000000000000));
       });
     });
   });

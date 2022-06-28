@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import BigNumber from "bignumber.js";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
@@ -31,7 +32,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
       return;
     }
     try {
-      const [balance, stakedBalance, unstakingBalance, profile] =
+      const [availableBalance, stakedBalance, unstakingBalance, profile] =
         await Promise.all([
           cosmosAPI.getBalance(),
           cosmosAPI.getStakedBalance(),
@@ -41,11 +42,13 @@ export function usePortfolioQuery(): PortfolioRequestState {
           ),
         ]);
 
-      const availableBalance = {
-        amount: balance.amount
-          .minus(stakedBalance.amount)
-          .minus(unstakingBalance.amount),
-        denom: balance.denom,
+      const balance = {
+        amount: BigNumber.sum(
+          availableBalance.amount,
+          stakedBalance.amount,
+          unstakingBalance.amount
+        ),
+        denom: availableBalance.denom,
       };
 
       setRequestState(
