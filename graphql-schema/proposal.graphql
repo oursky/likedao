@@ -16,7 +16,7 @@ enum ProposalStatus {
   Invalid
 }
 
-enum ProposalFilter {
+enum ProposalStatusFilter {
   Voting
   Deposit
   Passed
@@ -69,13 +69,27 @@ type ProposalTallyResult {
   outstandingOption: ProposalVoteOption
 }
 
+"""
+Filter by address's role in proposals
+or operator will be used when more than one is* field is specified
+"""
+input ProposalAddressFilter {
+  address: String!
+  isDepositor: Boolean!
+  isVoter: Boolean!
+  isSubmitter: Boolean!
+}
+
 input QueryProposalsInput {
-  # Limit
+  "Number of proposals to show in a page (limit)"
   first: Int!
-  # Offset
+  "Offset"
   after: Int!
-  filter: ProposalFilter
-  followingAddress: String
+  "Filter by proposal status"
+  status: ProposalStatusFilter
+  "filter by address's role in proposals"
+  address: ProposalAddressFilter
+  "filter by proposal title (not implemented)"
   searchTerm: String
 }
 

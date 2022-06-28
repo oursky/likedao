@@ -61,6 +61,7 @@
   "ProposalDetail.votingDateRange": "{from} 至 {to}",
   "ProposalDetail.votingDaysRemaining": "{days} days left",
   "ProposalDetail.votingPeriod": "Voting Period",
+  "ProposalScreen.filters.all": "All",
   "ProposalScreen.filters.deposit": "Deposit",
   "ProposalScreen.filters.following": "Following",
   "ProposalScreen.filters.passed": "Passed",

@@ -36,15 +36,15 @@ func (e *ProposalStatus) UnmarshalGQL(v string) error {
 	return nil
 }
 
-func (e ProposalFilter) ToProposalStatus() ProposalStatus {
+func (e ProposalStatusFilter) ToProposalStatus() ProposalStatus {
 	switch e {
-	case ProposalFilterVoting:
+	case ProposalStatusFilterVoting:
 		return ProposalStatusVotingPeriod
-	case ProposalFilterDeposit:
+	case ProposalStatusFilterDeposit:
 		return ProposalStatusDepositPeriod
-	case ProposalFilterPassed:
+	case ProposalStatusFilterPassed:
 		return ProposalStatusPassed
-	case ProposalFilterRejected:
+	case ProposalStatusFilterRejected:
 		return ProposalStatusRejected
 	default:
 		return ProposalStatusUnspecified

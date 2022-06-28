@@ -149,10 +149,10 @@ func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj
 
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
-	if input.FollowingAddress != nil && *input.FollowingAddress != "" {
-		proposalQuery = proposalQuery.ScopeRelatedAddress(*input.FollowingAddress)
-	} else if input.Filter != nil {
-		proposalQuery = proposalQuery.ScopeProposalStatus((*input.Filter).ToProposalStatus())
+	if input.Address != nil && input.Address.Address != "" {
+		proposalQuery = proposalQuery.ScopeRelatedAddress(input.Address.Address)
+	} else if input.Status != nil {
+		proposalQuery = proposalQuery.ScopeProposalStatus((*input.Status).ToProposalStatus())
 	}
 
 	res, err := proposalQuery.QueryPaginatedProposals(input.First, input.After)
