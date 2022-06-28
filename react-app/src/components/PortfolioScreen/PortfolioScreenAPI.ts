@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
@@ -17,7 +17,14 @@ import { Portfolio } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
 
-export function usePortfolioQuery(): PortfolioRequestState {
+interface UsePortfolioQuery {
+  (): {
+    requestState: PortfolioRequestState;
+    fetch: (address?: string) => Promise<void>;
+  };
+}
+
+export const usePortfolioQuery: UsePortfolioQuery = () => {
   const [requestState, setRequestState] =
     useState<PortfolioRequestState>(RequestStateInitial);
 
@@ -132,7 +139,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
     [isValidAddress, cosmosAPI, staking, distribution, desmosQuery]
   );
 
-  const fetchPortfolio = useCallback(
+  const fetch = useCallback(
     async (address?: string) => {
       setRequestState(RequestStateLoading);
 
@@ -154,11 +161,5 @@ export function usePortfolioQuery(): PortfolioRequestState {
     [fetchAddressPortfolio, fetchWalletPortfolio]
   );
 
-  useEffect(() => {
-    fetchPortfolio().catch((err) => {
-      setRequestState(RequestStateError(err));
-    });
-  }, [fetchPortfolio]);
-
-  return requestState;
-}
+  return { requestState, fetch };
+};

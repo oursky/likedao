@@ -30,6 +30,10 @@ const AppRouter: React.FC = () => {
             element={<ProposalDetailScreen />}
           />
           <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
+          <Route
+            path={AppRoutes.OtherPortfolio}
+            element={<PortfolioScreen />}
+          />
         </Route>
 
         <Route
