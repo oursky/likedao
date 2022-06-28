@@ -101,7 +101,8 @@ const ProposalScreen: React.FC = () => {
     if (tab) {
       setSelectedTab(tab.value);
     }
-  }, [fetch, handleSelectTab, searchParams, tabItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (RequestState.isRequestStateError(requestState)) {
