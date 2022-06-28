@@ -14,6 +14,8 @@ interface IDistributionAPI {
   getTotalDelegationRewards(): Promise<BigNumberCoin>;
   getTotalDelegationRewards(): Promise<BigNumberCoin>;
   getTotalCommission(): Promise<BigNumberCoin>;
+  getAddressTotalDelegationRewards(address: string): Promise<BigNumberCoin>;
+  getAddressTotalCommission(address: string): Promise<BigNumberCoin>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -112,16 +114,72 @@ export const useDistributionAPI = (): IDistributionAPI => {
     };
   }, [wallet, query]);
 
+  const getAddressTotalDelegationRewards = useCallback(
+    async (address: string) => {
+      const rewards = await query.distribution.delegationTotalRewards(address);
+
+      const totalRewards = rewards.total.find(
+        (r) => r.denom === CoinMinimalDenom
+      );
+
+      // Default cosmos decimal places is 18
+      const rewardAmount = new BigNumber(totalRewards?.amount ?? 0).shiftedBy(
+        -18
+      );
+
+      return {
+        denom: CoinDenom,
+        amount: convertMinimalTokenToToken(rewardAmount),
+      };
+    },
+    [query]
+  );
+
+  const getAddressTotalCommission = useCallback(
+    async (address: string) => {
+      const translatedAddress = translateAddress(address, Bech32PrefixValAddr);
+
+      const commission = (
+        await query.distribution.validatorCommission(translatedAddress)
+      ).commission;
+
+      if (!commission) {
+        return {
+          denom: CoinDenom,
+          amount: convertMinimalTokenToToken(0),
+        };
+      }
+
+      const totalCommission = commission.commission.find(
+        (r) => r.denom === CoinMinimalDenom
+      );
+      // Default cosmos decimal places is 18
+      const commissionAmount = new BigNumber(
+        totalCommission?.amount ?? 0
+      ).shiftedBy(-18);
+
+      return {
+        denom: CoinDenom,
+        amount: convertMinimalTokenToToken(commissionAmount),
+      };
+    },
+    [query]
+  );
+
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
       getTotalDelegationRewards,
       getTotalCommission,
+      getAddressTotalDelegationRewards,
+      getAddressTotalCommission,
     }),
     [
       signWithdrawDelegationRewardsTx,
       getTotalDelegationRewards,
       getTotalCommission,
+      getAddressTotalDelegationRewards,
+      getAddressTotalCommission,
     ]
   );
 };
