@@ -19,6 +19,7 @@ const PortfolioScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const { requestState, fetch } = usePortfolioQuery();
+
   const { translate } = useLocale();
   const wallet = useWallet();
 
@@ -34,8 +35,6 @@ const PortfolioScreen: React.FC = () => {
         } else {
           toast.error(translate("PortfolioScreen.requestState.error"));
         }
-      } else if (isRequestStateLoaded(requestState) && !requestState.data) {
-        toast.error(translate("PortfolioScreen.requestState.noData"));
       }
     },
     () =>
@@ -55,14 +54,11 @@ const PortfolioScreen: React.FC = () => {
     );
   }
 
-  if (!requestState.data) return null;
+  const { portfolio } = requestState.data;
 
   return (
     <div className={cn("flex", "flex-col")}>
-      <PortfolioPanel
-        portfolio={requestState.data}
-        isYourPortfolio={isYourPortfolio}
-      />
+      <PortfolioPanel portfolio={portfolio} isYourPortfolio={isYourPortfolio} />
     </div>
   );
 };
