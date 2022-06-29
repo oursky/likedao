@@ -11,6 +11,8 @@ import (
 type IValidatorQuery interface {
 	WithProposalVotes(proposalID int) IValidatorQuery
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
+	QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error)
+	QueryValidatorsBySelfDelegationAddresses(addresses []string) ([]*models.Validator, error)
 }
 
 type ValidatorQuery struct {
@@ -83,4 +85,64 @@ func (q *ValidatorQuery) QueryPaginatedValidators(first int, after int, includeA
 			TotalCount:  totalCount,
 		},
 	}, nil
+}
+
+func (q *ValidatorQuery) QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error) {
+	if len(addresses) == 0 {
+		return []*models.Validator{}, nil
+	}
+
+	var validators []models.Validator
+	err := q.NewQuery(&validators, []string{}).Where("validator.consensus_address IN (?)", bun.In(addresses)).Scan(q.ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	result := make([]*models.Validator, 0, len(validators))
+	addressToValidator := make(map[string]models.Validator, len(validators))
+	for _, validator := range validators {
+		addressToValidator[validator.ConsensusAddress] = validator
+	}
+
+	for _, address := range addresses {
+		validator, exists := addressToValidator[address]
+		if exists {
+			result = append(result, &validator)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+
+}
+
+func (q *ValidatorQuery) QueryValidatorsBySelfDelegationAddresses(addresses []string) ([]*models.Validator, error) {
+	if len(addresses) == 0 {
+		return []*models.Validator{}, nil
+	}
+
+	var validators []models.Validator
+	err := q.NewQuery(&validators, []string{}).Where("info.self_delegate_address IN (?)", bun.In(addresses)).Scan(q.ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	result := make([]*models.Validator, 0, len(validators))
+	addressToValidator := make(map[string]models.Validator, len(validators))
+	for _, validator := range validators {
+		addressToValidator[validator.Info.SelfDelegateAddress] = validator
+	}
+
+	for _, address := range addresses {
+		validator, exists := addressToValidator[address]
+		if exists {
+			result = append(result, &validator)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+
 }
