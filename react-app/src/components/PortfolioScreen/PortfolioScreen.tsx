@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,6 +21,8 @@ const PortfolioScreen: React.FC = () => {
   const { requestState, fetch } = usePortfolioQuery();
   const { translate } = useLocale();
   const wallet = useWallet();
+
+  const isYourPortfolio = useMemo(() => !address, [address]);
 
   useEffectOnce(
     () => {
@@ -57,7 +59,10 @@ const PortfolioScreen: React.FC = () => {
 
   return (
     <div className={cn("flex", "flex-col")}>
-      <PortfolioPanel portfolio={requestState.data} />
+      <PortfolioPanel
+        portfolio={requestState.data}
+        isYourPortfolio={isYourPortfolio}
+      />
     </div>
   );
 };

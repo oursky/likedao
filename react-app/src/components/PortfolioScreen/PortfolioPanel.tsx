@@ -16,6 +16,7 @@ import { Portfolio } from "./PortfolioScreenModel";
 
 interface PortfolioPanelProps {
   portfolio: Portfolio;
+  isYourPortfolio: boolean;
 }
 
 const ProfilePicture: React.FC<{
@@ -87,7 +88,10 @@ const CoinsAmountField: React.FC<{
   );
 };
 
-const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
+const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
+  portfolio,
+  isYourPortfolio,
+}) => {
   const { translate } = useLocale();
 
   const onAddressCopied = useCallback(() => {
@@ -99,7 +103,7 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
       <div className={cn("flex")}>
         <Icon
           className={cn("fill-likecoin-black", "mr-3")}
-          icon={IconType.PieChart}
+          icon={isYourPortfolio ? IconType.PieChart : IconType.Account}
           height={20}
           width={20}
         />
@@ -111,7 +115,13 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({ portfolio }) => {
             "text-likecoin-black"
           )}
         >
-          <LocalizedText messageID="PortfolioScreen.yourPortfolio" />
+          <LocalizedText
+            messageID={
+              isYourPortfolio
+                ? "PortfolioScreen.yourPortfolio"
+                : "PortfolioScreen.account"
+            }
+          />
         </h2>
       </div>
       <div className={cn("mt-11", "mb-6", "sm:flex")}>
