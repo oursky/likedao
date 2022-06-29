@@ -1,15 +1,15 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import CreateProposalScreen from "../components/CreateProposalScreen/CreateProposalScreen";
 import DummyScreen from "../components/DummyScreen/DummyScreen";
 import ErrorView, { ErrorType } from "../components/ErrorView/ErrorView";
 import OverviewScreen from "../components/OverviewScreen/OverviewScreen";
 import PortfolioScreen from "../components/PortfolioScreen/PortfolioScreen";
-import ProposalDetailScreen from "../components/ProposalDetailScreen/ProposalDetailScreen";
 import ProposalScreen from "../components/ProposalScreen/ProposalScreen";
 import WalletConnectingScreen from "../components/WalletConnectingScreen/WalletConnectingScreen";
 import { useWallet, ConnectionStatus } from "../providers/WalletProvider";
 import AppScaffold from "../components/AppScaffold/AppScaffold";
+import ProposalDetailRouter from "../components/ProposalDetailScreen/ProposalDetailRouter";
 import AppRoutes from "./AppRoutes";
 
 const AppRouter: React.FC = () => {
@@ -26,8 +26,8 @@ const AppRouter: React.FC = () => {
             element={<CreateProposalScreen />}
           />
           <Route
-            path={AppRoutes.ProposalDetail}
-            element={<ProposalDetailScreen />}
+            path={`${AppRoutes.ProposalDetail}/*`}
+            element={<ProposalDetailRouter />}
           />
           <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
           <Route
@@ -40,7 +40,7 @@ const AppRouter: React.FC = () => {
           path={AppRoutes.ErrorInvalidAddress}
           element={<ErrorView type={ErrorType.InvalidAddress} />}
         />
-        <Route path="*" element={<ErrorView type={ErrorType.NotFound} />} />
+        <Route path="*" element={<Navigate to={AppRoutes.NotFound} />} />
       </Routes>
 
       {wallet.status === ConnectionStatus.Connecting && (
