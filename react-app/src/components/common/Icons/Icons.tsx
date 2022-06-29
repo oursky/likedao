@@ -25,6 +25,8 @@ import { ReactComponent as LikeCoinIcon } from "../../../assets/ic-likecoin.svg"
 import { ReactComponent as InfoIcon } from "../../../assets/ic-info.svg";
 import { ReactComponent as ChevronUpIcon } from "../../../assets/ic-chevron-up.svg";
 import { ReactComponent as ChevronDownIcon } from "../../../assets/ic-chevron-down.svg";
+import { ReactComponent as SafeIcon } from "../../../assets/ic-safe.svg";
+import { ReactComponent as CommentsQAIcon } from "../../../assets/ic-commentsqa.svg";
 
 enum IconType {
   Home = "Home",
@@ -53,6 +55,8 @@ enum IconType {
   Info = "Info",
   ChevronUp = "ChevronUp",
   ChevronDown = "ChevronDown",
+  Safe = "SafeIcon",
+  CommentsQA = "CommentsQAIcon",
 }
 
 const iconMap = {
@@ -82,6 +86,8 @@ const iconMap = {
   [IconType.Info]: InfoIcon,
   [IconType.ChevronDown]: ChevronDownIcon,
   [IconType.ChevronUp]: ChevronUpIcon,
+  [IconType.Safe]: SafeIcon,
+  [IconType.CommentsQA]: CommentsQAIcon,
 };
 
 function getIcon(icon: IconType) {
