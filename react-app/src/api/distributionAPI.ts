@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
+import { QueryDelegationRewardsResponse } from "cosmjs-types/cosmos/distribution/v1beta1/query";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import { newWithdrawDelegatorRewardMessage } from "../models/cosmos/distribution";
@@ -16,6 +17,10 @@ interface IDistributionAPI {
   getTotalCommission(): Promise<BigNumberCoin>;
   getAddressTotalDelegationRewards(address: string): Promise<BigNumberCoin>;
   getAddressTotalCommission(address: string): Promise<BigNumberCoin>;
+  getDelegationRewardsByValidators(
+    delegatorAddress: string,
+    validatorAddresses: string[]
+  ): Promise<BigNumberCoin[]>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -80,6 +85,34 @@ export const useDistributionAPI = (): IDistributionAPI => {
       amount: convertMinimalTokenToToken(rewardAmount),
     };
   }, [wallet, query]);
+
+  const getDelegationRewardsByValidators = useCallback(
+    async (delegatorAddress: string, validatorAddresses: string[]) => {
+      const rewardPromises: Promise<QueryDelegationRewardsResponse>[] = [];
+
+      validatorAddresses.forEach((validatorAddress) =>
+        rewardPromises.push(
+          query.distribution.delegationRewards(
+            delegatorAddress,
+            validatorAddress
+          )
+        )
+      );
+      const rewards = await Promise.all(rewardPromises);
+      return rewards.map((rewardRespond) => {
+        const reward = rewardRespond.rewards.find(
+          (r) => r.denom === CoinMinimalDenom
+        );
+        // Default cosmos decimal places is 18
+        const rewardAmount = new BigNumber(reward?.amount ?? 0).shiftedBy(-18);
+        return {
+          denom: CoinDenom,
+          amount: convertMinimalTokenToToken(rewardAmount),
+        };
+      });
+    },
+    [query]
+  );
 
   const getTotalCommission = useCallback(async () => {
     if (wallet.status !== ConnectionStatus.Connected) {
@@ -173,6 +206,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getTotalCommission,
       getAddressTotalDelegationRewards,
       getAddressTotalCommission,
+      getDelegationRewardsByValidators,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -180,6 +214,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getTotalCommission,
       getAddressTotalDelegationRewards,
       getAddressTotalCommission,
+      getDelegationRewardsByValidators,
     ]
   );
 };
