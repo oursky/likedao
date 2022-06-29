@@ -21,6 +21,7 @@ import { convertMinimalTokenToToken } from "../../utils/coin";
 import { getReactionType } from "../reactions/ReactionModel";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import Config from "../../config/Config";
 import {
   PaginatedProposalVotes,
   PaginatedProposalDeposits,
@@ -60,6 +61,9 @@ const getVoterOrDepositorAddress = (
 
   return null;
 };
+
+const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
+const CoinDenom = Config.chainInfo.currency.coinDenom;
 
 export enum ProposalVoteSortableColumn {
   Voter = "voter",
@@ -207,13 +211,44 @@ export const useProposalVotesQuery: UseProposalVotesQuery = (
   };
 };
 
+export enum ProposalDepositSortableColumn {
+  Depositor = "depositor",
+  Amount = "amount",
+}
+
+function getProposalDepositSortOrderVariable(
+  order: {
+    id: ProposalDepositSortableColumn;
+    direction: "asc" | "desc";
+  } | null
+): ProposalDepositSort {
+  if (!order) {
+    return {};
+  }
+  switch (order.id) {
+    case ProposalDepositSortableColumn.Depositor:
+      return {
+        depositor: order.direction === "asc" ? Sort.Asc : Sort.Desc,
+      };
+    case ProposalDepositSortableColumn.Amount:
+      return {
+        amount: order.direction === "asc" ? Sort.Asc : Sort.Desc,
+      };
+    default:
+      return {};
+  }
+}
+
 interface UseProposalDepositsQuery {
   (proposalId: string, initialOffset: number, pageSize: number): {
     requestState: RequestState<PaginatedProposalDeposits>;
     fetch: (variables: {
       first: number;
       after: number;
-      order: ProposalDepositSort;
+      order: {
+        id: ProposalDepositSortableColumn;
+        direction: "asc" | "desc";
+      } | null;
     }) => Promise<void>;
   };
 }
@@ -251,7 +286,10 @@ export const useProposalDepositsQuery: UseProposalDepositsQuery = (
     }: {
       first: number;
       after: number;
-      order: ProposalDepositSort;
+      order: {
+        id: ProposalDepositSortableColumn;
+        direction: "asc" | "desc";
+      } | null;
     }) => {
       let delegatedValidators: string[] = [];
 
@@ -277,7 +315,7 @@ export const useProposalDepositsQuery: UseProposalDepositsQuery = (
           input: {
             first,
             after,
-            order,
+            order: getProposalDepositSortOrderVariable(order),
             pinnedValidators: delegatedValidators,
           },
         },
@@ -292,7 +330,20 @@ export const useProposalDepositsQuery: UseProposalDepositsQuery = (
       PaginatedProposalDeposits
     >(requestState, (r) => {
       const allDeposits =
-        r.proposalByID?.deposits.edges.map((v) => v.node) ?? [];
+        r.proposalByID?.deposits.edges.map((v) => {
+          const deposit = v.node.amount.find(
+            (c) => c.denom === CoinMinimalDenom
+          );
+
+          return {
+            ...v.node,
+            amount: {
+              denom: CoinDenom,
+              amount: convertMinimalTokenToToken(deposit?.amount ?? 0),
+            },
+          };
+        }) ?? [];
+
       const [pinnedDeposits, deposits] = allDeposits.reduce<
         [ProposalDeposit[], ProposalDeposit[]]
       >(
@@ -301,9 +352,10 @@ export const useProposalDepositsQuery: UseProposalDepositsQuery = (
             curr.depositor != null
               ? getVoterOrDepositorAddress(curr.depositor)
               : null;
-          if (!address) return acc;
 
-          acc[delegatedValidators.includes(address) ? 0 : 1].push(curr);
+          acc[address && delegatedValidators.includes(address) ? 0 : 1].push(
+            curr
+          );
           return acc;
         },
         [[], []]

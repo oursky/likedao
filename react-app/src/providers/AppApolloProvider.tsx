@@ -26,6 +26,7 @@ import { useLocale } from "./AppLocaleProvider";
 const typePolicies = {};
 const possibleTypes: PossibleTypesMap = {
   ProposalVoter: ["Validator", "StringObject"],
+  ProposalDepositor: ["Validator", "StringObject"],
 };
 const scalars: Record<string, GraphQLScalarType> = {
   BigInt: new GraphQLScalarType({

@@ -5,6 +5,7 @@ import {
   ProposalDetailProposalVoteVoterFragment as ProposalVoteVoterFragment,
   ProposalDetailProposalDepositDepositorFragment as ProposalDepositDepositorFragment,
 } from "../../generated/graphql";
+import { BigNumberCoin } from "../../models/coin";
 import { ReactionType } from "../reactions/ReactionModel";
 
 export interface ReactionItem {
@@ -42,7 +43,10 @@ export interface Proposal
 export type ProposalVoteVoter = ProposalVoteVoterFragment;
 export type ProposalDepositDepositor = ProposalDepositDepositorFragment;
 export type ProposalVote = ProposalVoteFragment;
-export type ProposalDeposit = ProposalDepositFragment;
+export interface ProposalDeposit
+  extends Omit<ProposalDepositFragment, "amount"> {
+  amount: BigNumberCoin;
+}
 export interface PaginatedProposalVotes {
   pinnedVotes: ProposalVoteFragment[];
   votes: ProposalVoteFragment[];
@@ -50,7 +54,7 @@ export interface PaginatedProposalVotes {
 }
 
 export interface PaginatedProposalDeposits {
-  pinnedDeposits: ProposalDepositFragment[];
-  deposits: ProposalDepositFragment[];
+  pinnedDeposits: ProposalDeposit[];
+  deposits: ProposalDeposit[];
   totalCount: number;
 }
