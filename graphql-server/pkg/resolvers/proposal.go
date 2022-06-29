@@ -183,6 +183,97 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 	return &conn, nil
 }
 
+func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, input models.QueryProposalDepositsInput) (*models.Connection[models.ProposalDeposit], error) {
+	result := make([]models.ProposalDeposit, 0)
+
+	validatorLimit := input.First
+	validatorOffset := input.After
+	// No need validators if no delegation or already went through all the validators
+	if len(input.PinnedValidators) == 0 || input.After > len(input.PinnedValidators) {
+		validatorLimit = 0
+		validatorOffset = 0
+	}
+
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
+	}
+
+	// Add validators to result
+	for i := range validators.Items {
+		validator := validators.Items[i]
+		if validator.Info != nil && len(validator.Info.ProposalDeposits) != 0 {
+			result = append(result, *validator.Info.ProposalDeposits[0])
+		} else {
+			result = append(result, models.ProposalDeposit{
+				ProposalID:       obj.ID,
+				DepositorAddress: validator.Info.SelfDelegateAddress,
+				Amount:           nil,
+				Height:           validator.Info.Height,
+
+				ValidatorInfo: validator.Info,
+			})
+		}
+	}
+
+	depositLimit := input.First
+	// Get the remaining vote items if the number of validators are fewer than the pageSize
+	if len(validators.Items) < input.First {
+		depositLimit = input.First - len(validators.Items)
+	}
+
+	// Skip votes if we already have enough items for a page
+	if len(validators.Items) == input.First {
+		depositLimit = 0
+	}
+
+	// Start offsetting the votes if we are done with the validators
+	depositOffset := input.After
+	if len(input.PinnedValidators) != 0 {
+		depositOffset -= validators.PaginationInfo.TotalCount
+	}
+	if depositOffset < 0 {
+		depositOffset = 0
+	}
+
+	deposits, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryPaginatedProposalDeposits(obj.ID, depositLimit, depositOffset, input.Order, input.PinnedValidators)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal votes: %v", err))
+	}
+
+	// Add votes to result
+	for i := range deposits.Items {
+		deposit := deposits.Items[i]
+		result = append(result, deposit)
+	}
+
+	depositWithValidatorCursorMap := make(map[string]string)
+	for index, identity := range result {
+		cursorString := strconv.Itoa(input.After + index + 1)
+		depositWithValidatorCursorMap[identity.NodeID().String()] = cursorString
+
+	}
+
+	conn := models.NewConnection(result, func(model models.ProposalDeposit) string {
+		return depositWithValidatorCursorMap[model.NodeID().String()]
+	})
+
+	totalCount := deposits.PaginationInfo.TotalCount
+	hasNextPage := deposits.PaginationInfo.HasNext
+	hasPreviousPage := deposits.PaginationInfo.HasPrevious
+	if validatorLimit != 0 {
+		totalCount = totalCount + validators.PaginationInfo.TotalCount
+		hasNextPage = validators.PaginationInfo.HasNext
+		hasPreviousPage = validators.PaginationInfo.HasPrevious
+	}
+
+	conn.TotalCount = totalCount
+	conn.PageInfo.HasNextPage = hasNextPage
+	conn.PageInfo.HasPreviousPage = hasPreviousPage
+
+	return &conn, nil
+}
+
 func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.ProposalDeposit) (models.ProposalDepositor, error) {
 	// Deposit is from a validator
 	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoBySelfDelegationAddress(obj.DepositorAddress)
