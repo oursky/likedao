@@ -13,6 +13,7 @@ import {
   ProposalDetailDepositsPanelQueryQuery,
   ProposalDetailDepositsPanelQueryQueryVariables,
   ProposalDepositSort,
+  Sort,
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
@@ -60,13 +61,44 @@ const getVoterOrDepositorAddress = (
   return null;
 };
 
+export enum ProposalVoteSortableColumn {
+  Voter = "voter",
+  Option = "option",
+}
+
+function getProposalVoteSortOrderVariable(
+  order: {
+    id: ProposalVoteSortableColumn;
+    direction: "asc" | "desc";
+  } | null
+): ProposalVoteSort {
+  if (!order) {
+    return {};
+  }
+  switch (order.id) {
+    case ProposalVoteSortableColumn.Voter:
+      return {
+        voter: order.direction === "asc" ? Sort.Asc : Sort.Desc,
+      };
+    case ProposalVoteSortableColumn.Option:
+      return {
+        option: order.direction === "asc" ? Sort.Asc : Sort.Desc,
+      };
+    default:
+      return {};
+  }
+}
+
 interface UseProposalVotesQuery {
   (proposalId: string, initialOffset: number, pageSize: number): {
     requestState: RequestState<PaginatedProposalVotes>;
     fetch: (variables: {
       first: number;
       after: number;
-      order: ProposalVoteSort;
+      order: {
+        id: ProposalVoteSortableColumn;
+        direction: "asc" | "desc";
+      } | null;
     }) => Promise<void>;
   };
 }
@@ -105,7 +137,10 @@ export const useProposalVotesQuery: UseProposalVotesQuery = (
     }: {
       first: number;
       after: number;
-      order: ProposalVoteSort;
+      order: {
+        id: ProposalVoteSortableColumn;
+        direction: "asc" | "desc";
+      } | null;
     }) => {
       let delegatedValidators: string[] = [];
 
@@ -130,8 +165,8 @@ export const useProposalVotesQuery: UseProposalVotesQuery = (
           input: {
             first,
             after,
-            order,
             pinnedValidators: delegatedValidators,
+            order: getProposalVoteSortOrderVariable(order),
           },
         },
       });

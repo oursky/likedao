@@ -17,7 +17,10 @@ import {
   ProposalVote,
   ProposalVoteVoter,
 } from "./ProposalDetailScreenModel";
-import { useProposalVotesQuery } from "./ProposalDetailScreenAPI";
+import {
+  ProposalVoteSortableColumn,
+  useProposalVotesQuery,
+} from "./ProposalDetailScreenAPI";
 
 const PROPOSAL_VOTE_PAGE_SIZE = 5;
 
@@ -149,10 +152,22 @@ const ProposalVotesPanel: React.FC = () => {
   const { translate } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentOffset = useMemo(() => {
+  const [currentOffset, sortOrder] = useMemo(() => {
     const page = searchParams.get("page") ?? "1";
+    const sortBy = searchParams.get("sortBy");
+    const sortDirection = searchParams.get("sortDirection");
 
-    return (parseInt(page, 10) - 1) * PROPOSAL_VOTE_PAGE_SIZE;
+    const sortOrder =
+      sortBy && sortDirection
+        ? {
+            id: sortBy as ProposalVoteSortableColumn,
+            direction: sortDirection as SectionedTable.ColumnOrder["direction"],
+          }
+        : undefined;
+
+    const offset = (parseInt(page, 10) - 1) * PROPOSAL_VOTE_PAGE_SIZE;
+
+    return [offset, sortOrder];
   }, [searchParams]);
 
   const { fetch, requestState } = useProposalVotesQuery(
@@ -165,6 +180,16 @@ const ProposalVotesPanel: React.FC = () => {
     (after: number) => {
       setSearchParams({
         page: `${Math.floor(after / PROPOSAL_VOTE_PAGE_SIZE) + 1}`,
+      });
+    },
+    [setSearchParams]
+  );
+
+  const setSortOrder = useCallback(
+    (order: SectionedTable.ColumnOrder) => {
+      setSearchParams({
+        sortBy: order.id,
+        sortDirection: order.direction,
       });
     },
     [setSearchParams]
@@ -202,9 +227,14 @@ const ProposalVotesPanel: React.FC = () => {
     fetch({
       first: PROPOSAL_VOTE_PAGE_SIZE,
       after: currentOffset,
-      order: {},
+      order: sortOrder
+        ? {
+            id: sortOrder.id,
+            direction: sortOrder.direction,
+          }
+        : null,
     });
-  }, [fetch, currentOffset]);
+  }, [fetch, currentOffset, sortOrder]);
 
   useEffect(() => {
     if (isRequestStateError(requestState)) {
@@ -219,16 +249,18 @@ const ProposalVotesPanel: React.FC = () => {
         sections={tableSections}
         isLoading={!isRequestStateLoaded(requestState)}
         emptyMessageID="ProposalDetail.votes.empty"
+        sortOrder={sortOrder}
+        onSort={setSortOrder}
       >
         <SectionedTable.Column<ProposalVote>
-          id="voter"
+          id={ProposalVoteSortableColumn.Voter}
           titleId="ProposalDetail.votes.voter"
           sortable={true}
         >
           {(item) => <ProposalVoter voter={item.voter} />}
         </SectionedTable.Column>
         <SectionedTable.Column<ProposalVote>
-          id="option"
+          id={ProposalVoteSortableColumn.Option}
           titleId="ProposalDetail.votes.option"
           sortable={true}
         >
