@@ -13,6 +13,7 @@ import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import AppRoutes from "../../navigation/AppRoutes";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
+import StakesPanel from "./StakesPanel";
 
 const PortfolioScreen: React.FC = () => {
   const { address } = useParams();
@@ -54,11 +55,12 @@ const PortfolioScreen: React.FC = () => {
     );
   }
 
-  const { portfolio } = requestState.data;
+  const { portfolio, stakes } = requestState.data;
 
   return (
     <div className={cn("flex", "flex-col")}>
       <PortfolioPanel portfolio={portfolio} isYourPortfolio={isYourPortfolio} />
+      <StakesPanel stakes={stakes} isYourPortfolio={isYourPortfolio} />
     </div>
   );
 };

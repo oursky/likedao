@@ -3,7 +3,7 @@ import BigNumber from "bignumber.js";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { translateAddress, truncateAddress } from "../../utils/address";
+import { translateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
   RequestState,
