@@ -101,6 +101,25 @@ type ProposalVoteConnection {
   totalCount: Int!
 }
 
+union ProposalDepositor = StringObject | Validator
+type ProposalDeposit implements Node {
+  id: ID!
+  proposalId: Int!
+  depositor: ProposalDepositor
+  amount: [Coin!]!
+}
+
+type ProposalDepositEdge {
+  cursor: String!
+  node: ProposalDeposit!
+}
+
+type ProposalDepositConnection {
+  pageInfo: PageInfo!
+  edges: [ProposalDepositEdge!]!
+  totalCount: Int!
+}
+
 input QueryProposalsInput {
   "Number of proposals to show in a page (limit)"
   first: Int!

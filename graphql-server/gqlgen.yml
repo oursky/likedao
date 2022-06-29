@@ -101,6 +101,15 @@ models:
     model: github.com/oursky/likedao/pkg/models.ProposalVoteEdge
   ProposalVoteConnection:
     model: github.com/oursky/likedao/pkg/models.ProposalVoteConnection
+  ProposalDeposit:
+    model: github.com/oursky/likedao/pkg/models.ProposalDeposit
+    fields:
+      id:
+        fieldName: NodeID
+  ProposalDepositEdge:
+    model: github.com/oursky/likedao/pkg/models.ProposalDepositEdge
+  ProposalDepositConnection:
+    model: github.com/oursky/likedao/pkg/models.ProposalDepositConnection
 
   Reaction:
     model: github.com/oursky/likedao/pkg/models.Reaction

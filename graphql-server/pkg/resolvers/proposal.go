@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/forbole/bdjuno/database/types"
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	"github.com/oursky/likedao/pkg/dataloaders"
 	servererrors "github.com/oursky/likedao/pkg/errors"
@@ -182,6 +183,42 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 	return &conn, nil
 }
 
+func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.ProposalDeposit) (models.ProposalDepositor, error) {
+	// Deposit is from a validator
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoBySelfDelegationAddress(obj.DepositorAddress)
+	if err == nil && validator != nil {
+		return validator, nil
+	}
+
+	// Deposit is from a depositor
+	if obj.DepositorAddress != "" {
+		return models.StringObject{
+			Value: obj.DepositorAddress,
+		}, nil
+	}
+
+	// Deposit is initial deposit by the proposer
+	proposal, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.Load(strconv.Itoa(obj.ProposalID))
+	if err == nil && proposal != nil && proposal.ProposerAddress != "" {
+		return models.StringObject{
+			Value: proposal.ProposerAddress,
+		}, nil
+	}
+
+	return nil, nil
+}
+
+func (r *proposalDepositResolver) Amount(ctx context.Context, obj *models.ProposalDeposit) ([]types.DbDecCoin, error) {
+	coins := make([]types.DbDecCoin, 0, len(obj.Amount))
+	for _, coin := range obj.Amount {
+		coins = append(coins, types.DbDecCoin{
+			Denom:  coin.Denom,
+			Amount: coin.Amount,
+		})
+	}
+	return coins, nil
+}
+
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
 	if obj.Yes == nil {
 		return 0, nil
@@ -300,6 +337,11 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 // Proposal returns graphql1.ProposalResolver implementation.
 func (r *Resolver) Proposal() graphql1.ProposalResolver { return &proposalResolver{r} }
 
+// ProposalDeposit returns graphql1.ProposalDepositResolver implementation.
+func (r *Resolver) ProposalDeposit() graphql1.ProposalDepositResolver {
+	return &proposalDepositResolver{r}
+}
+
 // ProposalTallyResult returns graphql1.ProposalTallyResultResolver implementation.
 func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 	return &proposalTallyResultResolver{r}
@@ -309,5 +351,6 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 func (r *Resolver) ProposalVote() graphql1.ProposalVoteResolver { return &proposalVoteResolver{r} }
 
 type proposalResolver struct{ *Resolver }
+type proposalDepositResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
 type proposalVoteResolver struct{ *Resolver }

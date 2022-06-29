@@ -18,6 +18,8 @@ func GetNodeID(obj interface{}) NodeID {
 		return NodeID{EntityType: "reaction", ID: v.ID}
 	case ProposalVote:
 		return NodeID{EntityType: "proposalVote", ID: v.ID().String()}
+	case ProposalDeposit:
+		return NodeID{EntityType: "proposalDeposit", ID: v.ID().String()}
 	case Validator:
 		return NodeID{EntityType: "validator", ID: v.ConsensusAddress}
 	default:
