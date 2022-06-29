@@ -2,6 +2,7 @@ import React from "react";
 import { useRoutes, Navigate } from "react-router-dom";
 import AppRoutes from "../../navigation/AppRoutes";
 import ProposalDetailScreen from "./ProposalDetailScreen";
+import { ProposalVotesPanel } from "./ProposalVotesPanel";
 
 export enum ProposalDetailPanelTab {
   Votes = "votes",
@@ -15,8 +16,12 @@ const ProposalDetailRouter: React.FC = () => {
       element: <ProposalDetailScreen />,
       children: [
         {
+          path: "/",
+          element: <ProposalVotesPanel />,
+        },
+        {
           path: ProposalDetailPanelTab.Votes,
-          element: <div>votes</div>,
+          element: <ProposalVotesPanel />,
         },
         {
           path: ProposalDetailPanelTab.Deposits,
