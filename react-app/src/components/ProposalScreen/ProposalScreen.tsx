@@ -8,7 +8,7 @@ import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
 import * as RequestState from "../../models/RequestState";
 import PageContoller from "../common/PageController/PageController";
-import FilterTabs, { IFilterTabItem } from "../FilterTabs/FilterTabs";
+import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { useProposalsQuery, FilterKey } from "./ProposalScreenAPI";
