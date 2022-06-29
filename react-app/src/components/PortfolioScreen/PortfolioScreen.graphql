@@ -1,7 +1,9 @@
 query PortfolioScreenQuery(
   $first: Int!
   $after: Int!
-  $addressFilter: ProposalAddressFilter
+  $isVoter: Boolean!
+  $isSubmitter: Boolean!
+  $isDepositor: Boolean!
   $address: String!
   $searchTerm: String
 ) {
@@ -12,7 +14,12 @@ query PortfolioScreenQuery(
     input: {
       first: $first
       after: $after
-      address: $addressFilter
+      address: {
+        address: $address
+        isVoter: $isVoter
+        isSubmitter: $isSubmitter
+        isDepositor: $isDepositor
+      }
       searchTerm: $searchTerm
     }
   ) {

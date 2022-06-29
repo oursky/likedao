@@ -21,12 +21,51 @@ import {
   RequestStateLoading,
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
+import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
 import PortfolioScreenModel, {
   Portfolio,
   PortfolioScreenGraphql,
 } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
+
+interface ProposalHistoryFilter {
+  address: string;
+  isVoter: boolean;
+  isSubmitter: boolean;
+  isDepositor: boolean;
+}
+
+function getFilterVariables(
+  tab: ProposalHistoryFilterKey,
+  address: string
+): ProposalHistoryFilter {
+  switch (tab) {
+    case "voted":
+      return {
+        address: address,
+        isVoter: true,
+        isSubmitter: false,
+        isDepositor: false,
+      };
+    case "submitted":
+      return {
+        address: address,
+        isVoter: false,
+        isSubmitter: true,
+        isDepositor: false,
+      };
+    case "deposited":
+      return {
+        address: address,
+        isVoter: false,
+        isSubmitter: false,
+        isDepositor: true,
+      };
+    default:
+      throw new Error(`Unknown filter state`);
+  }
+}
 
 interface UsePortfolioQuery {
   (): {
@@ -36,19 +75,26 @@ interface UsePortfolioQuery {
 }
 
 interface UsePortfolioScreenGraphqlQuery {
-  (initialOffset: number, pageSize: number): {
+  (): {
     requestState: RequestState<PortfolioScreenGraphql>;
     fetch: (variables: PortfolioScreenQueryQueryVariables) => void;
   };
 }
 
 interface UsePortfolioScreenQuery {
-  (initialOffset: number, pageSize: number, address?: string): {
+  (): {
     requestState: RequestState<PortfolioScreenModel>;
-    fetch: (
-      variables: PortfolioScreenQueryQueryVariables,
-      address?: string
-    ) => void;
+    fetch: ({
+      first,
+      after,
+      tab,
+      address,
+    }: {
+      first: number;
+      after: number;
+      tab: ProposalHistoryFilterKey;
+      address: string;
+    }) => void;
   };
 }
 
@@ -192,56 +238,36 @@ export const usePortfolioQuery: UsePortfolioQuery = () => {
   return { requestState, fetch };
 };
 
-export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery = (
-  initialOffset,
-  pageSize
-) => {
-  const [fetch, { requestState }] = useLazyGraphQLQuery<
-    PortfolioScreenQueryQuery,
-    PortfolioScreenQueryQueryVariables
-  >(PortfolioScreenQuery, {
-    variables: {
-      after: initialOffset,
-      first: pageSize,
-      address: "",
-    },
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-  });
+export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery =
+  () => {
+    const [fetch, { requestState }] = useLazyGraphQLQuery<
+      PortfolioScreenQueryQuery,
+      PortfolioScreenQueryQueryVariables
+    >(PortfolioScreenQuery, {
+      fetchPolicy: "cache-and-network",
+      nextFetchPolicy: "cache-first",
+    });
 
-  const callFetch = useCallback(
-    (variables: PortfolioScreenQueryQueryVariables) => {
-      // Errors are handled by the requestState
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetch({
-        variables,
-      });
-    },
-    [fetch]
-  );
+    const callFetch = useCallback(
+      (variables: PortfolioScreenQueryQueryVariables) => {
+        // Errors are handled by the requestState
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        fetch({
+          variables,
+        });
+      },
+      [fetch]
+    );
 
-  return {
-    requestState,
-    fetch: callFetch,
+    return {
+      requestState,
+      fetch: callFetch,
+    };
   };
-};
 
-export const usePortfolioScreenQuery: UsePortfolioScreenQuery = (
-  initialOffset,
-  pageSize
-) => {
-  const gqlQuery = usePortfolioScreenGraphqlQuery(initialOffset, pageSize);
+export const usePortfolioScreenQuery: UsePortfolioScreenQuery = () => {
+  const gqlQuery = usePortfolioScreenGraphqlQuery();
   const portfolioQuery = usePortfolioQuery();
-
-  const fetch = useCallback(
-    (variables: PortfolioScreenQueryQueryVariables, address?: string) => {
-      gqlQuery.fetch(variables);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      portfolioQuery.fetch(address);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gqlQuery.fetch, portfolioQuery.fetch]
-  );
 
   const requestState = useMemo(() => {
     if (
@@ -262,6 +288,34 @@ export const usePortfolioScreenQuery: UsePortfolioScreenQuery = (
 
     return RequestStateLoading;
   }, [gqlQuery.requestState, portfolioQuery]);
+
+  const fetch = useCallback(
+    ({
+      first,
+      after,
+      tab,
+      address,
+    }: {
+      first: number;
+      after: number;
+      tab: ProposalHistoryFilterKey;
+      address: string;
+    }) => {
+      // Errors are handled by the requestState
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      gqlQuery.fetch({
+        first,
+        after,
+        ...getFilterVariables(tab, address),
+      });
+      // Errors are handled by the requestState
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      portfolioQuery.fetch(address);
+    },
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gqlQuery.fetch]
+  );
 
   return {
     requestState,
