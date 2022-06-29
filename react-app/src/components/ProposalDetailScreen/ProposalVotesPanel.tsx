@@ -4,7 +4,7 @@ import { useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import TallyResultIndicator from "../TallyResultIndicator/TallyResultIndicator";
 import * as SectionedTable from "../SectionedTable/SectionedTable";
-import { VoteOption } from "../../models/cosmos/gov";
+import { ProposalStatus, VoteOption } from "../../models/cosmos/gov";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
   isRequestStateError,
@@ -12,6 +12,7 @@ import {
 } from "../../models/RequestState";
 import PageContoller from "../common/PageController/PageController";
 import { useLocale } from "../../providers/AppLocaleProvider";
+import AppButton from "../common/Buttons/AppButton";
 import {
   Proposal,
   ProposalVote,
@@ -147,6 +148,33 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
   }
 };
 
+const RemindToVoteButton: React.FC<{
+  proposal: Proposal;
+  vote: ProposalVote;
+}> = ({ proposal, vote }) => {
+  if (
+    vote.option != null ||
+    vote.voter.__typename !== "Validator" ||
+    vote.voter.securityContact == null ||
+    proposal.status !== ProposalStatus.VotingPeriod
+  ) {
+    return null;
+  }
+
+  const email: string = vote.voter.securityContact;
+
+  return (
+    <AppButton
+      type="anchor"
+      theme="secondary"
+      size="regular"
+      className={cn("border", "border-likecoin-grey")}
+      messageID="ProposalDetail.votes.remindToVote"
+      href={`mailto:${email}`}
+    />
+  );
+};
+
 const ProposalVotesPanel: React.FC = () => {
   const proposal = useOutletContext<Proposal>();
   const { translate } = useLocale();
@@ -265,6 +293,12 @@ const ProposalVotesPanel: React.FC = () => {
           sortable={true}
         >
           {(item) => <ProposalVoteOption option={item.option ?? null} />}
+        </SectionedTable.Column>
+        <SectionedTable.Column<ProposalVote>
+          id="action"
+          className={cn("text-right")}
+        >
+          {(item) => <RemindToVoteButton proposal={proposal} vote={item} />}
         </SectionedTable.Column>
       </SectionedTable.Table>
       <PageContoller

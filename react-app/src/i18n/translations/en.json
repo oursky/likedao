@@ -81,6 +81,7 @@
   "ProposalDetail.votes.option": "Option",
   "ProposalDetail.votes.option.notVoted": "Not Voted Yet",
   "ProposalDetail.votes.others": "Others",
+  "ProposalDetail.votes.remindToVote": "Remind to vote",
   "ProposalDetail.votes.requestState.error": "Failed to fetch proposal votes, please try again later.",
   "ProposalDetail.votes.voter": "Voter",
   "ProposalDetail.votes.voter.validator": "Validator",
