@@ -1,3 +1,54 @@
+fragment ProposalDetailVoterDepositorValidator on Validator {
+  id
+  operatorAddress
+  moniker
+  identity
+  securityContact
+}
+
+fragment ProposalDetailVoterDepositorAddress on StringObject {
+  value
+}
+
+fragment ProposalDetailProposalVoteVoter on ProposalVoter {
+  ... on StringObject {
+    ...ProposalDetailVoterDepositorAddress
+  }
+  ... on Validator {
+    ...ProposalDetailVoterDepositorValidator
+  }
+}
+
+fragment ProposalDetailProposalDepositDepositor on ProposalDepositor {
+  ... on StringObject {
+    ...ProposalDetailVoterDepositorAddress
+  }
+  ... on Validator {
+    ...ProposalDetailVoterDepositorValidator
+  }
+}
+
+fragment ProposalDetailProposalVote on ProposalVote {
+  id
+  proposalId
+  voter {
+    ...ProposalDetailProposalVoteVoter
+  }
+  option
+}
+
+fragment ProposalDetailProposalDeposit on ProposalDeposit {
+  id
+  proposalId
+  depositor {
+    ...ProposalDetailProposalDepositDepositor
+  }
+  amount {
+    denom
+    amount
+  }
+}
+
 fragment ProposalDetailScreenProposal on Proposal {
   id
   proposalId
@@ -24,6 +75,38 @@ fragment ProposalDetailScreenProposal on Proposal {
   }
 
   myReaction
+}
+
+query ProposalDetailVotesPanelQuery(
+  $proposalId: ID!
+  $input: QueryProposalVotesInput!
+) {
+  proposalByID(id: $proposalId) {
+    votes(input: $input) {
+      totalCount
+      edges {
+        node {
+          ...ProposalDetailProposalVote
+        }
+      }
+    }
+  }
+}
+
+query ProposalDetailDepositsPanelQuery(
+  $proposalId: ID!
+  $input: QueryProposalDepositsInput!
+) {
+  proposalByID(id: $proposalId) {
+    deposits(input: $input) {
+      totalCount
+      edges {
+        node {
+          ...ProposalDetailProposalDeposit
+        }
+      }
+    }
+  }
 }
 
 query ProposalDetailScreenQuery($id: ID!) {

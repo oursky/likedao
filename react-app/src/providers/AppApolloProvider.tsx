@@ -13,6 +13,7 @@ import {
   HttpLink,
   InMemoryCache,
   Observable,
+  PossibleTypesMap,
 } from "@apollo/client";
 import { withScalars } from "apollo-link-scalars";
 import { toast } from "react-toastify";
@@ -23,6 +24,9 @@ import { useAuth } from "./AuthProvider";
 import { useLocale } from "./AppLocaleProvider";
 
 const typePolicies = {};
+const possibleTypes: PossibleTypesMap = {
+  ProposalVoter: ["Validator", "StringObject"],
+};
 const scalars: Record<string, GraphQLScalarType> = {
   BigInt: new GraphQLScalarType({
     name: "BigInt",
@@ -116,6 +120,7 @@ const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
       },
       cache: new InMemoryCache({
         typePolicies,
+        possibleTypes,
       }),
     });
   }, [link]);

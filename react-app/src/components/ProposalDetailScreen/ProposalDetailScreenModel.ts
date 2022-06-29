@@ -1,4 +1,10 @@
-import { ProposalDetailScreenProposalFragment } from "../../generated/graphql";
+import {
+  ProposalDetailScreenProposalFragment,
+  ProposalDetailProposalVoteFragment as ProposalVoteFragment,
+  ProposalDetailProposalDepositFragment as ProposalDepositFragment,
+  ProposalDetailProposalVoteVoterFragment as ProposalVoteVoterFragment,
+  ProposalDetailProposalDepositDepositorFragment as ProposalDepositDepositorFragment,
+} from "../../generated/graphql";
 import { ReactionType } from "../reactions/ReactionModel";
 
 export interface ReactionItem {
@@ -13,6 +19,8 @@ export interface Proposal
     | "depositEndTime"
     | "submitTime"
     | "reactions"
+    | "votes"
+    | "deposits"
   > {
   votingStartTime: Date | null;
   votingEndTime: Date | null;
@@ -29,4 +37,20 @@ export interface Proposal
   remainingVotingDays: number | null;
 
   reactions: ReactionItem[];
+}
+
+export type ProposalVoteVoter = ProposalVoteVoterFragment;
+export type ProposalDepositDepositor = ProposalDepositDepositorFragment;
+export type ProposalVote = ProposalVoteFragment;
+export type ProposalDeposit = ProposalDepositFragment;
+export interface PaginatedProposalVotes {
+  pinnedVotes: ProposalVoteFragment[];
+  votes: ProposalVoteFragment[];
+  totalCount: number;
+}
+
+export interface PaginatedProposalDeposits {
+  pinnedDeposits: ProposalDepositFragment[];
+  deposits: ProposalDepositFragment[];
+  totalCount: number;
 }
