@@ -1,6 +1,7 @@
 import React from "react";
 import { useRoutes, Navigate } from "react-router-dom";
 import AppRoutes from "../../navigation/AppRoutes";
+import { ProposalDepositsPanel } from "./ProposalDepositsPanel";
 import ProposalDetailScreen from "./ProposalDetailScreen";
 import { ProposalVotesPanel } from "./ProposalVotesPanel";
 
@@ -25,7 +26,7 @@ const ProposalDetailRouter: React.FC = () => {
         },
         {
           path: ProposalDetailPanelTab.Deposits,
-          element: <div>deposits</div>,
+          element: <ProposalDepositsPanel />,
         },
         {
           path: "*",
