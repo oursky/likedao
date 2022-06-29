@@ -24,7 +24,7 @@ interface ColumnSortContextValue {
   setOrder?: (order: ColumnOrder) => void;
 }
 
-const ColumnSortContext = React.createContext<ColumnSortContextValue>(
+export const ColumnSortContext = React.createContext<ColumnSortContextValue>(
   {} as any
 );
 const ItemContext = React.createContext<any>({});
@@ -47,9 +47,9 @@ const Column: <T>(props: ColumnProps<T>) => React.ReactElement = (props) => {
   );
 };
 
-type ColumnHeaderProps = Omit<ColumnProps<any>, "children" | "className">;
-const ColumnHeader: React.FC<ColumnHeaderProps> = (props) => {
-  const { id, titleId, sortable } = props;
+type ColumnHeaderProps = Omit<ColumnProps<any>, "children">;
+export const ColumnHeader: React.FC<ColumnHeaderProps> = (props) => {
+  const { id, titleId, sortable, className } = props;
   const { order, setOrder } = React.useContext(ColumnSortContext);
 
   const handleSort = useCallback(() => {
@@ -66,7 +66,14 @@ const ColumnHeader: React.FC<ColumnHeaderProps> = (props) => {
   return (
     <th
       scope="col"
-      className={cn("w-80", "min-w-max", "px-6", "py-3.5", "text-left")}
+      className={cn(
+        "w-80",
+        "min-w-max",
+        "px-6",
+        "py-3.5",
+        "text-left",
+        className
+      )}
     >
       <button
         type="button"
