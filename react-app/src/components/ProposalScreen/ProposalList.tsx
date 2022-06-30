@@ -8,17 +8,19 @@ interface ProposalListProps {
   proposals: Proposal[];
 }
 
+const NoProposal: React.FC = () => (
+  <div className={cn("h-96", "flex", "items-center", "justify-center")}>
+    <span className={cn("font-bold", "text-xl", "leading-5", "text-black")}>
+      <LocalizedText messageID="ProposalScreen.noProposals" />
+    </span>
+  </div>
+);
+
 const ProposalList: React.FC<ProposalListProps> = (props) => {
   const { proposals } = props;
 
   if (proposals.length === 0) {
-    return (
-      <div className={cn("h-96", "flex", "items-center", "justify-center")}>
-        <span className={cn("font-bold", "text-xl", "leading-5", "text-black")}>
-          <LocalizedText messageID="ProposalScreen.noProposals" />
-        </span>
-      </div>
-    );
+    return <NoProposal />;
   }
 
   return (

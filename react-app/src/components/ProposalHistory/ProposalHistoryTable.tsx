@@ -27,10 +27,22 @@ const tableHeaderClassNames = cn(
   "text-likecoin-green"
 );
 
+const NoProposal: React.FC = () => (
+  <div className={cn("h-96", "flex", "items-center", "justify-center")}>
+    <span className={cn("font-bold", "text-xl", "leading-5", "text-black")}>
+      <LocalizedText messageID="ProposalScreen.noProposals" />
+    </span>
+  </div>
+);
+
 const ProposalHistoryTable: React.FC<ProposalHistoryTableProps> = ({
   className,
   data,
 }) => {
+  if (data.totalCount === 0) {
+    return <NoProposal />;
+  }
+
   return (
     <table className={cn("rounded-lg shadow-md", className)}>
       <thead className={cn("bg-gray-50", "border-b-[1px]", "border-gray-200")}>
