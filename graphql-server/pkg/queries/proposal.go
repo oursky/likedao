@@ -332,9 +332,19 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.
 
 func (q *ProposalQuery) QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error) {
 	stakingPool := new(models.ProposalStakingPool)
-	err := q.session.NewSelect().
+	query := q.session.NewSelect().
 		Model(stakingPool).
-		Where("proposal_id = ?", id).
+		Where("proposal_id = ?", id)
+
+	count, err := query.Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return nil, nil
+	}
+
+	err = query.
 		Limit(1).
 		Scan(q.ctx)
 	if err != nil {
