@@ -500,6 +500,15 @@ func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address s
 
 	totalCount := yesCount + noCount + abstainCount + noWithVetoCount
 
+	if totalCount == 0 {
+		return &models.ProposalVotesDistribution{
+			Yes:        0,
+			No:         0,
+			Abstain:    0,
+			NoWithVeto: 0,
+		}, nil
+	}
+
 	return &models.ProposalVotesDistribution{
 		Yes:        yesCount / totalCount,
 		No:         noCount / totalCount,
