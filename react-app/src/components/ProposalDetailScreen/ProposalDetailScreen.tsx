@@ -53,8 +53,15 @@ const ProposalDetailScreen: React.FC = () => {
 
   const onSetReaction = useCallback(
     async (type: ReactionType): Promise<void> => {
-      if (!isRequestStateLoaded(requestState) || requestState.data == null)
+      if (!isRequestStateLoaded(requestState) || requestState.data == null) {
         return;
+      }
+
+      if (wallet.status !== ConnectionStatus.Connected) {
+        wallet.openConnectWalletModal?.();
+        return;
+      }
+
       try {
         await reactionAPI.setReaction(requestState.data.id, type);
       } catch (e: unknown) {
@@ -62,19 +69,26 @@ const ProposalDetailScreen: React.FC = () => {
         toast.error(translate("ProposalDetail.setReaction.failure"));
       }
     },
-    [requestState, reactionAPI, translate]
+    [requestState, reactionAPI, wallet, translate]
   );
 
   const onUnsetReaction = useCallback(async (): Promise<void> => {
-    if (!isRequestStateLoaded(requestState) || requestState.data == null)
+    if (!isRequestStateLoaded(requestState) || requestState.data == null) {
       return;
+    }
+
+    if (wallet.status !== ConnectionStatus.Connected) {
+      wallet.openConnectWalletModal?.();
+      return;
+    }
+
     try {
       await reactionAPI.unsetReaction(requestState.data.id);
     } catch (e: unknown) {
       console.error("Error while setting reaction", e);
       toast.error(translate("ProposalDetail.setReaction.failure"));
     }
-  }, [requestState, reactionAPI, translate]);
+  }, [requestState, reactionAPI, wallet, translate]);
 
   const handleOpenVoteModal = useCallback(() => {
     if (wallet.status !== ConnectionStatus.Connected) {
