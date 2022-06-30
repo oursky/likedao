@@ -4,36 +4,35 @@ import BigNumber from "bignumber.js";
 import { RegisterOptions } from "react-hook-form";
 import { useFormValidators } from "../../../hooks/useFormValidators";
 import { useLocale } from "../../../providers/AppLocaleProvider";
-import {
-  CreateProposalFormValues,
-  useCreateProposalFormModel,
-} from "../CreateProposalForm/CreateProposalFormModel";
 
-export interface SubmitProposalFormValues extends CreateProposalFormValues {
+export interface DepositProposalFormValues {
+  proposalId: number;
   amount: string;
   memo: string | null;
 }
 
-export const useSubmitProposalFormModel = (
+export const useDepositProposalFromModel = (
   availableTokens: BigNumber
 ): {
-  registerOptions: Record<keyof SubmitProposalFormValues, RegisterOptions>;
+  registerOptions: Record<keyof DepositProposalFormValues, RegisterOptions>;
 } => {
-  const { registerOptions: createProposalFormModelRegisterOptions } =
-    useCreateProposalFormModel();
+  const { translate } = useLocale();
   const { requiredValidator, tokenAmountValidators, maxLengthValidator } =
     useFormValidators();
-  const { translate } = useLocale();
+
   const registerOptions = useMemo((): Record<
-    keyof SubmitProposalFormValues,
+    keyof DepositProposalFormValues,
     RegisterOptions
   > => {
     return {
-      ...createProposalFormModelRegisterOptions,
+      proposalId: {
+        required: requiredValidator,
+      },
       amount: {
         required: requiredValidator,
         validate: {
           isFinite: tokenAmountValidators.isFinite,
+          isGreaterThanZero: tokenAmountValidators.isGreaterThanZero,
           isLessThanMax: (v) => {
             const amount = new BigNumber(v);
             return (
@@ -52,12 +51,13 @@ export const useSubmitProposalFormModel = (
     };
   }, [
     availableTokens,
-    createProposalFormModelRegisterOptions,
     requiredValidator,
     tokenAmountValidators,
-    maxLengthValidator,
     translate,
+    maxLengthValidator,
   ]);
 
-  return { registerOptions };
+  return {
+    registerOptions,
+  };
 };

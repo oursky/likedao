@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import BigNumber from "bignumber.js";
 import AppRoutes from "../../navigation/AppRoutes";
 import Paper from "../common/Paper/Paper";
 import {
@@ -14,17 +15,41 @@ import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { ReactionType } from "../reactions/ReactionModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { useReactionAPI } from "../../api/reactionAPI";
+import VoteProposalModal from "../TransactionModals/VoteProposalModal";
+import { VoteProposalFormValues } from "../forms/VoteProposalForm/VoteProposalFormModel";
+import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { useCosmosAPI } from "../../api/cosmosAPI";
+import { useGovAPI } from "../../api/govAPI";
+import { DepositProposalFormValues } from "../forms/DepositProposalForm/DepositProposalFormModel";
+import DepositProposalModal from "../TransactionModals/DepositProposalModal";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
 import { ProposalData } from "./ProposalData";
+
+enum ProposalDetailModal {
+  Vote = "vote",
+  Deposit = "deposit",
+}
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
   const { fetch, requestState } = useProposalQuery();
   const { translate } = useLocale();
   const reactionAPI = useReactionAPI();
+  const wallet = useWallet();
   const navigate = useNavigate();
+  const govAPI = useGovAPI();
+  const cosmosAPI = useCosmosAPI();
+
+  const proposalId = useMemo(() => {
+    return id != null ? parseInt(id, 10) : null;
+  }, [id]);
+
+  const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
+    null
+  );
+  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
 
   const onSetReaction = useCallback(
     async (type: ReactionType): Promise<void> => {
@@ -51,11 +76,98 @@ const ProposalDetailScreen: React.FC = () => {
     }
   }, [requestState, reactionAPI, translate]);
 
-  useEffect(() => {
-    if (id) {
-      fetch(id);
+  const handleOpenVoteModal = useCallback(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      wallet.openConnectWalletModal?.();
+    } else {
+      setActiveModal(ProposalDetailModal.Vote);
     }
-  }, [fetch, id]);
+  }, [wallet]);
+
+  const handleOpenDepositModal = useCallback(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      wallet.openConnectWalletModal?.();
+    } else {
+      setActiveModal(ProposalDetailModal.Deposit);
+    }
+  }, [wallet]);
+
+  const closeModals = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  const handleVoteSubmission = useCallback(
+    async (values: VoteProposalFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await govAPI.signVoteProposalTx(
+          values.proposalId,
+          values.option,
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, govAPI, translate, wallet]
+  );
+
+  const handleDepositSubmission = useCallback(
+    async (values: DepositProposalFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await govAPI.signDepositProposalTx(
+          values.proposalId,
+          new BigNumber(values.amount),
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccounts();
+      } catch (err: unknown) {
+        console.error("Error signing send token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, govAPI, translate, wallet]
+  );
+
+  useEffect(() => {
+    if (proposalId) {
+      fetch(proposalId);
+    }
+  }, [fetch, proposalId]);
+
+  useEffect(() => {
+    cosmosAPI
+      .getBalance()
+      .then((balance) => {
+        setUserBalance(balance.amount);
+      })
+      .catch((err) => {
+        console.error("Failed to get balance and rewards", err);
+      });
+  }, [cosmosAPI]);
 
   useEffectOnce(
     () => {
@@ -83,7 +195,7 @@ const ProposalDetailScreen: React.FC = () => {
       isRequestStateError(requestState) || isRequestStateLoaded(requestState)
   );
 
-  if (!id) return <Navigate to={AppRoutes.Proposals} />;
+  if (!proposalId) return <Navigate to={AppRoutes.Proposals} />;
 
   if (!isRequestStateLoaded(requestState)) {
     return (
@@ -108,18 +220,37 @@ const ProposalDetailScreen: React.FC = () => {
   if (!requestState.data) return null;
 
   return (
-    <div className={cn("flex", "flex-col")}>
-      <ProposalHeader
-        proposal={requestState.data}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSetReaction={onSetReaction}
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onUnsetReaction={onUnsetReaction}
-      />
-      <ProposalDescription proposal={requestState.data} />
-      <ProposalData proposal={requestState.data} />
-      <Paper>Comments Placeholder</Paper>
-    </div>
+    <>
+      <div className={cn("flex", "flex-col")}>
+        <ProposalHeader
+          proposal={requestState.data}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onSetReaction={onSetReaction}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onUnsetReaction={onUnsetReaction}
+          onVoteClick={handleOpenVoteModal}
+          onDepositClick={handleOpenDepositModal}
+        />
+        <ProposalDescription proposal={requestState.data} />
+        <ProposalData proposal={requestState.data} />
+        <Paper>Comments Placeholder</Paper>
+      </div>
+      {activeModal === ProposalDetailModal.Vote && (
+        <VoteProposalModal
+          proposalId={proposalId}
+          onSubmit={handleVoteSubmission}
+          onClose={closeModals}
+        />
+      )}
+      {activeModal === ProposalDetailModal.Deposit && (
+        <DepositProposalModal
+          proposalId={proposalId}
+          availableTokens={userBalance}
+          onSubmit={handleDepositSubmission}
+          onClose={closeModals}
+        />
+      )}
+    </>
   );
 };
 

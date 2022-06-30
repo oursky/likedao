@@ -65,6 +65,7 @@ const SubmitProposalForm: React.FC<SubmitProposalFormProps> = (props) => {
         currencyUnit={chainInfo.currency.coinDenom}
         inputProps={{
           placeholder: "0",
+          max: availableTokens.toFixed(),
         }}
         setValue={setAmount}
         registerReturn={register("amount", registerOptions.amount)}

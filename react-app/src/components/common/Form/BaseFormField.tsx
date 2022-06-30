@@ -51,7 +51,7 @@ function getFormFieldClassNameClassNameByDirection(
 export interface BaseFormFieldProps {
   direction?: FormFieldDirection;
   size?: FormFieldSize;
-  label: MessageID;
+  label?: MessageID;
   children?: React.ReactNode;
   errorMessage?: string;
 }
@@ -70,16 +70,18 @@ const BaseFormField: React.FC<BaseFormFieldProps> = (props) => {
 
   return (
     <div className={cn("w-full", containerClassName)}>
-      <label
-        className={cn(
-          "text-sm",
-          "font-medium",
-          "leading-5",
-          "text-likecoin-black"
-        )}
-      >
-        <LocalizedText messageID={label} />
-      </label>
+      {label != null && (
+        <label
+          className={cn(
+            "text-sm",
+            "font-medium",
+            "leading-5",
+            "text-likecoin-black"
+          )}
+        >
+          <LocalizedText messageID={label} />
+        </label>
+      )}
       <div className={cn(inputClassName, getInputClassNameBySize(size))}>
         {children}
       </div>

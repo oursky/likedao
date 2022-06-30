@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
+import { isBefore, isWithinInterval } from "date-fns";
 import Paper from "../common/Paper/Paper";
 import Badge from "../common/Badge/Badge";
 import AppButton from "../common/Buttons/AppButton";
@@ -12,6 +13,7 @@ import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { ReactionList, ReactionPicker } from "../reactions";
 import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
+import { ProposalStatus } from "../../generated/graphql";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
@@ -178,20 +180,57 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   );
 };
 
-const ProposalActionArea: React.FC<{
+enum ProposalPeriod {
+  Voting = "voting",
+  Deposit = "deposit",
+}
+interface ProposalActionAreaProps {
   proposal: Proposal;
+  onVoteClick: () => void;
+  onDepositClick: () => void;
   handleReactionSelect: (type: ReactionType) => void;
-}> = ({ proposal, handleReactionSelect }) => {
-  const { reactions, myReaction } = proposal;
+}
+const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
+  const { proposal, onVoteClick, onDepositClick, handleReactionSelect } = props;
+
   const reactionItems = useMemo(() => {
-    return reactions.map((r) => {
+    return proposal.reactions.map((r) => {
       return {
-        isActive: r.type === myReaction,
+        isActive: r.type === proposal.myReaction,
         reaction: DefaultReactionMap[r.type],
         count: r.count,
       };
     });
-  }, [reactions, myReaction]);
+  }, [proposal]);
+
+  const proposalPeriod = useMemo(() => {
+    const now = new Date();
+
+    if (
+      proposal.status === ProposalStatus.DepositPeriod &&
+      proposal.depositEndTime &&
+      isBefore(now, proposal.depositEndTime)
+    ) {
+      return ProposalPeriod.Deposit;
+    }
+
+    if (
+      proposal.status === ProposalStatus.VotingPeriod &&
+      proposal.votingStartTime &&
+      proposal.votingEndTime
+    ) {
+      if (
+        isWithinInterval(now, {
+          start: proposal.votingStartTime,
+          end: proposal.votingEndTime,
+        })
+      ) {
+        return ProposalPeriod.Voting;
+      }
+    }
+
+    return null;
+  }, [proposal]);
 
   return (
     <div
@@ -223,21 +262,43 @@ const ProposalActionArea: React.FC<{
         />
         <ReactionPicker onAddNewReaction={handleReactionSelect} />
       </div>
-      <AppButton
-        size="extra-small"
-        theme="primary"
-        className={cn("text-base", "leading-6", "font-medium", "w-36")}
-        messageID="ProposalDetail.voteNow"
-      />
+      {proposalPeriod !== null && (
+        <AppButton
+          size="regular"
+          theme="primary"
+          className={cn("text-base", "leading-6", "font-medium")}
+          messageID={
+            proposalPeriod === ProposalPeriod.Voting
+              ? "ProposalDetail.voteNow"
+              : "ProposalDetail.deposit"
+          }
+          onClick={
+            proposalPeriod === ProposalPeriod.Voting
+              ? onVoteClick
+              : onDepositClick
+          }
+        />
+      )}
     </div>
   );
 };
 
-const ProposalHeader: React.FC<{
+interface ProposalHeaderProps {
   proposal: Proposal;
   onSetReaction: (type: ReactionType) => void;
   onUnsetReaction: () => void;
-}> = ({ proposal, onSetReaction, onUnsetReaction }) => {
+  onVoteClick: () => void;
+  onDepositClick: () => void;
+}
+const ProposalHeader: React.FC<ProposalHeaderProps> = (props) => {
+  const {
+    proposal,
+    onSetReaction,
+    onUnsetReaction,
+    onVoteClick,
+    onDepositClick,
+  } = props;
+
   const handleRectionSelect = useCallback(
     (type: ReactionType) => {
       if (type === proposal.myReaction) {
@@ -248,6 +309,7 @@ const ProposalHeader: React.FC<{
     },
     [onSetReaction, onUnsetReaction, proposal.myReaction]
   );
+
   return (
     <Paper>
       <ProposalTitle proposal={proposal} />
@@ -256,6 +318,8 @@ const ProposalHeader: React.FC<{
       <ProposalActionArea
         proposal={proposal}
         handleReactionSelect={handleRectionSelect}
+        onVoteClick={onVoteClick}
+        onDepositClick={onDepositClick}
       />
     </Paper>
   );

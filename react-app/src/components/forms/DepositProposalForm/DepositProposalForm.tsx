@@ -3,24 +3,25 @@ import cn from "classnames";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
 import AppButton from "../../common/Buttons/AppButton";
-import Config from "../../../config/Config";
-import LocalizedText from "../../common/Localized/LocalizedText";
 import * as FormField from "../../common/Form";
+import LocalizedText from "../../common/Localized/LocalizedText";
+import Config from "../../../config/Config";
 import {
-  SendTokenFormValues,
-  useSendTokenFormModel,
-} from "./SendTokenFormModel";
+  useDepositProposalFromModel,
+  DepositProposalFormValues,
+} from "./DepositProposalFormModel";
 
-interface SendTokenFormProps {
+interface DepositProposalFormProps {
   className?: string;
+  proposalId: number;
   availableTokens: BigNumber;
   onCancel: () => void;
-  onSubmit: (data: SendTokenFormValues) => void;
+  onSubmit: (data: DepositProposalFormValues) => void;
 }
 
-const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
-  const chainInfo = Config.chainInfo;
-  const { className, availableTokens, onCancel, onSubmit } = props;
+const DepositProposalForm: React.FC<DepositProposalFormProps> = (props) => {
+  const { className, availableTokens, proposalId, onCancel, onSubmit } = props;
+  const coinDenom = Config.chainInfo.currency.coinDenom;
 
   const {
     register,
@@ -28,10 +29,12 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<SendTokenFormValues>({
-    mode: "onTouched",
+  } = useForm<DepositProposalFormValues>({
+    mode: "onSubmit",
     reValidateMode: "onBlur",
-    defaultValues: undefined,
+    defaultValues: {
+      proposalId,
+    },
   });
 
   const setAmount = useCallback(
@@ -42,7 +45,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     [setValue, clearErrors]
   );
 
-  const { registerOptions } = useSendTokenFormModel(availableTokens);
+  const { registerOptions } = useDepositProposalFromModel(availableTokens);
 
   return (
     <form
@@ -50,14 +53,9 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
     >
-      <FormField.TextInput
-        label="SendTokenModal.fields.recipent"
-        registerReturn={register("recipent", registerOptions.recipent)}
-        errorMessage={errors.recipent?.message}
-      />
       <FormField.Currency
-        label="SendTokenModal.fields.amount"
-        currencyUnit={chainInfo.currency.coinDenom}
+        label="DepositProposalModal.fields.amount"
+        currencyUnit={coinDenom}
         inputProps={{
           placeholder: "0",
           max: availableTokens.toFixed(),
@@ -76,10 +74,10 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
         )}
       >
         <LocalizedText
-          messageID="SendTokenModal.fields.amount.available"
+          messageID="DepositProposalModal.fields.amount.available"
           messageArgs={{
             amount: availableTokens.toFixed(),
-            denom: chainInfo.currency.coinDenom,
+            denom: coinDenom,
           }}
         />
       </span>
@@ -109,4 +107,4 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
   );
 };
 
-export default SendTokenForm;
+export default DepositProposalForm;
