@@ -109,7 +109,7 @@ export class WalletConnectWallet extends BaseWallet {
 
       const signDocJSON = newSignDataMessage({ signer, data: base64data });
 
-      const resInJSON = await connector.sendCustomRequest({
+      const [resInJSON] = await connector.sendCustomRequest({
         id: payloadId(),
         jsonrpc: "2.0",
         method: "cosmos_signAmino",
