@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import {
+  OrderByMode,
   PortfolioScreenQuery,
   PortfolioScreenQueryQuery,
   PortfolioScreenQueryQueryVariables,
+  ProposalSortableFields,
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { useCosmosAPI } from "../../api/cosmosAPI";
@@ -306,6 +308,8 @@ export const usePortfolioScreenQuery: UsePortfolioScreenQuery = () => {
       gqlQuery.fetch({
         first,
         after,
+        orderBy: ProposalSortableFields.SubmitTime,
+        orderByMode: OrderByMode.Asc,
         ...getFilterVariables(tab, address),
       });
       // Errors are handled by the requestState
