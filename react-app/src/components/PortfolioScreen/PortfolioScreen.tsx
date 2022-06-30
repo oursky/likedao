@@ -129,6 +129,8 @@ const PortfolioScreen: React.FC = () => {
         tabs={filterItems}
         selectedTab={selectedTab}
         onSelectTab={handleSelectTab}
+        pageSize={PROPOSAL_HISTORY_PAGE_SIZE}
+        currentOffset={after}
         onPageChange={handlePageChange}
       />
     </div>

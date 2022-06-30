@@ -3,6 +3,7 @@ import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
 import ColorBar, { makeColorBarData } from "../common/ColorBar/ColorBar";
+import PageContoller from "../common/PageController/PageController";
 import {
   ProposalHistory as ProposalHistoryModel,
   ProposalHistoryFilterKey,
@@ -15,6 +16,8 @@ interface ProposalHistoryProps {
   tabs: ProposalHistoryTabItem[];
   selectedTab: ProposalHistoryFilterKey;
   onSelectTab: (tab: ProposalHistoryFilterKey) => void;
+  pageSize: number;
+  currentOffset: number;
   onPageChange: (after: number) => void;
 }
 
@@ -25,7 +28,12 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
   tabs,
   selectedTab,
   onSelectTab,
+  pageSize,
+  currentOffset,
+  onPageChange,
 }) => {
+  const { proposals, proposalVotesDistribution } = data;
+
   return (
     <Paper>
       <FilterTabs<ProposalHistoryFilterKey>
@@ -38,14 +46,22 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
       {selectedTab === "voted" && (
         <div className={cn("h-11")}>
           <ColorBar
-            data={makeColorBarData(data.proposalVotesDistribution)}
+            data={makeColorBarData(proposalVotesDistribution)}
             showPercentage={true}
             className={cn("rounded-full")}
           />
         </div>
       )}
 
-      <ProposalHistoryTable className="my-4 min-w-full" data={data.proposals} />
+      <ProposalHistoryTable className="my-4 min-w-full" data={proposals} />
+
+      <PageContoller
+        offsetBased={true}
+        pageSize={pageSize}
+        totalItems={proposals.totalCount}
+        currentOffset={currentOffset}
+        onPageChange={onPageChange}
+      />
     </Paper>
   );
 };
