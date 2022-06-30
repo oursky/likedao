@@ -50,6 +50,7 @@ const FilterTabItem: <T>(props: FilterTabItemProps<T>) => React.ReactElement = (
 };
 
 interface FilterTabsProps<T> {
+  className?: string;
   tabs: IFilterTabItem<T>[];
   selectedTab: T;
   onSelectTab: (tab: T) => void;
@@ -58,10 +59,10 @@ interface FilterTabsProps<T> {
 const FilterTabs: <T extends string | number>(
   props: FilterTabsProps<T>
 ) => React.ReactElement = (props) => {
-  const { tabs, selectedTab, onSelectTab } = props;
+  const { tabs, selectedTab, onSelectTab, className } = props;
 
   return (
-    <div className={cn("border-b", "border-gray-200")}>
+    <div className={cn("border-b", "border-gray-200", className)}>
       <nav
         className={cn("-mb-px", "flex", "space-x-8", "overflow-x-auto")}
         aria-label="Tabs"

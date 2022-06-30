@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
+import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
+import ColorBar, { makeColorBarData } from "../common/ColorBar/ColorBar";
 import {
   ProposalHistory as ProposalHistoryModel,
   ProposalHistoryFilterKey,
@@ -30,10 +32,20 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
   return (
     <Paper>
       <FilterTabs<ProposalHistoryFilterKey>
+        className="mb-4"
         tabs={tabs}
         selectedTab={selectedTab}
         onSelectTab={onSelectTab}
       />
+      {selectedTab === "voted" && (
+        <div className={cn("h-11")}>
+          <ColorBar
+            data={makeColorBarData(data.proposalVotesDistribution)}
+            showPercentage={true}
+            className={cn("rounded-full")}
+          />
+        </div>
+      )}
     </Paper>
   );
 };

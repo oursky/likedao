@@ -16,6 +16,32 @@ interface ColorBarSectionProps {
   showPercentage?: boolean;
 }
 
+export const makeColorBarData = (
+  data?: {
+    yes?: BigNumber.Value;
+    no?: BigNumber.Value;
+    abstain?: BigNumber.Value;
+    noWithVeto?: BigNumber.Value;
+  } | null
+): ColorBarData[] => [
+  {
+    value: new BigNumber(data?.yes ?? 0),
+    colorClassName: "bg-likecoin-vote-color-yes",
+  },
+  {
+    value: new BigNumber(data?.no ?? 0),
+    colorClassName: "bg-likecoin-vote-color-no",
+  },
+  {
+    value: new BigNumber(data?.noWithVeto ?? 0),
+    colorClassName: "bg-likecoin-vote-color-veto",
+  },
+  {
+    value: new BigNumber(data?.abstain ?? 0),
+    colorClassName: "bg-likecoin-vote-color-abstain",
+  },
+];
+
 const ColorBarSection: React.FC<ColorBarSectionProps> = (props) => {
   const { data, total, showPercentage } = props;
   const [percentageEl, setPercentageEl] = useState<HTMLSpanElement | null>(

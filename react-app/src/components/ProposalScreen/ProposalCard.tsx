@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import BigNumber from "bignumber.js";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
 import LocalizedText from "../common/Localized/LocalizedText";
-import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
+import ColorBar, {
+  ColorBarData,
+  makeColorBarData,
+} from "../common/ColorBar/ColorBar";
 import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
 import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { ReactionList } from "../reactions";
@@ -20,24 +22,7 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
   const { proposal } = props;
 
   const voteData = useMemo(
-    (): ColorBarData[] => [
-      {
-        value: new BigNumber(proposal.tallyResult?.yes ?? 0),
-        colorClassName: "bg-likecoin-vote-color-yes",
-      },
-      {
-        value: new BigNumber(proposal.tallyResult?.no ?? 0),
-        colorClassName: "bg-likecoin-vote-color-no",
-      },
-      {
-        value: new BigNumber(proposal.tallyResult?.noWithVeto ?? 0),
-        colorClassName: "bg-likecoin-vote-color-veto",
-      },
-      {
-        value: new BigNumber(proposal.tallyResult?.abstain ?? 0),
-        colorClassName: "bg-likecoin-vote-color-abstain",
-      },
-    ],
+    (): ColorBarData[] => makeColorBarData(proposal.tallyResult),
     [proposal]
   );
 
