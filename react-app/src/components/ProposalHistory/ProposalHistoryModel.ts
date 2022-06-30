@@ -9,3 +9,5 @@ export interface ProposalHistory {
   proposalVotesDistribution: ProposalVotesDistribution;
   proposals: ProposalConnection;
 }
+
+export type { ProposalConnection };

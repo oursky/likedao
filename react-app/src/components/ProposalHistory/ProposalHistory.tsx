@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
@@ -7,6 +7,7 @@ import {
   ProposalHistory as ProposalHistoryModel,
   ProposalHistoryFilterKey,
 } from "./ProposalHistoryModel";
+import ProposalHistoryTable from "./ProposalHistoryTable";
 
 interface ProposalHistoryProps {
   data: ProposalHistoryModel;
@@ -25,10 +26,6 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
   selectedTab,
   onSelectTab,
 }) => {
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   return (
     <Paper>
       <FilterTabs<ProposalHistoryFilterKey>
@@ -37,6 +34,7 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
         selectedTab={selectedTab}
         onSelectTab={onSelectTab}
       />
+
       {selectedTab === "voted" && (
         <div className={cn("h-11")}>
           <ColorBar
@@ -46,6 +44,8 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
           />
         </div>
       )}
+
+      <ProposalHistoryTable className="my-4 min-w-full" data={data.proposals} />
     </Paper>
   );
 };

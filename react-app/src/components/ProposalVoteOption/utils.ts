@@ -35,3 +35,23 @@ export function getVoteOptionBgCn(option: ProposalVoteOption): string {
       throw new Error("Unknown vote option");
   }
 }
+
+/**
+ * Get the tailwindCss text color class name for proposal vote option
+ * @param option - proposal vote option
+ * @returns tailwind text color class name
+ */
+export function getVoteOptionTextColorCn(option: ProposalVoteOption): string {
+  switch (option) {
+    case ProposalVoteOption.Yes:
+      return "text-likecoin-vote-color-yes";
+    case ProposalVoteOption.Abstain:
+      return "text-likecoin-vote-color-abstain";
+    case ProposalVoteOption.No:
+      return "text-likecoin-vote-color-no";
+    case ProposalVoteOption.NoWithVeto:
+      return "text-likecoin-vote-color-veto";
+    default:
+      throw new Error("Unknown vote option");
+  }
+}
