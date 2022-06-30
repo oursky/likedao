@@ -4,7 +4,6 @@ import (
 	godataloader "github.com/cychiuae/go-dataloader"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/oursky/likedao/pkg/queries"
-	"golang.org/x/exp/slices"
 )
 
 type ProposalDataloader interface {
@@ -84,13 +83,19 @@ func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloa
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(keys []ProposalVoteKey) ([]*models.ProposalVote, []error) {
+			// use maps to check if proposal id or address have been added to array yet
+			proposalIDsMap := make(map[int]struct{})
+			addressesMap := make(map[string]struct{})
+
 			proposalIDs := []int{}
 			addresses := []string{}
 			for _, key := range keys {
-				if !slices.Contains(proposalIDs, key.ProposalID) {
+				if _, exists := proposalIDsMap[key.ProposalID]; !exists {
+					proposalIDsMap[key.ProposalID] = struct{}{}
 					proposalIDs = append(proposalIDs, key.ProposalID)
 				}
-				if !slices.Contains(addresses, key.Address) {
+				if _, exists := addressesMap[key.Address]; !exists {
+					addressesMap[key.Address] = struct{}{}
 					addresses = append(addresses, key.Address)
 				}
 			}
@@ -123,13 +128,19 @@ func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloa
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(keys []ProposalDepositKey) ([]*models.ProposalDeposit, []error) {
+			// use maps to check if proposal id or address have been added to array yet
+			proposalIDsMap := make(map[int]struct{})
+			addressesMap := make(map[string]struct{})
+
 			proposalIDs := []int{}
 			addresses := []string{}
 			for _, key := range keys {
-				if !slices.Contains(proposalIDs, key.ProposalID) {
+				if _, exists := proposalIDsMap[key.ProposalID]; !exists {
+					proposalIDsMap[key.ProposalID] = struct{}{}
 					proposalIDs = append(proposalIDs, key.ProposalID)
 				}
-				if !slices.Contains(addresses, key.Address) {
+				if _, exists := addressesMap[key.Address]; !exists {
+					addressesMap[key.Address] = struct{}{}
 					addresses = append(addresses, key.Address)
 				}
 			}

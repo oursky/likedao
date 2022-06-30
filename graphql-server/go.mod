@@ -21,8 +21,6 @@ require (
 	github.com/xplorfin/gql-bigint v0.4.0
 )
 
-require golang.org/x/exp v0.0.0-20220613132600-b0d781184e0d
-
 require (
 	github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d // indirect
 	github.com/DataDog/zstd v1.4.5 // indirect
