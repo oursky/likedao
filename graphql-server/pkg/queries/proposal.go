@@ -2,6 +2,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/oursky/likedao/pkg/config"
@@ -296,18 +297,10 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.
 		Where("(deposit.coin).denom = ?", denom).
 		GroupExpr("(deposit.coin).denom")
 
-	// In case there are no deposits for a proposal
-	// this happens for some reason even if min proposal deposit is positive
-	count, err := query.Count(q.ctx)
-	if err != nil {
-		return bunbig.Int{}, err
-	}
-	if count == 0 {
+	err := query.Scan(q.ctx, &res)
+	if err == sql.ErrNoRows {
 		return bunbig.Int{}, nil
-	}
-
-	err = query.Scan(q.ctx, &res)
-	if err != nil {
+	} else if err != nil {
 		return bunbig.Int{}, err
 	}
 	return res, nil
@@ -315,21 +308,17 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.
 
 func (q *ProposalQuery) QueryProposalStakingPool(id int) (*models.ProposalStakingPool, error) {
 	stakingPool := new(models.ProposalStakingPool)
-	query := q.session.NewSelect().
-		Model(stakingPool).
-		Where("proposal_id = ?", id)
 
-	count, err := query.Count(q.ctx)
-	if err != nil {
-		return nil, err
-	}
-	if count == 0 {
+	err := q.session.NewSelect().
+		Model(stakingPool).
+		Where("proposal_id = ?", id).
+		Limit(1).
+		Scan(q.ctx)
+
+	if err == sql.ErrNoRows {
 		return nil, nil
 	}
 
-	err = query.
-		Limit(1).
-		Scan(q.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -340,19 +329,14 @@ func (q *ProposalQuery) QueryProposalVotes(proposalIDs []int, addresses []string
 	if len(proposalIDs) == 0 || len(addresses) == 0 {
 		return nil, nil
 	}
-	// (proposal, address)
+
+	var votes []*models.ProposalVote
 	query := q.session.NewSelect().
-		Model((*models.ProposalVote)(nil)).
+		Model(&votes).
 		Where("(proposal_id) IN (?)", bun.In(proposalIDs)).
 		Where("voter_address IN (?)", bun.In(addresses))
 
-	count, err := query.Count(q.ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	votes := make([]*models.ProposalVote, count)
-	err = query.Scan(q.ctx, &votes)
+	err := query.Scan(q.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -361,17 +345,12 @@ func (q *ProposalQuery) QueryProposalVotes(proposalIDs []int, addresses []string
 }
 
 func (q *ProposalQuery) QueryProposalVotesByAddress(address string) ([]*models.ProposalVote, error) {
+	var votes []*models.ProposalVote
 	query := q.session.NewSelect().
-		Model((*models.ProposalVote)(nil)).
+		Model(&votes).
 		Where("voter_address = ?", address)
 
-	count, err := query.Count(q.ctx)
-	if err != nil {
-		return nil, err
-	}
-	votes := make([]*models.ProposalVote, count)
-
-	err = query.Scan(q.ctx, &votes)
+	err := query.Scan(q.ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -382,19 +361,14 @@ func (q *ProposalQuery) QueryProposalDeposits(proposalIDs []int, addresses []str
 	if len(proposalIDs) == 0 || len(addresses) == 0 {
 		return nil, nil
 	}
-	// (proposal, address)
+
+	var deposits []*models.ProposalDeposit
 	query := q.session.NewSelect().
-		Model((*models.ProposalDeposit)(nil)).
+		Model(&deposits).
 		Where("proposal_id IN (?)", bun.In(proposalIDs)).
 		Where("depositor_address IN (?)", bun.In(addresses))
 
-	count, err := query.Count(q.ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	deposits := make([]*models.ProposalDeposit, count)
-	err = query.Scan(q.ctx, &deposits)
+	err := query.Scan(q.ctx)
 	if err != nil {
 		return nil, err
 	}
