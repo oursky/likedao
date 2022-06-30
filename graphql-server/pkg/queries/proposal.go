@@ -51,45 +51,28 @@ func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 	}
 
 	if q.scopedAddressFilter != nil {
-		relatedDeposits := q.session.NewSelect().
-			Model((*models.ProposalDeposit)(nil)).
-			Column("proposal_id").
-			Where("depositor_address = ?", q.scopedAddressFilter.Address)
 
-		relatedVotes := q.session.NewSelect().
-			Model((*models.ProposalVote)(nil)).
-			Column("proposal_id").
-			Where("voter_address = ?", q.scopedAddressFilter.Address)
+		query = query.WhereGroup(" AND ", func(query *bun.SelectQuery) *bun.SelectQuery {
+			if q.scopedAddressFilter.IsDepositor {
+				depositedProposalIDs := q.session.NewSelect().
+					Model((*models.ProposalDeposit)(nil)).
+					Column("proposal_id").
+					Where("depositor_address = ?", q.scopedAddressFilter.Address)
+				query = query.WhereOr("id IN (?)", depositedProposalIDs)
+			}
+			if q.scopedAddressFilter.IsVoter {
+				votedProposalIDs := q.session.NewSelect().
+					Model((*models.ProposalVote)(nil)).
+					Column("proposal_id").
+					Where("voter_address = ?", q.scopedAddressFilter.Address)
+				query = query.WhereOr("id IN (?)", votedProposalIDs)
+			}
 
-		isFirstAddressFilter := true
-		if q.scopedAddressFilter.IsDepositor {
-			if isFirstAddressFilter {
-				query = query.Where("id IN (?)", relatedDeposits)
-				isFirstAddressFilter = false
-			} else {
-				query = query.WhereOr("id IN (?)", relatedDeposits)
-			}
-		}
-		if q.scopedAddressFilter.IsVoter {
-			if isFirstAddressFilter {
-				query = query.Where("id IN (?)", relatedVotes)
-				isFirstAddressFilter = false
-			} else {
-				query = query.WhereOr("id IN (?)", relatedVotes)
-			}
-		}
-		if q.scopedAddressFilter.IsSubmitter {
-			if isFirstAddressFilter {
-				query = query.Where("proposal.proposer_address = ?", q.scopedAddressFilter.Address)
-				isFirstAddressFilter = false
-			} else {
+			if q.scopedAddressFilter.IsSubmitter {
 				query = query.WhereOr("proposal.proposer_address = ?", q.scopedAddressFilter.Address)
 			}
-		}
-		if isFirstAddressFilter {
-			// none of the is* field are marked as true
-			query = query.Where("id IN (null)")
-		}
+			return query
+		})
 	}
 
 	return query

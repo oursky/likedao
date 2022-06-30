@@ -438,6 +438,9 @@ func (r *proposalVoteResolver) Option(ctx context.Context, obj *models.ProposalV
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
 	if input.Address != nil {
+		if !input.Address.IsDepositor && !input.Address.IsSubmitter && !input.Address.IsVoter {
+			return nil, errors.New("at least one of isDepositor, isSubmitter, isVoter should be true")
+		}
 		proposalQuery = proposalQuery.ScopeProposalAddress(input.Address)
 	}
 	if input.Status != nil {
