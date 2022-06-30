@@ -7,6 +7,7 @@ import * as FormField from "../../common/Form";
 import { ProposalType } from "../../../models/cosmos/gov";
 import AppButton from "../../common/Buttons/AppButton";
 import { useLocale } from "../../../providers/AppLocaleProvider";
+import Paper from "../../common/Paper/Paper";
 import {
   CreateProposalFormValues,
   useCreateProposalFormModel,
@@ -43,7 +44,7 @@ const CreateProposalForm: React.FC<CreateProposalFormProps> = (props) => {
   }, [translate]);
 
   return (
-    <div className={cn("flex", "flex-col")}>
+    <Paper className={cn("flex", "flex-col")}>
       <h1
         className={cn(
           "text-lg",
@@ -109,7 +110,7 @@ const CreateProposalForm: React.FC<CreateProposalFormProps> = (props) => {
           onClick={handleSubmit(onSubmit)}
         />
       </form>
-    </div>
+    </Paper>
   );
 };
 

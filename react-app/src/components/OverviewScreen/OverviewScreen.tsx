@@ -10,6 +10,7 @@ import {
 } from "../../models/RequestState";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
+import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
 import { useCommunityStatusQuery } from "./OverviewScreenAPI";
 
 const OverviewScreen: React.FC = () => {
@@ -43,12 +44,12 @@ const OverviewScreen: React.FC = () => {
   );
 
   return (
-    <div className={cn("flex-1", "rounded-lg", "flex", "flex-col", "gap-y-3")}>
+    <div className={cn("flex", "flex-col", "gap-y-3")}>
       <CommunityStatus
         isLoading={isScreenLoading}
         communityStatus={screenData}
       />
-      <p>Other Content</p>
+      <GovernanceInfoPanel />
     </div>
   );
 };

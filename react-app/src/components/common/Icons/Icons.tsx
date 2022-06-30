@@ -22,6 +22,7 @@ import { ReactComponent as ArrowNarrowRightIcon } from "../../../assets/ic-arrow
 import { ReactComponent as ArrowNarrowLeftIcon } from "../../../assets/ic-arrow-narrow-left.svg";
 import { ReactComponent as AccountIcon } from "../../../assets/ic-account.svg";
 import { ReactComponent as LikeCoinIcon } from "../../../assets/ic-likecoin.svg";
+import { ReactComponent as InfoIcon } from "../../../assets/ic-info.svg";
 
 enum IconType {
   Home = "Home",
@@ -47,6 +48,7 @@ enum IconType {
   ArrowNarrowLeft = "ArrowNarrowLeft",
   Account = "AccountIcon",
   LikeCoin = "LikeCoin",
+  Info = "Info",
 }
 
 const iconMap = {
@@ -73,6 +75,7 @@ const iconMap = {
   [IconType.ArrowNarrowLeft]: ArrowNarrowLeftIcon,
   [IconType.Account]: AccountIcon,
   [IconType.LikeCoin]: LikeCoinIcon,
+  [IconType.Info]: InfoIcon,
 };
 
 function getIcon(icon: IconType) {
