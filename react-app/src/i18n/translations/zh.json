@@ -95,6 +95,7 @@
   "ProposalScreen.requestState.error": "Failed to fetch data, please try again later.",
   "ProposalScreen.title": "Proposals",
   "ReactionPicker.addReaction": "Add Reaction",
+  "SectionedTable.noItems": "No Items",
   "SendTokenModal.fields.amount": "Amount",
   "SendTokenModal.fields.amount.available": "Available: {amount} {denom}",
   "SendTokenModal.fields.memo": "Memo",

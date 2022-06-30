@@ -3,6 +3,7 @@ import cn from "classnames";
 import { MessageID } from "../../i18n/LocaleModel";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
+import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 
 export interface ColumnOrder {
   id: string;
@@ -140,6 +141,8 @@ const Section: <T>(props: SectionProps<T>) => React.ReactElement = (props) => {
 
 interface SectionedTableProps<T> {
   sections: SectionItem<T>[];
+  isLoading?: boolean;
+  emptyMessageID?: MessageID;
   sortOrder?: ColumnOrder;
   onSort?: (order: ColumnOrder) => void;
   children:
@@ -150,7 +153,8 @@ interface SectionedTableProps<T> {
 const SectionedTable: <T>(
   props: SectionedTableProps<T>
 ) => React.ReactElement = (props) => {
-  const { sections, children, sortOrder, onSort } = props;
+  const { sections, children, emptyMessageID, isLoading, sortOrder, onSort } =
+    props;
 
   const columnSortContextValue = useMemo(
     () => ({
@@ -159,6 +163,10 @@ const SectionedTable: <T>(
     }),
     [sortOrder, onSort]
   );
+
+  const visibleSections = useMemo(() => {
+    return sections.filter((section) => section.items.length > 0);
+  }, [sections]);
 
   return (
     <div className={cn("inline-block", "min-w-full", "py-2", "align-middle")}>
@@ -173,7 +181,7 @@ const SectionedTable: <T>(
         )}
       >
         <table className="min-w-full">
-          <thead className="bg-white">
+          <thead className={cn("bg-white", "border-b")}>
             <tr>
               <ColumnSortContext.Provider value={columnSortContextValue}>
                 {React.Children.map(children, (column, index) => (
@@ -183,9 +191,57 @@ const SectionedTable: <T>(
             </tr>
           </thead>
           <tbody className="bg-white">
-            {sections.map((section, sectionIdx) => (
-              <Section key={sectionIdx} section={section} columns={children} />
-            ))}
+            {isLoading ? (
+              <tr>
+                <td colSpan={React.Children.count(children)}>
+                  <div
+                    className={cn(
+                      "w-full",
+                      "h-96",
+                      "flex",
+                      "items-center",
+                      "justify-center"
+                    )}
+                  >
+                    <LoadingSpinner className={cn("h-16", "w-full")} />
+                  </div>
+                </td>
+              </tr>
+            ) : visibleSections.length === 0 ? (
+              <tr>
+                <td colSpan={React.Children.count(children)}>
+                  <div
+                    className={cn(
+                      "h-96",
+                      "flex",
+                      "items-center",
+                      "justify-center"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "font-bold",
+                        "text-xl",
+                        "leading-5",
+                        "text-black"
+                      )}
+                    >
+                      <LocalizedText
+                        messageID={emptyMessageID ?? "SectionedTable.noItems"}
+                      />
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              visibleSections.map((section, sectionIdx) => (
+                <Section
+                  key={sectionIdx}
+                  section={section}
+                  columns={children}
+                />
+              ))
+            )}
           </tbody>
         </table>
       </div>
