@@ -166,7 +166,17 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.
 		Where("(deposit.coin).denom = ?", denom).
 		GroupExpr("(deposit.coin).denom")
 
-	err := query.Scan(q.ctx, &res)
+	// In case there are no deposits for a proposal
+	// this happens for some reason even if min proposal deposit is positive
+	count, err := query.Count(q.ctx)
+	if err != nil {
+		return bunbig.Int{}, err
+	}
+	if count == 0 {
+		return bunbig.Int{}, nil
+	}
+
+	err = query.Scan(q.ctx, &res)
 	if err != nil {
 		return bunbig.Int{}, err
 	}
