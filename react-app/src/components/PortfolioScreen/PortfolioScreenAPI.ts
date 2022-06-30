@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import BigNumber from "bignumber.js";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
@@ -11,6 +12,7 @@ import {
   RequestStateLoaded,
   RequestStateLoading,
 } from "../../models/RequestState";
+import { useDistributionAPI } from "../../api/distributionAPI";
 import { Portfolio } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
@@ -22,6 +24,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
   const staking = useStakingAPI();
+  const distribution = useDistributionAPI();
   const { desmosQuery } = useQueryClient();
 
   const fetchPortfolio = useCallback(async () => {
@@ -31,21 +34,31 @@ export function usePortfolioQuery(): PortfolioRequestState {
       return;
     }
     try {
-      const [balance, stakedBalance, unstakingBalance, profile] =
-        await Promise.all([
-          cosmosAPI.getBalance(),
-          cosmosAPI.getStakedBalance(),
-          staking.getUnstakingAmount(wallet.account.address),
-          desmosQuery.getProfile(
-            translateAddress(wallet.account.address, "desmos")
-          ),
-        ]);
+      const [
+        availableBalance,
+        stakedBalance,
+        unstakingBalance,
+        commission,
+        reward,
+        profile,
+      ] = await Promise.all([
+        cosmosAPI.getBalance(),
+        cosmosAPI.getStakedBalance(),
+        staking.getUnstakingAmount(wallet.account.address),
+        distribution.getTotalCommission(),
+        distribution.getTotalDelegationRewards(),
+        desmosQuery.getProfile(
+          translateAddress(wallet.account.address, "desmos")
+        ),
+      ]);
 
-      const availableBalance = {
-        amount: balance.amount
-          .minus(stakedBalance.amount)
-          .minus(unstakingBalance.amount),
-        denom: balance.denom,
+      const balance = {
+        amount: BigNumber.sum(
+          availableBalance.amount,
+          stakedBalance.amount,
+          unstakingBalance.amount
+        ),
+        denom: availableBalance.denom,
       };
 
       setRequestState(
@@ -55,6 +68,8 @@ export function usePortfolioQuery(): PortfolioRequestState {
           stakedBalance,
           unstakingBalance,
           availableBalance,
+          commission,
+          reward,
           address: wallet.account.address,
         })
       );
@@ -64,7 +79,7 @@ export function usePortfolioQuery(): PortfolioRequestState {
       }
       console.log("Failed to handle fetch portfolio error =", err);
     }
-  }, [wallet, cosmosAPI, staking, desmosQuery, setRequestState]);
+  }, [wallet, cosmosAPI, staking, desmosQuery, setRequestState, distribution]);
 
   useEffect(() => {
     fetchPortfolio().catch((err) => {

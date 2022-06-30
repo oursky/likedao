@@ -1,7 +1,14 @@
 window.appConfig = {
   sentry: null,
   chainInfo: {
-    bech32Prefix: "like",
+    bech32Config: {
+      bech32PrefixAccAddr: "like",
+      bech32PrefixAccPub: "likepub",
+      bech32PrefixValAddr: "likevaloper",
+      bech32PrefixValPub: "likevaloperpub",
+      bech32PrefixConsAddr: "likevalcons",
+      bech32PrefixConsPub: "likevalconspub",
+    },
     gasPrice: "200000nanoekil",
     chainId: "likecoin-public-testnet-5",
     chainRpc: "https://likecoin-public-testnet-5.oursky.dev:443/rpc/",
