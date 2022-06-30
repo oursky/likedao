@@ -18,10 +18,12 @@ const VoteDetail: React.FC<VoteDetailProps> = (props) => {
   const { labelId, value, total, colorClassName } = props;
   const coinDenom = Config.chainInfo.currency.coinDenom;
 
-  const percentage = useMemo(
-    () => value.dividedBy(total).shiftedBy(2),
-    [value, total]
-  );
+  const percentage = useMemo(() => {
+    if (value.isZero() || total.isZero()) {
+      return new BigNumber(0);
+    }
+    return value.dividedBy(total).shiftedBy(2);
+  }, [value, total]);
 
   return (
     <div className={cn("flex", "flex-row", "gap-x-2.5")}>

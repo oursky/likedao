@@ -40,6 +40,9 @@ const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
 
   const { yes, no, noWithVeto, abstain } = tallyResult;
   const total = BigNumber.sum(yes, no, noWithVeto, abstain);
+  if (total.isZero()) {
+    return 0;
+  }
   const turnout = new BigNumber(100).minus(
     abstain.dividedBy(total).multipliedBy(100)
   );
