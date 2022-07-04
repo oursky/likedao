@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
 import { useForm } from "react-hook-form";
-import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import AppButton from "../../common/Buttons/AppButton";
 import * as FormField from "../../common/Form";
 import { useLocale } from "../../../providers/AppLocaleProvider";
 import { Selection } from "../../common/Form/SelectionFormField";
+import { VoteOption } from "../../../models/cosmos/gov";
 import {
   useVoteProposalFromModel,
   VoteProposalFormValues,
@@ -41,22 +41,22 @@ const VoteProposalForm: React.FC<VoteProposalFormProps> = (props) => {
     return [
       {
         label: translate("proposal.voteOption.yes"),
-        value: VoteOption.VOTE_OPTION_YES,
+        value: VoteOption.Yes,
         className: "text-likecoin-green",
       },
       {
         label: translate("proposal.voteOption.no"),
-        value: VoteOption.VOTE_OPTION_NO,
+        value: VoteOption.No,
         className: "text-likecoin-vote-color-no",
       },
       {
         label: translate("proposal.voteOption.noWithVeto"),
-        value: VoteOption.VOTE_OPTION_NO_WITH_VETO,
+        value: VoteOption.NoWithVeto,
         className: "text-likecoin-vote-color-veto",
       },
       {
         label: translate("proposal.voteOption.abstain"),
-        value: VoteOption.VOTE_OPTION_ABSTAIN,
+        value: VoteOption.Abstain,
         className: "text-likecoin-vote-color-abstain",
       },
     ];

@@ -11,7 +11,10 @@ import {
   MsgDeposit,
 } from "cosmjs-types/cosmos/gov/v1beta1/tx";
 
-import { TextProposal, VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
+import {
+  TextProposal,
+  voteOptionFromJSON,
+} from "cosmjs-types/cosmos/gov/v1beta1/gov";
 
 import { Duration } from "cosmjs-types/google/protobuf/duration";
 
@@ -43,6 +46,13 @@ export enum ProposalType {
   CommunityPoolSpend = "CommunityPoolSpend",
   SoftwareUpgrade = "SoftwareUpgrade",
   CancelSoftwareUpgrade = "CancelSoftwareUpgrade",
+}
+
+export enum VoteOption {
+  Abstain = "VOTE_OPTION_ABSTAIN",
+  No = "VOTE_OPTION_NO",
+  NoWithVeto = "VOTE_OPTION_NO_WITH_VETO",
+  Yes = "VOTE_OPTION_YES",
 }
 
 interface TextProposalContentBody {
@@ -156,7 +166,7 @@ function makeVoteMessage(body: VoteMessageBody): MsgVoteEncodeObject {
     value: MsgVote.fromPartial({
       proposalId: body.proposalId,
       voter: body.voter,
-      option: body.option,
+      option: voteOptionFromJSON(body.option),
     }),
   };
 }
