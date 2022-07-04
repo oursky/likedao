@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/forbole/bdjuno/database/types"
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	"github.com/oursky/likedao/pkg/dataloaders"
 	servererrors "github.com/oursky/likedao/pkg/errors"
@@ -182,6 +183,133 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 	return &conn, nil
 }
 
+func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, input models.QueryProposalDepositsInput) (*models.Connection[models.ProposalDeposit], error) {
+	result := make([]models.ProposalDeposit, 0)
+
+	validatorLimit := input.First
+	validatorOffset := input.After
+	// No need validators if no delegation or already went through all the validators
+	if len(input.PinnedValidators) == 0 || input.After > len(input.PinnedValidators) {
+		validatorLimit = 0
+		validatorOffset = 0
+	}
+
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
+	}
+
+	// Add validators to result
+	for i := range validators.Items {
+		validator := validators.Items[i]
+		if validator.Info != nil && len(validator.Info.ProposalDeposits) != 0 {
+			result = append(result, *validator.Info.ProposalDeposits[0])
+		} else {
+			result = append(result, models.ProposalDeposit{
+				ProposalID:       obj.ID,
+				DepositorAddress: validator.Info.SelfDelegateAddress,
+				Amount:           nil,
+				Height:           validator.Info.Height,
+
+				ValidatorInfo: validator.Info,
+			})
+		}
+	}
+
+	depositLimit := input.First
+	// Get the remaining vote items if the number of validators are fewer than the pageSize
+	if len(validators.Items) < input.First {
+		depositLimit = input.First - len(validators.Items)
+	}
+
+	// Skip votes if we already have enough items for a page
+	if len(validators.Items) == input.First {
+		depositLimit = 0
+	}
+
+	// Start offsetting the votes if we are done with the validators
+	depositOffset := input.After
+	if len(input.PinnedValidators) != 0 {
+		depositOffset -= validators.PaginationInfo.TotalCount
+	}
+	if depositOffset < 0 {
+		depositOffset = 0
+	}
+
+	deposits, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryPaginatedProposalDeposits(obj.ID, depositLimit, depositOffset, input.Order, input.PinnedValidators)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal votes: %v", err))
+	}
+
+	// Add votes to result
+	for i := range deposits.Items {
+		deposit := deposits.Items[i]
+		result = append(result, deposit)
+	}
+
+	depositWithValidatorCursorMap := make(map[string]string)
+	for index, identity := range result {
+		cursorString := strconv.Itoa(input.After + index + 1)
+		depositWithValidatorCursorMap[identity.NodeID().String()] = cursorString
+
+	}
+
+	conn := models.NewConnection(result, func(model models.ProposalDeposit) string {
+		return depositWithValidatorCursorMap[model.NodeID().String()]
+	})
+
+	totalCount := deposits.PaginationInfo.TotalCount
+	hasNextPage := deposits.PaginationInfo.HasNext
+	hasPreviousPage := deposits.PaginationInfo.HasPrevious
+	if validatorLimit != 0 {
+		totalCount = totalCount + validators.PaginationInfo.TotalCount
+		hasNextPage = validators.PaginationInfo.HasNext
+		hasPreviousPage = validators.PaginationInfo.HasPrevious
+	}
+
+	conn.TotalCount = totalCount
+	conn.PageInfo.HasNextPage = hasNextPage
+	conn.PageInfo.HasPreviousPage = hasPreviousPage
+
+	return &conn, nil
+}
+
+func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.ProposalDeposit) (models.ProposalDepositor, error) {
+	// Deposit is from a validator
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoBySelfDelegationAddress(obj.DepositorAddress)
+	if err == nil && validator != nil {
+		return validator, nil
+	}
+
+	// Deposit is from a depositor
+	if obj.DepositorAddress != "" {
+		return models.StringObject{
+			Value: obj.DepositorAddress,
+		}, nil
+	}
+
+	// Deposit is initial deposit by the proposer
+	proposal, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.Load(strconv.Itoa(obj.ProposalID))
+	if err == nil && proposal != nil && proposal.ProposerAddress != "" {
+		return models.StringObject{
+			Value: proposal.ProposerAddress,
+		}, nil
+	}
+
+	return nil, nil
+}
+
+func (r *proposalDepositResolver) Amount(ctx context.Context, obj *models.ProposalDeposit) ([]types.DbDecCoin, error) {
+	coins := make([]types.DbDecCoin, 0, len(obj.Amount))
+	for _, coin := range obj.Amount {
+		coins = append(coins, types.DbDecCoin{
+			Denom:  coin.Denom,
+			Amount: coin.Amount,
+		})
+	}
+	return coins, nil
+}
+
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
 	if obj.Yes == nil {
 		return 0, nil
@@ -300,6 +428,11 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 // Proposal returns graphql1.ProposalResolver implementation.
 func (r *Resolver) Proposal() graphql1.ProposalResolver { return &proposalResolver{r} }
 
+// ProposalDeposit returns graphql1.ProposalDepositResolver implementation.
+func (r *Resolver) ProposalDeposit() graphql1.ProposalDepositResolver {
+	return &proposalDepositResolver{r}
+}
+
 // ProposalTallyResult returns graphql1.ProposalTallyResultResolver implementation.
 func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 	return &proposalTallyResultResolver{r}
@@ -309,5 +442,6 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 func (r *Resolver) ProposalVote() graphql1.ProposalVoteResolver { return &proposalVoteResolver{r} }
 
 type proposalResolver struct{ *Resolver }
+type proposalDepositResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
 type proposalVoteResolver struct{ *Resolver }

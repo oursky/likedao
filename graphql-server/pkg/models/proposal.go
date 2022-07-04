@@ -115,7 +115,54 @@ type ProposalDeposit struct {
 	DepositorAddress string            `bun:"column:depositor_address,notnull"`
 	Amount           bdjuno.DbDecCoins `bun:"column:amount,notnull"`
 	Height           int64             `bun:"column:height,notnull"`
+
+	Proposal      *Proposal      `bun:"rel:belongs-to,join:proposal_id=id"`
+	ValidatorInfo *ValidatorInfo `bun:"rel:has-one,join:depositor_address=self_delegate_address"`
 }
+
+func (p ProposalDeposit) ID() ProposalDepositID {
+	return ProposalDepositID{
+		ProposalID: p.ProposalID,
+		Depositor:  p.DepositorAddress,
+	}
+}
+
+type ProposalDepositID struct {
+	ProposalID int
+	Depositor  string
+}
+
+func (proposalDepositID ProposalDepositID) String() string {
+	if proposalDepositID.Depositor == "" {
+		return strconv.Itoa(proposalDepositID.ProposalID)
+	}
+	return fmt.Sprintf("%d-%s", proposalDepositID.ProposalID, proposalDepositID.Depositor)
+}
+
+func ParseProposalDepositID(proposalDepositID string) (ProposalDepositID, error) {
+	parts := strings.Split(proposalDepositID, "-")
+	if len(parts) != 2 {
+		return ProposalDepositID{}, fmt.Errorf("invalid proposal vote ID: %s", proposalDepositID)
+	}
+
+	proposalID, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return ProposalDepositID{}, fmt.Errorf("failed to parse proposal ID: %s", proposalDepositID)
+	}
+
+	return ProposalDepositID{
+		ProposalID: proposalID,
+		Depositor:  parts[1],
+	}, nil
+}
+
+func (p ProposalDeposit) IsNode() {}
+func (p ProposalDeposit) NodeID() NodeID {
+	return GetNodeID(p)
+}
+
+type ProposalDepositConnection = Connection[ProposalDeposit]
+type ProposalDepositEdge = Edge[ProposalDeposit]
 
 type ProposalVote struct {
 	bun.BaseModel `bun:"table:proposal_vote"`

@@ -14,6 +14,7 @@ import (
 type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
 	ScopeRelatedAddress(address string) IProposalQuery
+	QueryPaginatedProposalDeposits(proposalID int, first int, after int, orderBy *models.ProposalDepositSort, excludeAddresses []string) (*Paginated[models.ProposalDeposit], error)
 	QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error)
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
@@ -147,6 +148,59 @@ func (q *ProposalQuery) QueryPaginatedProposalVotes(proposalID int, first int, a
 
 	return &Paginated[models.ProposalVote]{
 		Items: votes,
+		PaginationInfo: PaginationInfo{
+			HasNext:     hasNextPage,
+			HasPrevious: hasPreviousPage,
+			TotalCount:  totalCount,
+		},
+	}, nil
+
+}
+
+func (q *ProposalQuery) NewProposalDepositQuery(proposalID int, excludeAddresses []string) *bun.SelectQuery {
+	query := q.session.NewSelect().Model((*models.ProposalDeposit)(nil)).Where("proposal_id = ?", proposalID)
+
+	if len(excludeAddresses) != 0 {
+		query = query.Where("depositor_address NOT IN (?)", bun.In(excludeAddresses))
+	}
+
+	return query
+}
+func (q *ProposalQuery) QueryPaginatedProposalDeposits(proposalID int, first int, after int, orderBy *models.ProposalDepositSort, excludeAddresses []string) (*Paginated[models.ProposalDeposit], error) {
+	totalCount, err := q.NewProposalDepositQuery(proposalID, excludeAddresses).Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var deposits []models.ProposalDeposit
+	query := q.NewProposalDepositQuery(proposalID, excludeAddresses).
+		Relation("ValidatorInfo.Validator.Description")
+
+	if orderBy.Depositor != nil {
+		query = query.Order(fmt.Sprintf("moniker %s", orderBy.Depositor)).Order(fmt.Sprintf("depositor_address %s", orderBy.Depositor))
+	} else if orderBy.Amount != nil {
+		query = query.Order(fmt.Sprintf("amount %s", orderBy.Amount))
+	} else {
+		query = query.Order("height DESC")
+	}
+
+	query = query.Limit(first + 1).
+		Offset(after)
+
+	err = query.Scan(q.ctx, &deposits)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	hasNextPage := len(deposits) > first
+	hasPreviousPage := after > 0
+
+	if len(deposits) > first {
+		deposits = deposits[:first]
+	}
+
+	return &Paginated[models.ProposalDeposit]{
+		Items: deposits,
 		PaginationInfo: PaginationInfo{
 			HasNext:     hasNextPage,
 			HasPrevious: hasPreviousPage,

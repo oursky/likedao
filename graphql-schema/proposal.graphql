@@ -50,6 +50,7 @@ type Proposal implements Node {
   myReaction: String
 
   votes(input: QueryProposalVotesInput!): ProposalVoteConnection!
+  deposits(input: QueryProposalDepositsInput!): ProposalDepositConnection!
 }
 
 type ProposalEdge {
@@ -101,6 +102,25 @@ type ProposalVoteConnection {
   totalCount: Int!
 }
 
+union ProposalDepositor = StringObject | Validator
+type ProposalDeposit implements Node {
+  id: ID!
+  proposalId: Int!
+  depositor: ProposalDepositor
+  amount: [Coin!]!
+}
+
+type ProposalDepositEdge {
+  cursor: String!
+  node: ProposalDeposit!
+}
+
+type ProposalDepositConnection {
+  pageInfo: PageInfo!
+  edges: [ProposalDepositEdge!]!
+  totalCount: Int!
+}
+
 input QueryProposalsInput {
   "Number of proposals to show in a page (limit)"
   first: Int!
@@ -126,6 +146,20 @@ input QueryProposalVotesInput {
   after: Int!
   pinnedValidators: [String!]
   order: ProposalVoteSort!
+}
+
+input ProposalDepositSort {
+  depositor: Sort
+  amount: Sort
+}
+
+input QueryProposalDepositsInput {
+  # Limit
+  first: Int!
+  # Offset
+  after: Int!
+  pinnedValidators: [String!]
+  order: ProposalDepositSort!
 }
 
 extend type Query {
