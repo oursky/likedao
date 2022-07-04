@@ -80,7 +80,7 @@ export const usePortfolioQuery = (): {
   const bankAPI = useBankAPI();
   const stakingAPI = useStakingAPI();
   const distribution = useDistributionAPI();
-  const { desmosQuery, stargateQuery } = useQueryClient();
+  const { desmosQuery, query } = useQueryClient();
 
   const [stakesOrder, setStakesOrder] = useState({
     id: "name",
@@ -90,13 +90,13 @@ export const usePortfolioQuery = (): {
   const isValidAddress = useCallback(
     async (address: string) => {
       try {
-        await stargateQuery.getAccount(address);
+        const account = await query.auth.account(address);
+        return account != null;
       } catch {
         return false;
       }
-      return true;
     },
-    [stargateQuery]
+    [query]
   );
 
   const fetchAddressPortfolio = useCallback<
