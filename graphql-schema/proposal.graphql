@@ -175,5 +175,5 @@ type ProposalVotesDistribution {
 extend type Query {
   proposals(input: QueryProposalsInput!): ProposalConnection!
   proposalByID(id: ID!): Proposal
-  proposalVotesDistribution(address: String!): ProposalVotesDistribution!
+  proposalVotesDistribution(address: String!): ProposalTallyResult!
 }

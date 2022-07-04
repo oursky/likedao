@@ -25,6 +25,7 @@ type IProposalQuery interface {
 	QueryProposalVotes(proposalIDs []int, addresses []string) ([]*models.ProposalVote, error)
 	QueryProposalVotesByAddress(address string) ([]*models.ProposalVote, error)
 	QueryProposalDeposits(proposalIDs []int, addresses []string) ([]*models.ProposalDeposit, error)
+	QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error)
 }
 
 type ProposalQuery struct {
@@ -374,4 +375,36 @@ func (q *ProposalQuery) QueryProposalDeposits(proposalIDs []int, addresses []str
 	}
 
 	return deposits, nil
+}
+
+func (q *ProposalQuery) QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error) {
+	res := make([]*models.ProposalVoteOptionCount, 4)
+	err := q.session.NewSelect().
+		Model((*models.ProposalVote)(nil)).
+		Column("option").
+		ColumnExpr("count(*)").
+		Where("voter_address = ?", address).
+		Group("option").
+		Scan(q.ctx, &res)
+
+	if err != nil {
+		return nil, nil
+	}
+
+	distribution := models.ProposalTallyResult{}
+	for _, voteCount := range res {
+		switch voteCount.Option {
+		case models.ProposalVoteOptionYes:
+			distribution.Yes = voteCount.Count
+		case models.ProposalVoteOptionNo:
+			distribution.No = voteCount.Count
+		case models.ProposalVoteOptionAbstain:
+			distribution.Abstain = voteCount.Count
+		case models.ProposalVoteOptionNoWithVeto:
+			distribution.NoWithVeto = voteCount.Count
+		default:
+			return nil, errors.New("invalid vote option encountered")
+		}
+	}
+	return &distribution, nil
 }

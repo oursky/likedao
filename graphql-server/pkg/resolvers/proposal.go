@@ -475,49 +475,12 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 	return res, nil
 }
 
-func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address string) (*models.ProposalVotesDistribution, error) {
-	votes, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalVotesByAddress(address)
+func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address string) (*models.ProposalTallyResult, error) {
+	distribution, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalVoteCountByAddress(address)
 	if err != nil {
 		return nil, err
 	}
-
-	yesCount := float64(0)
-	noCount := float64(0)
-	abstainCount := float64(0)
-	noWithVetoCount := float64(0)
-
-	for _, vote := range votes {
-		switch vote.Option {
-		case models.ProposalVoteOptionYes:
-			yesCount++
-		case models.ProposalVoteOptionNo:
-			noCount++
-		case models.ProposalVoteOptionAbstain:
-			abstainCount++
-		case models.ProposalVoteOptionNoWithVeto:
-			noWithVetoCount++
-		default:
-			return nil, errors.New("invalid proposal option")
-		}
-	}
-
-	totalCount := yesCount + noCount + abstainCount + noWithVetoCount
-
-	if totalCount == 0 {
-		return &models.ProposalVotesDistribution{
-			Yes:        0,
-			No:         0,
-			Abstain:    0,
-			NoWithVeto: 0,
-		}, nil
-	}
-
-	return &models.ProposalVotesDistribution{
-		Yes:        yesCount / totalCount,
-		No:         noCount / totalCount,
-		Abstain:    abstainCount / totalCount,
-		NoWithVeto: noWithVetoCount / totalCount,
-	}, nil
+	return distribution, nil
 }
 
 // Proposal returns graphql1.ProposalResolver implementation.
