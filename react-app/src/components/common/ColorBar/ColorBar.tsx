@@ -31,17 +31,32 @@ const ColorBarSection: React.FC<ColorBarSectionProps> = (props) => {
   });
 
   const percentage = useMemo(() => {
+    if (total.isZero()) {
+      return 0;
+    }
     return `${data.value.div(total).shiftedBy(2).toFixed(1)}%`;
   }, [data, total]);
 
   const handlePercentageDisplay = useCallback(() => {
     if (percentageEl) {
       const parentEle = percentageEl.parentElement;
+
+      if (
+        parentEle &&
+        parentEle.offsetWidth === 0 &&
+        percentageEl.offsetWidth !== 0
+      ) {
+        // Component is still being initialized
+        return;
+      }
+
       if (
         !showPercentage ||
         (parentEle && parentEle.offsetWidth < percentageEl.offsetWidth)
       ) {
         percentageEl.hidden = true;
+      } else {
+        percentageEl.hidden = false;
       }
     }
   }, [percentageEl, showPercentage]);
@@ -108,34 +123,52 @@ const ColorBarSection: React.FC<ColorBarSectionProps> = (props) => {
 interface ColorBarProps {
   className?: string;
   showPercentage?: boolean;
+  total?: BigNumber;
   data: ColorBarData[];
 }
 
 const ColorBar: React.FC<ColorBarProps> = (props) => {
-  const { className, data, showPercentage } = props;
+  const { className, data, showPercentage, total } = props;
 
-  const total = useMemo(
+  const calculatedTotal = useMemo(
     () =>
+      total ??
       data.reduce((total, data) => total.plus(data.value), new BigNumber(0)),
-    [data]
+    [data, total]
   );
 
+  // Using grid to overlap the bars without using relative which breaks the tooltips
   return (
-    <div className={cn("flex", "h-full", "overflow-hidden", className)}>
-      {!total.eq(0) ? (
-        data.map((data, index) => (
+    <div
+      className={cn(
+        "grid",
+        "grid-rows-1",
+        "grid-cols-1",
+        "h-full",
+        "overflow-hidden",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "row-start-1",
+          "col-start-1",
+          "block",
+          "h-full",
+          "w-full",
+          "bg-likecoin-grey"
+        )}
+      />
+      <div className={cn("row-start-1", "col-start-1", "flex")}>
+        {data.map((data, index) => (
           <ColorBarSection
             key={index}
             data={data}
-            total={total}
+            total={calculatedTotal}
             showPercentage={showPercentage}
           />
-        ))
-      ) : (
-        <div
-          className={cn("inline-block", "h-full", "w-full", "bg-likecoin-grey")}
-        />
-      )}
+        ))}
+      </div>
     </div>
   );
 };

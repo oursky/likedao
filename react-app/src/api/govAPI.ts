@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
-import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import { Coin } from "@cosmjs/stargate";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
@@ -12,6 +11,7 @@ import {
   convertMinimalTokenToToken,
 } from "../utils/coin";
 import { convertUInt8ArrayToDecimal } from "../utils/number";
+import { VoteOption } from "../models/cosmos/gov";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 
 interface IGovAPI {

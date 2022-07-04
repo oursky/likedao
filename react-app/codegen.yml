@@ -6,6 +6,7 @@ generates:
     config:
       enumValues:
         ProposalStatus: ../models/cosmos/gov#ProposalStatus
+        ProposalVoteOption: ../models/cosmos/gov#VoteOption
     plugins:
       - "typescript"
       - "typescript-operations"

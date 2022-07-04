@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import cn from "classnames";
 import { MessageID } from "../../i18n/LocaleModel";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { ProposalVoteOption } from "../../generated/graphql";
 
-function getVoteOptionMessage(option: ProposalVoteOption): MessageID {
+function getVoteOptionMessage(option: ProposalVoteOption): MessageID | null {
   switch (option) {
     case ProposalVoteOption.Yes:
       return "proposal.voteOption.yes";
@@ -15,11 +15,13 @@ function getVoteOptionMessage(option: ProposalVoteOption): MessageID {
     case ProposalVoteOption.NoWithVeto:
       return "proposal.voteOption.noWithVeto";
     default:
-      throw new Error("Unknown vote option");
+      return null;
   }
 }
 
-function getVoteOptionIndicatorClassname(option: ProposalVoteOption): string {
+function getVoteOptionIndicatorClassname(
+  option: ProposalVoteOption
+): string | null {
   switch (option) {
     case ProposalVoteOption.Yes:
       return "bg-likecoin-vote-color-yes";
@@ -30,7 +32,7 @@ function getVoteOptionIndicatorClassname(option: ProposalVoteOption): string {
     case ProposalVoteOption.NoWithVeto:
       return "bg-likecoin-vote-color-veto";
     default:
-      throw new Error("Unknown vote option");
+      return null;
   }
 }
 
@@ -42,6 +44,18 @@ interface VoteOptionIndicatorProps {
 const VoteOptionIndicator: React.FC<VoteOptionIndicatorProps> = (props) => {
   const { className, option } = props;
 
+  const [voteOptionIndicatorClassName, voteOptionMessage] = useMemo(
+    () => [
+      getVoteOptionIndicatorClassname(option),
+      getVoteOptionMessage(option),
+    ],
+    [option]
+  );
+
+  if (voteOptionIndicatorClassName == null || voteOptionMessage == null) {
+    return null;
+  }
+
   return (
     <div
       className={cn("flex", "flex-row", "gap-x-1", "items-center", className)}
@@ -51,13 +65,13 @@ const VoteOptionIndicator: React.FC<VoteOptionIndicatorProps> = (props) => {
           "rounded-full",
           "h-1",
           "w-1",
-          getVoteOptionIndicatorClassname(option)
+          voteOptionIndicatorClassName
         )}
       />
       <span
         className={cn("text-2xs", "leading-5", "font-medium", "text-black")}
       >
-        <LocalizedText messageID={getVoteOptionMessage(option)} />
+        <LocalizedText messageID={voteOptionMessage} />
       </span>
     </div>
   );

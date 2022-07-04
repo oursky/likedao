@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
 import { RegisterOptions } from "react-hook-form";
-import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import { useFormValidators } from "../../../hooks/useFormValidators";
+import { VoteOption } from "../../../models/cosmos/gov";
 
 export interface VoteProposalFormValues {
   proposalId: number;
