@@ -6,12 +6,15 @@ import LocalizedText from "../common/Localized/LocalizedText";
 
 export enum ErrorType {
   NotFound = "NotFound",
+  InvalidAddress = "InvalidAddress",
 }
 
 function getErrorViewMessage(type?: ErrorType): MessageID {
   switch (type) {
     case ErrorType.NotFound:
       return "ErrorView.notFound";
+    case ErrorType.InvalidAddress:
+      return "ErrorView.invalidAddress";
     default:
       return "ErrorView.unknown";
   }

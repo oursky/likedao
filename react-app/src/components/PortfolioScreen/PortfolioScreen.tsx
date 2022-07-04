@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
   isRequestStateError,
@@ -9,20 +10,30 @@ import {
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import AppRoutes from "../../navigation/AppRoutes";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PortfolioScreen: React.FC = () => {
-  const requestState = usePortfolioQuery();
+  const { address } = useParams();
+  const navigate = useNavigate();
+
+  const { requestState, fetch } = usePortfolioQuery();
   const { translate } = useLocale();
   const wallet = useWallet();
 
+  const isYourPortfolio = useMemo(() => !address, [address]);
+
   useEffectOnce(
     () => {
-      if (wallet.status === ConnectionStatus.Idle) {
+      if (wallet.status === ConnectionStatus.Idle && !address) {
         wallet.openConnectWalletModal();
       } else if (isRequestStateError(requestState)) {
-        toast.error(translate("PortfolioScreen.requestState.error"));
+        if (requestState.error.message === "Invalid address") {
+          navigate(AppRoutes.ErrorInvalidAddress);
+        } else {
+          toast.error(translate("PortfolioScreen.requestState.error"));
+        }
       } else if (isRequestStateLoaded(requestState) && !requestState.data) {
         toast.error(translate("PortfolioScreen.requestState.noData"));
       }
@@ -30,6 +41,11 @@ const PortfolioScreen: React.FC = () => {
     () =>
       isRequestStateError(requestState) || isRequestStateLoaded(requestState)
   );
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetch(address);
+  }, [address, fetch]);
 
   if (!isRequestStateLoaded(requestState)) {
     return (
@@ -43,7 +59,10 @@ const PortfolioScreen: React.FC = () => {
 
   return (
     <div className={cn("flex", "flex-col")}>
-      <PortfolioPanel portfolio={requestState.data} />
+      <PortfolioPanel
+        portfolio={requestState.data}
+        isYourPortfolio={isYourPortfolio}
+      />
     </div>
   );
 };
