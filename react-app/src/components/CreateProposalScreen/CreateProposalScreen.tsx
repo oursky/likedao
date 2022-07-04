@@ -16,10 +16,12 @@ import { ProposalType } from "../../models/cosmos/gov";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppRoutes from "../../navigation/AppRoutes";
 import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
+import { useBankAPI } from "../../api/bankAPI";
 
 const CreateProposalScreen: React.FC = () => {
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
   const govAPI = useGovAPI();
   const { translate } = useLocale();
   const navigate = useNavigate();
@@ -91,7 +93,7 @@ const CreateProposalScreen: React.FC = () => {
 
   useEffect(() => {
     // TODO: Handle query from bdjuno after implementing gov param display
-    Promise.all([cosmosAPI.getBalance(), govAPI.getMinDepositParams()])
+    Promise.all([bankAPI.getBalance(), govAPI.getMinDepositParams()])
       .then(([balance, minDeposit]) => {
         setUserBalance(balance.amount);
         setMinimumDeposit(minDeposit.amount);
@@ -99,7 +101,7 @@ const CreateProposalScreen: React.FC = () => {
       .catch((err) => {
         console.log("Failed to get balance", err);
       });
-  }, [chainInfo, cosmosAPI, govAPI, wallet]);
+  }, [chainInfo, bankAPI, govAPI, wallet]);
 
   return (
     <div className={cn("flex", "flex-col")}>

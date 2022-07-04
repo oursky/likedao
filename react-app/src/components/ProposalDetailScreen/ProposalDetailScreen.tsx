@@ -22,6 +22,7 @@ import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useGovAPI } from "../../api/govAPI";
 import { DepositProposalFormValues } from "../forms/DepositProposalForm/DepositProposalFormModel";
 import DepositProposalModal from "../TransactionModals/DepositProposalModal";
+import { useBankAPI } from "../../api/bankAPI";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
@@ -41,6 +42,7 @@ const ProposalDetailScreen: React.FC = () => {
   const navigate = useNavigate();
   const govAPI = useGovAPI();
   const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
 
   const proposalId = useMemo(() => {
     return id != null ? parseInt(id, 10) : null;
@@ -173,7 +175,7 @@ const ProposalDetailScreen: React.FC = () => {
   }, [fetch, proposalId]);
 
   useEffect(() => {
-    cosmosAPI
+    bankAPI
       .getBalance()
       .then((balance) => {
         setUserBalance(balance.amount);
@@ -181,7 +183,7 @@ const ProposalDetailScreen: React.FC = () => {
       .catch((err) => {
         console.error("Failed to get balance and rewards", err);
       });
-  }, [cosmosAPI]);
+  }, [bankAPI]);
 
   useEffectOnce(
     () => {

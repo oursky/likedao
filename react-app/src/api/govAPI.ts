@@ -13,6 +13,7 @@ import {
 import { convertUInt8ArrayToDecimal } from "../utils/number";
 import { VoteOption } from "../models/cosmos/gov";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
+import { useBankAPI } from "./bankAPI";
 
 interface IGovAPI {
   signSubmitProposalTx(
@@ -60,6 +61,7 @@ const getMinDepositFromAllMinDeposit = (
 export const useGovAPI = (): IGovAPI => {
   const wallet = useWallet();
   const cosmos = useCosmosAPI();
+  const bank = useBankAPI();
   const { query } = useQueryClient();
 
   const signSubmitProposalTx = useCallback(
@@ -74,7 +76,7 @@ export const useGovAPI = (): IGovAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await cosmos.getBalance();
+      const balance = await bank.getBalance();
       const minimalDeposit = convertTokenToMinimalToken(initialDeposit);
 
       if (balance.amount.isLessThan(initialDeposit)) {
@@ -98,7 +100,7 @@ export const useGovAPI = (): IGovAPI => {
 
       return cosmos.signTx([request], memo);
     },
-    [cosmos, wallet]
+    [bank, cosmos, wallet]
   );
 
   const signVoteProposalTx = useCallback(
@@ -128,7 +130,7 @@ export const useGovAPI = (): IGovAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await cosmos.getBalance();
+      const balance = await bank.getBalance();
       const minimalDeposit = convertTokenToMinimalToken(amount);
 
       if (balance.amount.isLessThan(minimalDeposit)) {
@@ -148,7 +150,7 @@ export const useGovAPI = (): IGovAPI => {
 
       return cosmos.signTx([request], memo);
     },
-    [cosmos, wallet]
+    [cosmos, bank, wallet]
   );
 
   const getMinDepositParams = useCallback(async () => {

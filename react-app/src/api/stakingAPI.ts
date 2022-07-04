@@ -14,6 +14,7 @@ import {
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
+import { useBankAPI } from "./bankAPI";
 
 interface IStakingAPI {
   signDelegateTokenTx(
@@ -35,6 +36,7 @@ interface IStakingAPI {
 export const useStakingAPI = (): IStakingAPI => {
   const wallet = useWallet();
   const cosmos = useCosmosAPI();
+  const bank = useBankAPI();
   const { query } = useQueryClient();
   const chainInfo = Config.chainInfo;
 
@@ -48,7 +50,7 @@ export const useStakingAPI = (): IStakingAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await cosmos.getBalance();
+      const balance = await bank.getBalance();
       const coinBalance = convertTokenToMinimalToken(balance.amount);
 
       if (coinBalance.isLessThan(coinAmount)) {
@@ -66,7 +68,7 @@ export const useStakingAPI = (): IStakingAPI => {
 
       return cosmos.signTx([request], memo);
     },
-    [chainInfo, cosmos, wallet]
+    [chainInfo, cosmos, bank, wallet]
   );
 
   const signUndelegateTokenTx = useCallback(

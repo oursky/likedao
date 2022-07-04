@@ -119,7 +119,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
 
   useEffect(() => {
     Promise.all([
-      cosmosAPI.getBalance(),
+      bankAPI.getBalance(),
       distributionAPI.getTotalDelegationRewards(),
     ])
       .then(([balance, rewards]) => {
@@ -129,7 +129,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
       .catch((err) => {
         console.error("Failed to get balance and rewards", err);
       });
-  }, [cosmosAPI, distributionAPI]);
+  }, [bankAPI, distributionAPI]);
 
   const contextValue = useMemo((): TransactionProviderContextValue => {
     return {

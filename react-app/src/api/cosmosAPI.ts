@@ -15,9 +15,7 @@ export type SignedTx = Uint8Array;
 const GAS_ADJUSTMENT = 1.3;
 
 interface ICosmosAPI {
-  getBalance(): Promise<BigNumberCoin>;
   getStakedBalance(): Promise<BigNumberCoin>;
-  getAddressBalance(address: string): Promise<BigNumberCoin>;
   getAddressStakedBalance(address: string): Promise<BigNumberCoin>;
   signArbitrary(data: string): Promise<SignDataMessageResponse>;
   signTx(messages: EncodeObject[], memo?: string): Promise<SignedTx>;
@@ -28,24 +26,6 @@ export const useCosmosAPI = (): ICosmosAPI => {
   const wallet = useWallet();
   const { stargateQuery } = useQueryClient();
   const chainInfo = Config.chainInfo;
-
-  const getBalance = useCallback(async () => {
-    if (wallet.status !== ConnectionStatus.Connected) {
-      throw new Error("Wallet not connected");
-    }
-
-    const balance = await wallet.provider.getBalance(
-      wallet.account.address,
-      chainInfo.currency.coinMinimalDenom
-    );
-
-    const amount = convertMinimalTokenToToken(balance.amount);
-
-    return {
-      denom: balance.denom,
-      amount,
-    };
-  }, [chainInfo.currency.coinMinimalDenom, wallet]);
 
   const getStakedBalance = useCallback(async () => {
     if (wallet.status !== ConnectionStatus.Connected) {
@@ -68,23 +48,6 @@ export const useCosmosAPI = (): ICosmosAPI => {
       amount: convertMinimalTokenToToken(balance.amount),
     };
   }, [chainInfo.currency.coinMinimalDenom, wallet]);
-
-  const getAddressBalance = useCallback(
-    async (address: string) => {
-      const balance = await stargateQuery.getBalance(
-        address,
-        chainInfo.currency.coinMinimalDenom
-      );
-
-      const amount = convertMinimalTokenToToken(balance.amount);
-
-      return {
-        denom: balance.denom,
-        amount,
-      };
-    },
-    [chainInfo.currency.coinMinimalDenom, stargateQuery]
-  );
 
   const getAddressStakedBalance = useCallback(
     async (address: string) => {
@@ -152,18 +115,14 @@ export const useCosmosAPI = (): ICosmosAPI => {
 
   return useMemo(
     () => ({
-      getBalance,
       getStakedBalance,
-      getAddressBalance,
       getAddressStakedBalance,
       signArbitrary,
       signTx,
       broadcastTx,
     }),
     [
-      getBalance,
       getStakedBalance,
-      getAddressBalance,
       getAddressStakedBalance,
       signArbitrary,
       signTx,

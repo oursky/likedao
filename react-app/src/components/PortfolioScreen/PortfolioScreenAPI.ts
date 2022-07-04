@@ -23,6 +23,7 @@ import {
 } from "../../generated/graphql";
 import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
+import { useBankAPI } from "../../api/bankAPI";
 import PortfolioScreenModel, {
   Portfolio,
   PortfolioScreenGraphql,
@@ -78,6 +79,7 @@ export const usePortfolioQuery = (): {
 
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
   const staking = useStakingAPI();
   const distribution = useDistributionAPI();
   const { desmosQuery, stargateQuery } = useQueryClient();
@@ -111,7 +113,7 @@ export const usePortfolioQuery = (): {
         reward,
         profile,
       ] = await Promise.all([
-        cosmosAPI.getAddressBalance(address),
+        bankAPI.getAddressBalance(address),
         cosmosAPI.getAddressStakedBalance(address),
         staking.getUnstakingAmount(address),
         distribution.getAddressTotalCommission(address),
@@ -139,7 +141,7 @@ export const usePortfolioQuery = (): {
         address,
       };
     },
-    [cosmosAPI, staking, distribution, desmosQuery]
+    [bankAPI, cosmosAPI, staking, distribution, desmosQuery]
   );
 
   const fetchStakes = useCallback(
