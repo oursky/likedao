@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
-import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { translateAddress, truncateAddress } from "../../utils/address";
@@ -78,9 +77,8 @@ export const usePortfolioQuery = (): {
     useState<PortfolioScreenRequestState>(RequestStateInitial);
 
   const wallet = useWallet();
-  const cosmosAPI = useCosmosAPI();
   const bankAPI = useBankAPI();
-  const staking = useStakingAPI();
+  const stakingAPI = useStakingAPI();
   const distribution = useDistributionAPI();
   const { desmosQuery, stargateQuery } = useQueryClient();
 
@@ -114,8 +112,8 @@ export const usePortfolioQuery = (): {
         profile,
       ] = await Promise.all([
         bankAPI.getAddressBalance(address),
-        cosmosAPI.getAddressStakedBalance(address),
-        staking.getUnstakingAmount(address),
+        stakingAPI.getAddressStakedBalance(address),
+        stakingAPI.getUnstakingAmount(address),
         distribution.getAddressTotalCommission(address),
         distribution.getAddressTotalDelegationRewards(address),
         desmosQuery.getProfile(translateAddress(address, "desmos")),
@@ -141,13 +139,13 @@ export const usePortfolioQuery = (): {
         address,
       };
     },
-    [bankAPI, cosmosAPI, staking, distribution, desmosQuery]
+    [bankAPI, stakingAPI, distribution, desmosQuery]
   );
 
   const fetchStakes = useCallback(
     async (address: string) => {
       // get stakes amount and validator address of each delegation
-      const delegations = await staking.getDelegatorStakes(address);
+      const delegations = await stakingAPI.getDelegatorStakes(address);
 
       // get rewards of each delegations
       const validatorAddresses = delegations.map(
@@ -170,7 +168,7 @@ export const usePortfolioQuery = (): {
 
       return stakeEntries;
     },
-    [distribution, staking]
+    [distribution, stakingAPI]
   );
 
   const fetch = useCallback(
