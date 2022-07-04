@@ -17,6 +17,7 @@ type IProposalQuery interface {
 	QueryPaginatedProposalDeposits(proposalID int, first int, after int, orderBy *models.ProposalDepositSort, excludeAddresses []string) (*Paginated[models.ProposalDeposit], error)
 	QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error)
 	ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery
+	ScopeProposalOrder(order *models.ProposalSort) IProposalQuery
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
@@ -35,6 +36,7 @@ type ProposalQuery struct {
 
 	scopedProposalStatus models.ProposalStatus
 	scopedAddressFilter  *models.ProposalAddressFilter
+	scopedOrder          *models.ProposalSort
 }
 
 func NewProposalQuery(ctx context.Context, config config.Config, session *bun.DB) IProposalQuery {
@@ -77,6 +79,12 @@ func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 		})
 	}
 
+	if q.scopedOrder != nil {
+		if q.scopedOrder.SubmitTime != nil {
+			query = query.Order(fmt.Sprintf("submit_time %s", q.scopedOrder.SubmitTime))
+		}
+	}
+
 	return query
 }
 
@@ -89,6 +97,12 @@ func (q *ProposalQuery) ScopeProposalStatus(status models.ProposalStatus) IPropo
 func (q *ProposalQuery) ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery {
 	var newQuery = *q
 	newQuery.scopedAddressFilter = filter
+	return &newQuery
+}
+
+func (q *ProposalQuery) ScopeProposalOrder(order *models.ProposalSort) IProposalQuery {
+	var newQuery = *q
+	newQuery.scopedOrder = order
 	return &newQuery
 }
 
