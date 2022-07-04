@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -46,7 +46,10 @@ const PortfolioScreen: React.FC = () => {
   const { translate } = useLocale();
   const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams({
+    tab: "voted",
+    page: "1",
+  });
 
   const address = useMemo(() => {
     if (wallet.status === ConnectionStatus.Connected) {
@@ -55,19 +58,39 @@ const PortfolioScreen: React.FC = () => {
     return "";
   }, [wallet]);
 
-  const [selectedTab, setSelectedTab] =
-    useState<ProposalHistoryFilterKey>("voted");
-  const [after, setAfter] = useState(0);
-
   const isYourPortfolio = useMemo(() => !address, [address]);
 
-  const handleSelectTab = useCallback((tab: ProposalHistoryFilterKey) => {
-    setSelectedTab(tab);
-  }, []);
+  const after = useMemo(() => {
+    return (
+      (parseInt(searchParams.get("page") ?? "1", 10) - 1) *
+      PROPOSAL_HISTORY_PAGE_SIZE
+    );
+  }, [searchParams]);
 
-  const handlePageChange = useCallback((after: number) => {
-    setAfter(after);
-  }, []);
+  const selectedTab = useMemo(
+    () => (searchParams.get("tab") ?? "voted") as ProposalHistoryFilterKey,
+    [searchParams]
+  );
+
+  const handleSelectTab = useCallback(
+    (tab: ProposalHistoryFilterKey) => {
+      setSearchParams({
+        tab: tab,
+        page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
+      });
+    },
+    [after, setSearchParams]
+  );
+
+  const handlePageChange = useCallback(
+    (after: number) => {
+      setSearchParams({
+        tab: selectedTab,
+        page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
+      });
+    },
+    [selectedTab, setSearchParams]
+  );
 
   useEffect(() => {
     if (wallet.status === ConnectionStatus.Idle && !address) {
@@ -111,32 +134,10 @@ const PortfolioScreen: React.FC = () => {
       tab: selectedTab,
       address,
     });
-    setSearchParams({
-      tab: selectedTab,
-      page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    address,
-    after,
-    proposalHistoryQuery.fetch,
-    selectedTab,
-    setSearchParams,
-  ]);
 
-  useEffect(() => {
-    const tab = filterItems.find(
-      (item) => item.value === searchParams.get("tab")
-    );
-    if (tab) {
-      setSelectedTab(tab.value);
-    }
-    const page = searchParams.get("page");
-    if (page) {
-      setAfter((parseInt(page, 10) - 1) * PROPOSAL_HISTORY_PAGE_SIZE);
-    }
+    // proposalHistoryQuery shouldn't be in the deps arr
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [address, after, proposalHistoryQuery.fetch, selectedTab]);
 
   return (
     <div className={cn("flex", "flex-col")}>
