@@ -31,13 +31,12 @@ func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (mode
 	return *proposalType, nil
 }
 
-func (r *proposalResolver) DepositTotal(ctx context.Context, obj *models.Proposal) (gql_bigint.BigInt, error) {
-	config := pkgContext.GetConfigFromCtx(ctx)
-	res, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalDepositTotal(obj.ID, config.Chain.CoinDenom)
+func (r *proposalResolver) DepositTotal(ctx context.Context, obj *models.Proposal) ([]types.DbDecCoin, error) {
+	res, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalDepositTotal(obj.ID)
 	if err != nil {
-		return 0, err
+		return []types.DbDecCoin{}, err
 	}
-	return gql_bigint.BigInt(res.ToInt64()), nil
+	return res, nil
 }
 
 func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal) (*models.ProposalTallyResult, error) {
