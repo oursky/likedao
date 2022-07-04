@@ -16,6 +16,8 @@ import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
 import { ProposalStatus } from "../../generated/graphql";
 import { Proposal } from "./ProposalDetailScreenModel";
 
+const CoinDenom = Config.chainInfo.currency.coinDenom;
+
 const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const { proposalId, title, status } = proposal;
 
@@ -51,12 +53,12 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     depositTotal,
     turnout,
   } = proposal;
+
   const totalDepositString = useMemo(() => {
-    return (
-      convertBigNumberToLocalizedIntegerString(depositTotal) +
-      " " +
-      Config.chainInfo.currency.coinDenom.toUpperCase()
-    );
+    if (depositTotal.lt(1)) {
+      return depositTotal.toFixed(3);
+    }
+    return convertBigNumberToLocalizedIntegerString(depositTotal);
   }, [depositTotal]);
 
   return (
@@ -123,7 +125,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
       >
         <div className={cn("flex", "flex-col", "items-center", "grow")}>
           <LocalizedText messageID="ProposalDetail.deposit" />
-          <p>{totalDepositString}</p>
+          <p>{`${totalDepositString} ${CoinDenom}`}</p>
         </div>
         <div className={cn("flex", "flex-col", "items-center", "grow")}>
           <LocalizedText messageID="ProposalDetail.turnOut" />
