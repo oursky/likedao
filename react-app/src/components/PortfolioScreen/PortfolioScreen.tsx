@@ -19,7 +19,8 @@ const PortfolioScreen: React.FC = () => {
   const { address } = useParams();
   const navigate = useNavigate();
 
-  const { requestState, fetch } = usePortfolioQuery();
+  const { requestState, fetch, stakesOrder, setStakesOrder } =
+    usePortfolioQuery();
 
   const { translate } = useLocale();
   const wallet = useWallet();
@@ -60,7 +61,12 @@ const PortfolioScreen: React.FC = () => {
   return (
     <div className={cn("flex", "flex-col")}>
       <PortfolioPanel portfolio={portfolio} isYourPortfolio={isYourPortfolio} />
-      <StakesPanel stakes={stakes} isYourPortfolio={isYourPortfolio} />
+      <StakesPanel
+        stakes={stakes}
+        isYourPortfolio={isYourPortfolio}
+        order={stakesOrder}
+        setOrder={setStakesOrder}
+      />
     </div>
   );
 };

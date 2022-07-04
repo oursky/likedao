@@ -1,11 +1,12 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { translateAddress } from "../../utils/address";
+import { translateAddress, truncateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
+  isRequestStateLoaded,
   RequestState,
   RequestStateError,
   RequestStateInitial,
@@ -13,18 +14,17 @@ import {
   RequestStateLoading,
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
+import { ColumnOrder } from "../SectionedTable/SectionedTable";
 import PortfolioScreenModel, { Portfolio, Stake } from "./PortfolioScreenModel";
 
 type PortfolioScreenRequestState = RequestState<PortfolioScreenModel>;
 
-interface UsePortfolioScreenQuery {
-  (): {
-    requestState: PortfolioScreenRequestState;
-    fetch: (address?: string) => Promise<void>;
-  };
-}
-
-export const usePortfolioQuery: UsePortfolioScreenQuery = () => {
+export const usePortfolioQuery = (): {
+  requestState: PortfolioScreenRequestState;
+  fetch: (address?: string) => Promise<void>;
+  stakesOrder: ColumnOrder;
+  setStakesOrder: (order: ColumnOrder) => void;
+} => {
   const [requestState, setRequestState] =
     useState<PortfolioScreenRequestState>(RequestStateInitial);
 
@@ -33,6 +33,11 @@ export const usePortfolioQuery: UsePortfolioScreenQuery = () => {
   const staking = useStakingAPI();
   const distribution = useDistributionAPI();
   const { desmosQuery, stargateQuery } = useQueryClient();
+
+  const [stakesOrder, setStakesOrder] = useState({
+    id: "name",
+    direction: "asc" as ColumnOrder["direction"],
+  });
 
   const isValidAddress = useCallback(
     async (address: string) => {
@@ -148,5 +153,45 @@ export const usePortfolioQuery: UsePortfolioScreenQuery = () => {
     [fetchAddressPortfolio, fetchStakes, isValidAddress, wallet]
   );
 
-  return { requestState, fetch };
+  const requestStateSorted = useMemo(() => {
+    if (!isRequestStateLoaded(requestState)) {
+      return requestState;
+    }
+    return RequestStateLoaded({
+      ...requestState.data,
+      stakes: requestState.data.stakes.sort((a, b) => {
+        switch (stakesOrder.id) {
+          case "name":
+            return (
+              (
+                a.validator.moniker ??
+                truncateAddress(a.delegation.validatorAddress)
+              ).localeCompare(
+                b.validator.moniker ??
+                  truncateAddress(b.delegation.validatorAddress)
+              ) * (stakesOrder.direction === "asc" ? 1 : -1)
+            );
+          case "staked":
+            return (
+              a.balance.amount.minus(b.balance.amount).toNumber() *
+              (stakesOrder.direction === "asc" ? 1 : -1)
+            );
+          case "rewards":
+            return (
+              a.reward.amount.minus(b.reward.amount).toNumber() *
+              (stakesOrder.direction === "asc" ? 1 : -1)
+            );
+          default:
+            return 1;
+        }
+      }),
+    });
+  }, [stakesOrder.direction, stakesOrder.id, requestState]);
+
+  return {
+    requestState: requestStateSorted,
+    fetch,
+    stakesOrder,
+    setStakesOrder,
+  };
 };

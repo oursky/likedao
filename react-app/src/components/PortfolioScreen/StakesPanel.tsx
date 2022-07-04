@@ -1,35 +1,39 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import cn from "classnames";
 import Paper from "../common/Paper/Paper";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
-  ColumnHeader,
-  ColumnOrder,
-  ColumnSortContext,
-} from "../SectionedTable/SectionedTable";
-import {
   convertBigNumberToFixedPointString,
   convertBigNumberToMillifiedIntegerString,
 } from "../../utils/number";
-import Table, { TableCell, TableHead, TableRow } from "../common/Table/Table";
+import Table, {
+  ColumnOrder,
+  ColumnSortContext,
+  SortableColumnHeader,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "../common/Table/Table";
 import { Stake } from "./PortfolioScreenModel";
 
 interface StakesPanelProps {
   stakes: Stake[];
   isYourPortfolio: boolean;
+  order: ColumnOrder;
+  setOrder: (order: ColumnOrder) => void;
 }
 
 const StakesPanel: React.FC<StakesPanelProps> = ({
   stakes,
   isYourPortfolio,
+  order,
+  setOrder,
 }) => {
-  const [order, setOrder] = useState({
-    id: "name",
-    direction: "asc" as ColumnOrder["direction"],
-  });
-
-  const columnSortContextValue = useMemo(() => ({ order, setOrder }), [order]);
+  const columnSortContextValue = useMemo(
+    () => ({ order, setOrder }),
+    [order, setOrder]
+  );
 
   return (
     <Paper>
@@ -62,30 +66,30 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
         <TableHead>
           <TableRow>
             <ColumnSortContext.Provider value={columnSortContextValue}>
-              <ColumnHeader
+              <SortableColumnHeader
                 id="name"
                 titleId="StakesPanel.name"
                 sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
-              <ColumnHeader
+              <SortableColumnHeader
                 id="staked"
                 titleId="StakesPanel.staked"
                 sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
-              <ColumnHeader
+              <SortableColumnHeader
                 id="rewards"
                 titleId="StakesPanel.rewards"
                 sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
-              <ColumnHeader
+              <SortableColumnHeader
                 id="expectedReturns"
                 titleId="StakesPanel.expectedReturns"
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
-              <ColumnHeader
+              <SortableColumnHeader
                 id="votingPower"
                 titleId="StakesPanel.votingPower"
                 className="uppercase bg-gray-50 border-b border-gray-200"
