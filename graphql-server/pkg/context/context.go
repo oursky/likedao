@@ -31,6 +31,7 @@ type QueryContext struct {
 	Proposal      queries.IProposalQuery
 	Gov           queries.IGovQuery
 	Reaction      queries.IReactionQuery
+	Validator     queries.IValidatorQuery
 }
 
 type MutatorContext struct {
@@ -39,10 +40,11 @@ type MutatorContext struct {
 }
 
 type DataLoaderContext struct {
-	Test     dataloaders.TestDataloader
-	Block    dataloaders.BlockDataloader
-	Proposal dataloaders.ProposalDataloader
-	Reaction dataloaders.ReactionDataloader
+	Test      dataloaders.TestDataloader
+	Block     dataloaders.BlockDataloader
+	Proposal  dataloaders.ProposalDataloader
+	Reaction  dataloaders.ReactionDataloader
+	Validator dataloaders.ValidatorDataloader
 }
 
 type DatabaseContext struct {
@@ -67,16 +69,18 @@ func NewRequestContext(
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 		Gov:           queries.NewGovQuery(ctx, chainDB),
 		Reaction:      queries.NewReactionQuery(ctx, serverDB),
+		Validator:     queries.NewValidatorQuery(ctx, chainDB),
 	}
 	mutators := MutatorContext{
 		Test:     mutators.NewTestMutator(ctx, serverDB),
 		Reaction: mutators.NewReactionMutator(ctx, serverDB),
 	}
 	dataLoaders := DataLoaderContext{
-		Test:     dataloaders.NewTestDataloader(queries.Test),
-		Block:    dataloaders.NewBlockDataloader(queries.Block),
-		Proposal: dataloaders.NewProposalDataloader(queries.Proposal),
-		Reaction: dataloaders.NewReactionDataloader(queries.Reaction),
+		Test:      dataloaders.NewTestDataloader(queries.Test),
+		Block:     dataloaders.NewBlockDataloader(queries.Block),
+		Proposal:  dataloaders.NewProposalDataloader(queries.Proposal),
+		Reaction:  dataloaders.NewReactionDataloader(queries.Reaction),
+		Validator: dataloaders.NewValidatorDataloader(queries.Validator),
 	}
 
 	databases := DatabaseContext{

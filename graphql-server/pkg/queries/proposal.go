@@ -2,6 +2,7 @@ package queries
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/models"
@@ -13,6 +14,7 @@ import (
 type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
 	ScopeRelatedAddress(address string) IProposalQuery
+	QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error)
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
@@ -83,7 +85,7 @@ func (q *ProposalQuery) QueryPaginatedProposals(first int, after int) (*Paginate
 		return nil, errors.WithStack(err)
 	}
 
-	hasNextPage := len(proposals) > after
+	hasNextPage := len(proposals) > first
 	hasPreviousPage := after > 0
 
 	if len(proposals) > first {
@@ -92,6 +94,59 @@ func (q *ProposalQuery) QueryPaginatedProposals(first int, after int) (*Paginate
 
 	return &Paginated[models.Proposal]{
 		Items: proposals,
+		PaginationInfo: PaginationInfo{
+			HasNext:     hasNextPage,
+			HasPrevious: hasPreviousPage,
+			TotalCount:  totalCount,
+		},
+	}, nil
+
+}
+
+func (q *ProposalQuery) NewProposalVotesQuery(proposalID int, excludeAddresses []string) *bun.SelectQuery {
+	query := q.session.NewSelect().Model((*models.ProposalVote)(nil)).Where("proposal_id = ?", proposalID)
+
+	if len(excludeAddresses) != 0 {
+		query = query.Where("voter_address NOT IN (?)", bun.In(excludeAddresses))
+	}
+
+	return query
+}
+func (q *ProposalQuery) QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error) {
+	totalCount, err := q.NewProposalVotesQuery(proposalID, excludeAddresses).Count(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var votes []models.ProposalVote
+	query := q.NewProposalVotesQuery(proposalID, excludeAddresses).
+		Relation("ValidatorInfo.Validator.Description")
+
+	if orderBy.Voter != nil {
+		query = query.Order(fmt.Sprintf("moniker %s", orderBy.Voter)).Order(fmt.Sprintf("voter_address %s", orderBy.Voter))
+	} else if orderBy.Option != nil {
+		query = query.Order(fmt.Sprintf("option %s", orderBy.Option))
+	} else {
+		query = query.Order("height DESC")
+	}
+
+	query = query.Limit(first + 1).
+		Offset(after)
+
+	err = query.Scan(q.ctx, &votes)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	hasNextPage := len(votes) > first
+	hasPreviousPage := after > 0
+
+	if len(votes) > first {
+		votes = votes[:first]
+	}
+
+	return &Paginated[models.ProposalVote]{
+		Items: votes,
 		PaginationInfo: PaginationInfo{
 			HasNext:     hasNextPage,
 			HasPrevious: hasPreviousPage,

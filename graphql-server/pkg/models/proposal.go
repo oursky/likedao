@@ -2,6 +2,8 @@ package models
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	bdjuno "github.com/forbole/bdjuno/database/types"
@@ -51,6 +53,36 @@ func (e ProposalStatusFilter) ToProposalStatus() ProposalStatus {
 	}
 }
 
+type ProposalVoteOption string
+
+const (
+	ProposalVoteOptionYes        ProposalVoteOption = "VOTE_OPTION_YES"
+	ProposalVoteOptionNo         ProposalVoteOption = "VOTE_OPTION_NO"
+	ProposalVoteOptionAbstain    ProposalVoteOption = "VOTE_OPTION_ABSTAIN"
+	ProposalVoteOptionNoWithVeto ProposalVoteOption = "VOTE_OPTION_NO_WITH_VETO"
+)
+
+func (e ProposalVoteOption) IsValid() bool {
+	switch e {
+	case ProposalVoteOptionYes, ProposalVoteOptionNo, ProposalVoteOptionAbstain, ProposalVoteOptionNoWithVeto:
+		return true
+	}
+	return false
+}
+
+func (e *ProposalVoteOption) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProposalVoteOption(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProposalVoteOption", str)
+	}
+	return nil
+}
+
 type Proposal struct {
 	bun.BaseModel `bun:"table:proposal"`
 
@@ -88,11 +120,54 @@ type ProposalDeposit struct {
 type ProposalVote struct {
 	bun.BaseModel `bun:"table:proposal_vote"`
 
-	ProposalID   int    `bun:"column:proposal_id,pk"`
-	VoterAddress string `bun:"column:voter_address,notnull"`
-	Option       string `bun:"column:option,notnull"`
-	Height       int64  `bun:"column:height,notnull"`
+	ProposalID   int                `bun:"column:proposal_id,pk"`
+	VoterAddress string             `bun:"column:voter_address,notnull"`
+	Option       ProposalVoteOption `bun:"column:option,notnull"`
+	Height       int64              `bun:"column:height,notnull"`
+
+	ValidatorInfo *ValidatorInfo `bun:"rel:has-one,join:voter_address=self_delegate_address"`
 }
+
+func (p ProposalVote) ID() ProposalVoteID {
+	return ProposalVoteID{
+		ProposalID: p.ProposalID,
+		Voter:      p.VoterAddress,
+	}
+}
+
+type ProposalVoteID struct {
+	ProposalID int
+	Voter      string
+}
+
+func (proposalVoteID ProposalVoteID) String() string {
+	return fmt.Sprintf("%d-%s", proposalVoteID.ProposalID, proposalVoteID.Voter)
+}
+
+func ParseProposalVoteID(proposalVoteID string) (ProposalVoteID, error) {
+	parts := strings.Split(proposalVoteID, "-")
+	if len(parts) != 2 {
+		return ProposalVoteID{}, fmt.Errorf("invalid proposal vote ID: %s", proposalVoteID)
+	}
+
+	proposalID, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return ProposalVoteID{}, fmt.Errorf("failed to parse proposal ID: %s", proposalVoteID)
+	}
+
+	return ProposalVoteID{
+		ProposalID: proposalID,
+		Voter:      parts[1],
+	}, nil
+}
+
+func (p ProposalVote) IsNode() {}
+func (p ProposalVote) NodeID() NodeID {
+	return GetNodeID(p)
+}
+
+type ProposalVoteConnection = Connection[ProposalVote]
+type ProposalVoteEdge = Edge[ProposalVote]
 
 type ProposalTallyResult struct {
 	bun.BaseModel `bun:"table:proposal_tally_result"`

@@ -8,3 +8,13 @@ A type denoting an large numbers.
 """
 scalar BigInt
 scalar BigFloat
+
+# Created to handle union string
+type StringObject {
+  value: String!
+}
+
+enum Sort {
+  ASC
+  DESC
+}

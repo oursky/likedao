@@ -87,6 +87,101 @@ func (r *proposalResolver) MyReaction(ctx context.Context, obj *models.Proposal)
 	return &reaction.Reaction, nil
 }
 
+func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, input models.QueryProposalVotesInput) (*models.Connection[models.ProposalVote], error) {
+	result := make([]models.ProposalVote, 0)
+
+	validatorLimit := input.First
+	validatorOffset := input.After
+	// No need validators if no delegation or already went through all the validators
+	if len(input.PinnedValidators) == 0 || input.After > len(input.PinnedValidators) {
+		validatorLimit = 0
+		validatorOffset = 0
+	}
+
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalVotes(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
+	}
+
+	// Add validators to result
+	validatorDelegationAddresses := make([]string, 0)
+	for i := range validators.Items {
+		validator := validators.Items[i]
+		// There should only be at most one vote when scoped
+		if validator.Info != nil && len(validator.Info.ProposalVotes) != 0 {
+			result = append(result, *validator.Info.ProposalVotes[0])
+		} else {
+			result = append(result, models.ProposalVote{
+				ProposalID:   obj.ID,
+				VoterAddress: validator.Info.SelfDelegateAddress,
+				Option:       "",
+				Height:       validator.Info.Height,
+
+				ValidatorInfo: validator.Info,
+			})
+		}
+
+		validatorDelegationAddresses = append(validatorDelegationAddresses, validator.Info.SelfDelegateAddress)
+	}
+
+	voteLimit := input.First
+	// Get the remaining vote items if the number of validators are fewer than the pageSize
+	if len(validators.Items) < input.First {
+		voteLimit = input.First - len(validators.Items)
+	}
+
+	// Skip votes if we already have enough items for a page
+	if len(validators.Items) == input.First {
+		voteLimit = 0
+	}
+
+	// Start offsetting the votes if we are done with the validators
+	voteOffset := input.After
+	if len(input.PinnedValidators) != 0 {
+		voteOffset -= validators.PaginationInfo.TotalCount
+	}
+	if voteOffset < 0 {
+		voteOffset = 0
+	}
+
+	votes, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryPaginatedProposalVotes(obj.ID, voteLimit, voteOffset, input.Order, validatorDelegationAddresses)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal votes: %v", err))
+	}
+
+	// Add votes to result
+	for i := range votes.Items {
+		vote := votes.Items[i]
+		result = append(result, vote)
+	}
+
+	voteWithValidatorCursorMap := make(map[string]string)
+	for index, identity := range result {
+		cursorString := strconv.Itoa(input.After + index + 1)
+		voteWithValidatorCursorMap[identity.NodeID().String()] = cursorString
+
+	}
+
+	conn := models.NewConnection(result, func(model models.ProposalVote) string {
+		return voteWithValidatorCursorMap[model.NodeID().String()]
+	})
+
+	totalCount := votes.PaginationInfo.TotalCount
+	hasNextPage := votes.PaginationInfo.HasNext
+	hasPreviousPage := votes.PaginationInfo.HasPrevious
+	if validatorLimit != 0 {
+		totalCount = totalCount + validators.PaginationInfo.TotalCount
+		hasNextPage = validators.PaginationInfo.HasNext
+		hasPreviousPage = validators.PaginationInfo.HasPrevious
+	}
+
+	conn.TotalCount = totalCount
+	conn.PageInfo.HasNextPage = hasNextPage
+	conn.PageInfo.HasPreviousPage = hasPreviousPage
+
+	return &conn, nil
+}
+
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
 	if obj.Yes == nil {
 		return 0, nil
@@ -147,6 +242,25 @@ func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj
 	return option, nil
 }
 
+func (r *proposalVoteResolver) Voter(ctx context.Context, obj *models.ProposalVote) (models.ProposalVoter, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoBySelfDelegationAddress(obj.VoterAddress)
+	if err == nil && validator != nil {
+		return validator, nil
+	}
+
+	return models.StringObject{
+		Value: obj.VoterAddress,
+	}, nil
+}
+
+func (r *proposalVoteResolver) Option(ctx context.Context, obj *models.ProposalVote) (*models.ProposalVoteOption, error) {
+	if obj.Option == "" {
+		return nil, nil
+	}
+
+	return &obj.Option, nil
+}
+
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
 	if input.Address != nil && input.Address.Address != "" {
@@ -191,5 +305,9 @@ func (r *Resolver) ProposalTallyResult() graphql1.ProposalTallyResultResolver {
 	return &proposalTallyResultResolver{r}
 }
 
+// ProposalVote returns graphql1.ProposalVoteResolver implementation.
+func (r *Resolver) ProposalVote() graphql1.ProposalVoteResolver { return &proposalVoteResolver{r} }
+
 type proposalResolver struct{ *Resolver }
 type proposalTallyResultResolver struct{ *Resolver }
+type proposalVoteResolver struct{ *Resolver }
