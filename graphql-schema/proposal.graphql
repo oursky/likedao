@@ -125,6 +125,10 @@ type ProposalDepositConnection {
   totalCount: Int!
 }
 
+input ProposalSort {
+  submitTime: Sort
+}
+
 input QueryProposalsInput {
   "Number of proposals to show in a page (limit)"
   first: Int!
@@ -136,6 +140,7 @@ input QueryProposalsInput {
   address: ProposalAddressFilter
   "filter by proposal title (not implemented)"
   searchTerm: String
+  order: ProposalSort
 }
 
 input ProposalVoteSort {
