@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
   isRequestStateError,
   isRequestStateLoaded,
@@ -15,7 +14,11 @@ import ProposalHistory, {
   ProposalHistoryTabItem,
 } from "../ProposalHistory/ProposalHistory";
 import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
-import { usePortfolioScreenQuery } from "./PortfolioScreenAPI";
+import Paper from "../common/Paper/Paper";
+import {
+  usePortfolioQuery,
+  usePortfolioScreenProposalHistoryQuery,
+} from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 
 const PROPOSAL_HISTORY_PAGE_SIZE = 2;
@@ -36,7 +39,8 @@ const filterItems: ProposalHistoryTabItem[] = [
 ];
 
 const PortfolioScreen: React.FC = () => {
-  const { requestState, fetch } = usePortfolioScreenQuery();
+  const proposalHistoryQuery = usePortfolioScreenProposalHistoryQuery();
+  const portfolioQuery = usePortfolioQuery();
 
   const wallet = useWallet();
   const { translate } = useLocale();
@@ -65,24 +69,43 @@ const PortfolioScreen: React.FC = () => {
     setAfter(after);
   }, []);
 
-  useEffectOnce(
-    () => {
-      if (wallet.status === ConnectionStatus.Idle && !address) {
-        wallet.openConnectWalletModal();
-      } else if (isRequestStateError(requestState)) {
-        if (requestState.error.message === "Invalid address") {
+  useEffect(() => {
+    if (wallet.status === ConnectionStatus.Idle && !address) {
+      wallet.openConnectWalletModal();
+    } else {
+      if (isRequestStateError(portfolioQuery.requestState)) {
+        if (portfolioQuery.requestState.error.message === "Invalid address") {
           navigate(AppRoutes.ErrorInvalidAddress);
         } else {
-          toast.error(translate("PortfolioScreen.requestState.error"));
+          toast.error(
+            translate("PortfolioScreen.portfolioQuery.requestState.error")
+          );
         }
       }
-    },
-    () =>
-      isRequestStateError(requestState) || isRequestStateLoaded(requestState)
-  );
+      if (isRequestStateError(proposalHistoryQuery.requestState)) {
+        toast.error(
+          translate("PortfolioScreen.proposalHistoryQuery.requestState.error")
+        );
+      }
+    }
+  }, [
+    address,
+    navigate,
+    portfolioQuery.requestState,
+    proposalHistoryQuery.requestState,
+    translate,
+    wallet,
+  ]);
 
   useEffect(() => {
-    fetch({
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    portfolioQuery.fetch(address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, portfolioQuery.fetch]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    proposalHistoryQuery.fetch({
       first: PROPOSAL_HISTORY_PAGE_SIZE,
       after: after,
       tab: selectedTab,
@@ -92,7 +115,14 @@ const PortfolioScreen: React.FC = () => {
       tab: selectedTab,
       page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
     });
-  }, [address, after, fetch, selectedTab, setSearchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    address,
+    after,
+    proposalHistoryQuery.fetch,
+    selectedTab,
+    setSearchParams,
+  ]);
 
   useEffect(() => {
     const tab = filterItems.find(
@@ -108,31 +138,35 @@ const PortfolioScreen: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!isRequestStateLoaded(requestState)) {
-    return (
-      <div className={cn("flex", "justify-center", "items-center", "h-full")}>
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (!requestState.data.portfolio) return null;
-
-  const { portfolio, ...restData } = requestState.data;
-
   return (
     <div className={cn("flex", "flex-col")}>
-      <PortfolioPanel portfolio={portfolio} isYourPortfolio={isYourPortfolio} />
-      <ProposalHistory
-        data={restData}
-        address={address}
-        tabs={filterItems}
-        selectedTab={selectedTab}
-        onSelectTab={handleSelectTab}
-        pageSize={PROPOSAL_HISTORY_PAGE_SIZE}
-        currentOffset={after}
-        onPageChange={handlePageChange}
-      />
+      {isRequestStateLoaded(portfolioQuery.requestState) &&
+      portfolioQuery.requestState.data ? (
+        <PortfolioPanel
+          portfolio={portfolioQuery.requestState.data}
+          isYourPortfolio={isYourPortfolio}
+        />
+      ) : (
+        <Paper className={cn("flex", "justify-center", "items-center")}>
+          <LoadingSpinner />
+        </Paper>
+      )}
+      {isRequestStateLoaded(proposalHistoryQuery.requestState) ? (
+        <ProposalHistory
+          data={proposalHistoryQuery.requestState.data}
+          address={address}
+          tabs={filterItems}
+          selectedTab={selectedTab}
+          onSelectTab={handleSelectTab}
+          pageSize={PROPOSAL_HISTORY_PAGE_SIZE}
+          currentOffset={after}
+          onPageChange={handlePageChange}
+        />
+      ) : (
+        <Paper className={cn("flex", "justify-center", "items-center")}>
+          <LoadingSpinner />
+        </Paper>
+      )}
     </div>
   );
 };

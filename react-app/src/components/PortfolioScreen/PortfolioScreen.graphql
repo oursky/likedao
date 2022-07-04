@@ -6,8 +6,7 @@ query PortfolioScreenQuery(
   $isDepositor: Boolean!
   $address: String!
   $searchTerm: String
-  $orderBy: ProposalSortableFields
-  $orderByMode: OrderByMode
+  $order: ProposalSort
 ) {
   proposalVotesDistribution(address: $address) {
     ...PortfolioHistoryProposalVotesDistribution
@@ -23,8 +22,7 @@ query PortfolioScreenQuery(
         isDepositor: $isDepositor
       }
       searchTerm: $searchTerm
-      orderBy: $orderBy
-      orderByMode: $orderByMode
+      order: $order
     }
   ) {
     ...PortfolioHistoryProposalConnection

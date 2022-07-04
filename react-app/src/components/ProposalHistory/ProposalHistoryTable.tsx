@@ -73,7 +73,7 @@ const ProposalHistoryTable: React.FC<ProposalHistoryTableProps> = ({
               </p>
               <ProposalStatusBadge status={proposal.status} />
             </td>
-            {proposal.myVote ? (
+            {proposal.myVote?.option ? (
               <td
                 className={cn(
                   "items-center",

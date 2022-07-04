@@ -1,11 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import BigNumber from "bignumber.js";
 import {
-  OrderByMode,
   PortfolioScreenQuery,
   PortfolioScreenQueryQuery,
   PortfolioScreenQueryQueryVariables,
-  ProposalSortableFields,
+  Sort,
 } from "../../generated/graphql";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { useCosmosAPI } from "../../api/cosmosAPI";
@@ -14,8 +13,6 @@ import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { translateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
-  isRequestStateError,
-  isRequestStateLoaded,
   RequestState,
   RequestStateError,
   RequestStateInitial,
@@ -24,10 +21,7 @@ import {
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
 import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
-import PortfolioScreenModel, {
-  Portfolio,
-  PortfolioScreenGraphql,
-} from "./PortfolioScreenModel";
+import { Portfolio, PortfolioScreenGraphql } from "./PortfolioScreenModel";
 
 type PortfolioRequestState = RequestState<Portfolio | null>;
 
@@ -76,16 +70,9 @@ interface UsePortfolioQuery {
   };
 }
 
-interface UsePortfolioScreenGraphqlQuery {
+interface UsePortfolioScreenProposalHistoryQuery {
   (): {
     requestState: RequestState<PortfolioScreenGraphql>;
-    fetch: (variables: PortfolioScreenQueryQueryVariables) => void;
-  };
-}
-
-interface UsePortfolioScreenQuery {
-  (): {
-    requestState: RequestState<PortfolioScreenModel>;
     fetch: ({
       first,
       after,
@@ -240,7 +227,7 @@ export const usePortfolioQuery: UsePortfolioQuery = () => {
   return { requestState, fetch };
 };
 
-export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery =
+export const usePortfolioScreenProposalHistoryQuery: UsePortfolioScreenProposalHistoryQuery =
   () => {
     const [fetch, { requestState }] = useLazyGraphQLQuery<
       PortfolioScreenQueryQuery,
@@ -251,11 +238,28 @@ export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery =
     });
 
     const callFetch = useCallback(
-      (variables: PortfolioScreenQueryQueryVariables) => {
+      ({
+        first,
+        after,
+        tab,
+        address,
+      }: {
+        first: number;
+        after: number;
+        tab: ProposalHistoryFilterKey;
+        address: string;
+      }) => {
         // Errors are handled by the requestState
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetch({
-          variables,
+          variables: {
+            first,
+            after,
+            order: {
+              submitTime: Sort.Asc,
+            },
+            ...getFilterVariables(tab, address),
+          },
         });
       },
       [fetch]
@@ -266,63 +270,3 @@ export const usePortfolioScreenGraphqlQuery: UsePortfolioScreenGraphqlQuery =
       fetch: callFetch,
     };
   };
-
-export const usePortfolioScreenQuery: UsePortfolioScreenQuery = () => {
-  const gqlQuery = usePortfolioScreenGraphqlQuery();
-  const portfolioQuery = usePortfolioQuery();
-
-  const requestState = useMemo(() => {
-    if (
-      isRequestStateLoaded(gqlQuery.requestState) &&
-      isRequestStateLoaded(portfolioQuery.requestState)
-    ) {
-      return RequestStateLoaded<PortfolioScreenModel>({
-        ...gqlQuery.requestState.data,
-        portfolio: portfolioQuery.requestState.data,
-      });
-    }
-
-    if (isRequestStateError(gqlQuery.requestState)) {
-      return RequestStateError(gqlQuery.requestState.error);
-    } else if (isRequestStateError(portfolioQuery.requestState)) {
-      return RequestStateError(portfolioQuery.requestState.error);
-    }
-
-    return RequestStateLoading;
-  }, [gqlQuery.requestState, portfolioQuery]);
-
-  const fetch = useCallback(
-    ({
-      first,
-      after,
-      tab,
-      address,
-    }: {
-      first: number;
-      after: number;
-      tab: ProposalHistoryFilterKey;
-      address: string;
-    }) => {
-      // Errors are handled by the requestState
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      gqlQuery.fetch({
-        first,
-        after,
-        orderBy: ProposalSortableFields.SubmitTime,
-        orderByMode: OrderByMode.Asc,
-        ...getFilterVariables(tab, address),
-      });
-      // Errors are handled by the requestState
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      portfolioQuery.fetch(address);
-    },
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gqlQuery.fetch]
-  );
-
-  return {
-    requestState,
-    fetch,
-  };
-};
