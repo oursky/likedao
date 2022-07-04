@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   isRequestStateError,
   isRequestStateLoaded,
@@ -45,6 +45,7 @@ const PortfolioScreen: React.FC = () => {
   const wallet = useWallet();
   const { translate } = useLocale();
   const navigate = useNavigate();
+  const { address: urlAddress } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams({
     tab: "voted",
@@ -52,11 +53,14 @@ const PortfolioScreen: React.FC = () => {
   });
 
   const address = useMemo(() => {
+    if (urlAddress) {
+      return urlAddress;
+    }
     if (wallet.status === ConnectionStatus.Connected) {
       return wallet.account.address;
     }
     return "";
-  }, [wallet]);
+  }, [urlAddress, wallet]);
 
   const isYourPortfolio = useMemo(() => !address, [address]);
 
