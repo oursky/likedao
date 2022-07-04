@@ -1,3 +1,4 @@
+host: likedao.example.com
 graphqlServer:
   imageName: ghcr.io/oursky/likedao-graphql-server
   session:
@@ -17,13 +18,11 @@ graphqlServer:
     url: postgres://likedao:likedao@bdjuno-db/bdjuno?sslmode=disable
     schema: bdjuno
     poolSize: 5
-  host: api.likedao.example.com
   chain:
     coinDenom: nanolike
     bech32Prefix: like
 reactApp:
   imageName: ghcr.io/oursky/likedao-react-app
-  host: likedao.example.com
 bdjuno:
   imageName: ghcr.io/oursky/likedao-bdjuno
   genesisUrl: https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.json

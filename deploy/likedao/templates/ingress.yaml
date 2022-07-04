@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/tls-acme: "true"
 spec:
   rules:
-    - host: {{ .Values.reactApp.host }}
+    - host: {{ .Values.host }}
       http:
         paths:
           - pathType: ImplementationSpecific
@@ -19,11 +19,15 @@ spec:
                 name: react-app-{{ .Values.deploymentTag }}
                 port:
                   number: 80
-    - host: {{ .Values.graphqlServer.host }}
-      http:
-        paths:
           - pathType: ImplementationSpecific
-            path: /
+            path: /graphql
+            backend:
+              service:
+                name: graphql-server-{{ .Values.deploymentTag }}
+                port:
+                  number: 80
+          - pathType: ImplementationSpecific
+            path: /auth
             backend:
               service:
                 name: graphql-server-{{ .Values.deploymentTag }}
@@ -31,6 +35,5 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - {{ .Values.reactApp.host }}
-        - {{ .Values.graphqlServer.host }}
+        - {{ .Values.host }}
       secretName: likedao-tls-{{ .Values.deploymentTag }}
