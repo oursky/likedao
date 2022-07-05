@@ -77,3 +77,6 @@ To execute a deployment for the LikeDAO system, please review the files in the [
 3. Duplicate the content in [values template](./deploy/likedao/values.sample.yaml) and create one that fits the deployment environment
 4. Run `make -C deploy deploy NAMESPACE=${NAMESPACE} VALUES=${PATH_TO_VALUES}`
 
+## Contributing
+
+See [Contributing Docs](./docs/Contributing.md)
