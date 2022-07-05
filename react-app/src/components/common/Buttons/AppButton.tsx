@@ -47,7 +47,8 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "text-white",
         "disabled:bg-gray-300",
         "hover:bg-likecoin-lightgreen",
-        "acitve:bg-likecoin-darkgreen"
+        "acitve:bg-likecoin-darkgreen",
+        "transition-colors"
       );
     case "secondary":
       return cn(
@@ -56,14 +57,16 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "disabled:bg-gray-300",
         "hover:bg-likecoin-lightgreen",
         "hover:text-white",
-        "acitve:bg-likecoin-darkgreen"
+        "acitve:bg-likecoin-darkgreen",
+        "transition-colors"
       );
     case "rounded":
       return cn(
         "rounded-full",
         "bg-likecoin-secondarygreen",
         "hover:bg-likecoin-lightgreen",
-        "hover:text-white"
+        "hover:text-white",
+        "transition-colors"
       );
     default:
       throw new Error("Unknown button type");

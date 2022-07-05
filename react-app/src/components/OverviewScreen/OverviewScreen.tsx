@@ -12,6 +12,7 @@ import { useLocale } from "../../providers/AppLocaleProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
 import { useCommunityStatusQuery } from "./OverviewScreenAPI";
+import ActiveProposalsPanel from "./ActiveProposalsPanel";
 
 const OverviewScreen: React.FC = () => {
   const communityStatusRequestState = useCommunityStatusQuery();
@@ -49,6 +50,7 @@ const OverviewScreen: React.FC = () => {
         isLoading={isScreenLoading}
         communityStatus={screenData?.communityStatus ?? null}
       />
+      <ActiveProposalsPanel proposals={screenData?.proposals ?? []} />
       <GovernanceInfoPanel />
     </div>
   );
