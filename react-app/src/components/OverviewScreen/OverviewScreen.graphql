@@ -7,8 +7,40 @@ fragment OverviewScreenScreenCommunityStatus on CommunityStatus {
   }
 }
 
-query OverviewScreenQuery {
+fragment OverviewScreenScreenProposal on Proposal {
+  id
+  proposalId
+  title
+  description
+  type
+  submitTime
+  depositEndTime
+  votingStartTime
+  votingEndTime
+  proposerAddress
+  status
+  tallyResult {
+    yes
+    no
+    noWithVeto
+    abstain
+    outstandingOption
+  }
+  reactions {
+    reaction
+    count
+  }
+}
+
+query OverviewScreenQuery($first: Int!, $after: Int!, $order: ProposalSort) {
   communityStatus {
     ...OverviewScreenScreenCommunityStatus
+  }
+  proposals(input: { first: $first, after: $after, order: $order }) {
+    edges {
+      node {
+        ...ProposalScreenProposal
+      }
+    }
   }
 }

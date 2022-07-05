@@ -47,7 +47,7 @@ const OverviewScreen: React.FC = () => {
     <div className={cn("flex", "flex-col", "gap-y-3")}>
       <CommunityStatus
         isLoading={isScreenLoading}
-        communityStatus={screenData}
+        communityStatus={screenData?.communityStatus ?? null}
       />
       <GovernanceInfoPanel />
     </div>
