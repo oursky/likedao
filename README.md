@@ -17,6 +17,10 @@ make -C react-app dev
 
 Then visit http://localhost:3000
 
+## Architecture
+
+See [Architecture Docs](./docs/Architecture.md) for diagram and descriptions.
+
 ## Development
 
 ### Prerequisite
