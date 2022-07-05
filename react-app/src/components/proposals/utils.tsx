@@ -1,4 +1,8 @@
-import { ProposalStatus, ProposalType } from "../../generated/graphql";
+import {
+  ProposalStatus,
+  ProposalType,
+  ProposalVoteOption,
+} from "../../generated/graphql";
 import { MessageID } from "../../i18n/LocaleModel";
 import { BadgeColor } from "../common/Badge/Badge";
 
@@ -37,5 +41,39 @@ export function getProposalTypeMessage(type: ProposalType): MessageID {
       return "ProposalScreen.proposalType.cancelSoftwareUpgrade";
     default:
       throw new Error("Unknown proposal type");
+  }
+}
+
+export function getVoteOptionMessage(
+  option: ProposalVoteOption
+): MessageID | null {
+  switch (option) {
+    case ProposalVoteOption.Yes:
+      return "proposal.voteOption.yes";
+    case ProposalVoteOption.Abstain:
+      return "proposal.voteOption.abstain";
+    case ProposalVoteOption.No:
+      return "proposal.voteOption.no";
+    case ProposalVoteOption.NoWithVeto:
+      return "proposal.voteOption.noWithVeto";
+    default:
+      return null;
+  }
+}
+
+export function getVoteOptionIndicatorClassname(
+  option: ProposalVoteOption
+): string | null {
+  switch (option) {
+    case ProposalVoteOption.Yes:
+      return "bg-likecoin-vote-color-yes";
+    case ProposalVoteOption.Abstain:
+      return "bg-likecoin-vote-color-abstain";
+    case ProposalVoteOption.No:
+      return "bg-likecoin-vote-color-no";
+    case ProposalVoteOption.NoWithVeto:
+      return "bg-likecoin-vote-color-veto";
+    default:
+      return null;
   }
 }

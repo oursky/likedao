@@ -11,8 +11,8 @@ import PageContoller from "../common/PageController/PageController";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { useLocale } from "../../providers/AppLocaleProvider";
+import { ProposalList } from "../proposals/ProposalList";
 import { useProposalsQuery, FilterKey } from "./ProposalScreenAPI";
-import { ProposalList } from "./ProposalList";
 
 const PROPOSAL_LIST_PAGE_SIZE = 5;
 

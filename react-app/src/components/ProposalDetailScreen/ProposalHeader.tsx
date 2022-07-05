@@ -9,10 +9,10 @@ import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
-import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
-import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
+import { getProposalTypeMessage } from "../proposals/utils";
 import { ReactionList, ReactionPicker } from "../reactions";
 import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
+import ProposalStatusBadge from "../proposals/ProposalStatusBadge";
 import { ProposalStatus } from "../../generated/graphql";
 import { Proposal } from "./ProposalDetailScreenModel";
 

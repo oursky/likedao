@@ -5,7 +5,7 @@ import UTCDatetime from "../common/DateTime/UTCDatetime";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { MessageID } from "../../i18n/LocaleModel";
 import VoteOptionIndicator from "../ProposalVoteOption/VoteOptionIndicator";
-import { Proposal } from "./ProposalScreenModel";
+import { Proposal } from "../proposals/ProposalModel";
 
 interface ProposalInsightProps {
   proposal: Proposal;

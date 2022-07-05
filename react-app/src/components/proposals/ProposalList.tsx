@@ -2,7 +2,7 @@ import React from "react";
 import cn from "classnames";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ProposalCard from "./ProposalCard";
-import { Proposal } from "./ProposalScreenModel";
+import { Proposal } from "./ProposalModel";
 
 interface ProposalListProps {
   proposals: Proposal[];

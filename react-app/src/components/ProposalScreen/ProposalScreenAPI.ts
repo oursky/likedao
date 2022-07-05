@@ -8,8 +8,9 @@ import {
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { ReactionItem } from "../proposals/ProposalModel";
 import { getReactionType } from "../reactions/ReactionModel";
-import { PaginatedProposals, ReactionItem } from "./ProposalScreenModel";
+import { PaginatedProposals } from "./ProposalScreenModel";
 
 type ProposalFilter = Omit<
   ProposalScreenQueryQueryVariables,
