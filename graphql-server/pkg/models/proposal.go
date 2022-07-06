@@ -224,6 +224,11 @@ func (p ProposalVote) NodeID() NodeID {
 type ProposalVoteConnection = Connection[ProposalVote]
 type ProposalVoteEdge = Edge[ProposalVote]
 
+type ProposalVoteOptionCount struct {
+	Option ProposalVoteOption
+	Count  bunbig.Int
+}
+
 type ProposalTallyResult struct {
 	bun.BaseModel `bun:"table:proposal_tally_result"`
 

@@ -450,6 +450,14 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 	return res, nil
 }
 
+func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address string) (*models.ProposalTallyResult, error) {
+	distribution, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalVoteCountByAddress(address)
+	if err != nil {
+		return nil, err
+	}
+	return distribution, nil
+}
+
 // Proposal returns graphql1.ProposalResolver implementation.
 func (r *Resolver) Proposal() graphql1.ProposalResolver { return &proposalResolver{r} }
 

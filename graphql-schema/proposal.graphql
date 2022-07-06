@@ -169,4 +169,5 @@ input QueryProposalDepositsInput {
 extend type Query {
   proposals(input: QueryProposalsInput!): ProposalConnection!
   proposalByID(id: ID!): Proposal
+  proposalVotesDistribution(address: String!): ProposalTallyResult!
 }

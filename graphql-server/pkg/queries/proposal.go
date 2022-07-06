@@ -6,6 +6,7 @@ import (
 
 	"github.com/forbole/bdjuno/database/types"
 	"github.com/oursky/likedao/pkg/config"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -23,6 +24,7 @@ type IProposalQuery interface {
 	QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
 	QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error)
 	QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error)
+	QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error)
 }
 
 type ProposalQuery struct {
@@ -407,4 +409,36 @@ func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) 
 	}
 
 	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error) {
+	res := make([]*models.ProposalVoteOptionCount, 4)
+	err := q.session.NewSelect().
+		Model((*models.ProposalVote)(nil)).
+		Column("option").
+		ColumnExpr("count(*)").
+		Where("voter_address = ?", address).
+		Group("option").
+		Scan(q.ctx, &res)
+
+	if err != nil {
+		return nil, nil
+	}
+
+	distribution := models.ProposalTallyResult{}
+	for _, voteCount := range res {
+		switch voteCount.Option {
+		case models.ProposalVoteOptionYes:
+			distribution.Yes = &voteCount.Count
+		case models.ProposalVoteOptionNo:
+			distribution.No = &voteCount.Count
+		case models.ProposalVoteOptionAbstain:
+			distribution.Abstain = &voteCount.Count
+		case models.ProposalVoteOptionNoWithVeto:
+			distribution.NoWithVeto = &voteCount.Count
+		default:
+			return nil, servererrors.InternalError.NewError(q.ctx, "invalid vote option encountered")
+		}
+	}
+	return &distribution, nil
 }
