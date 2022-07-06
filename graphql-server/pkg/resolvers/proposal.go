@@ -390,9 +390,16 @@ func (r *proposalVoteResolver) Option(ctx context.Context, obj *models.ProposalV
 
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
-	if input.Address != nil && input.Address.Address != "" {
-		proposalQuery = proposalQuery.ScopeRelatedAddress(input.Address.Address)
-	} else if input.Status != nil {
+	if input.Address != nil {
+		if !input.Address.IsDepositor && !input.Address.IsSubmitter && !input.Address.IsVoter {
+			return nil, servererrors.BadUserInput.NewError(
+				ctx,
+				"invalid address filter: at least one of isDepositor, isSubmitter, isVoter in address filter should be true",
+			)
+		}
+		proposalQuery = proposalQuery.ScopeProposalAddress(input.Address)
+	}
+	if input.Status != nil {
 		proposalQuery = proposalQuery.ScopeProposalStatus((*input.Status).ToProposalStatus())
 	}
 
