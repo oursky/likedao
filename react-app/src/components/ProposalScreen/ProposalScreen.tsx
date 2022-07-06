@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import cn from "classnames";
 import { toast } from "react-toastify";
 import { useSearchParams } from "react-router-dom";
@@ -49,14 +49,10 @@ const defaultTabItem = defaultTabItems[0];
 const ProposalScreen: React.FC = () => {
   const wallet = useWallet();
   const { translate } = useLocale();
-  const [selectedTab, setSelectedTab] = useState<FilterKey>(
-    defaultTabItem.value
-  );
-  const [after, setAfter] = useState(0);
 
   const [searchParams, setSearchParams] = useSearchParams({
-    after: after.toString(),
     tab: defaultTabItem.value,
+    page: "1",
   });
 
   const tabItems: ProposalTabItem[] = useMemo(() => {
@@ -71,38 +67,49 @@ const ProposalScreen: React.FC = () => {
     return defaultTabItems;
   }, [wallet]);
 
+  const [after, selectedTab] = useMemo(() => {
+    const after =
+      (parseInt(searchParams.get("page") ?? "1", 10) - 1) *
+      PROPOSAL_LIST_PAGE_SIZE;
+    const tab = (
+      tabItems.find((item) => item.value === searchParams.get("tab")) ??
+      defaultTabItem
+    ).value;
+    return [after, tab];
+  }, [searchParams, tabItems]);
+
   const { requestState, fetch } = useProposalsQuery(
     after,
     PROPOSAL_LIST_PAGE_SIZE
   );
 
-  const setPage = useCallback((after: number) => {
-    setAfter(after);
-  }, []);
+  const setPage = useCallback(
+    (after: number) => {
+      setSearchParams({
+        tab: selectedTab,
+        page: (after / PROPOSAL_LIST_PAGE_SIZE + 1).toString(),
+      });
+    },
+    [selectedTab, setSearchParams]
+  );
 
-  const handleSelectTab = useCallback((tab: FilterKey) => {
-    setSelectedTab(tab);
-  }, []);
+  const handleSelectTab = useCallback(
+    (tab: FilterKey) => {
+      setSearchParams({
+        tab: tab,
+        page: (after / PROPOSAL_LIST_PAGE_SIZE + 1).toString(),
+      });
+    },
+    [after, setSearchParams]
+  );
 
   useEffect(() => {
-    setSearchParams({
-      after: after.toString(),
-      tab: selectedTab,
-    });
     fetch({
       first: PROPOSAL_LIST_PAGE_SIZE,
       after,
       tab: selectedTab,
     });
   }, [after, fetch, selectedTab, setSearchParams]);
-
-  useEffect(() => {
-    const tab = tabItems.find((item) => item.value === searchParams.get("tab"));
-    if (tab) {
-      setSelectedTab(tab.value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (RequestState.isRequestStateError(requestState)) {
