@@ -108,13 +108,17 @@ func (p Proposal) NodeID() NodeID {
 type ProposalConnection = Connection[Proposal]
 type ProposalEdge = Edge[Proposal]
 
+type ProposalDepositKey struct {
+	ProposalID int
+	Address    string
+}
 type ProposalDeposit struct {
 	bun.BaseModel `bun:"table:proposal_deposit"`
 
-	ProposalID       int               `bun:"column:proposal_id,pk"`
-	DepositorAddress string            `bun:"column:depositor_address,notnull"`
-	Amount           bdjuno.DbDecCoins `bun:"column:amount,notnull"`
-	Height           int64             `bun:"column:height,notnull"`
+	ProposalID       int                `bun:"column:proposal_id,pk"`
+	DepositorAddress string             `bun:"column:depositor_address,notnull"`
+	Amount           []bdjuno.DbDecCoin `bun:"column:amount,notnull,array"`
+	Height           int64              `bun:"column:height,notnull"`
 
 	Proposal      *Proposal      `bun:"rel:belongs-to,join:proposal_id=id"`
 	ValidatorInfo *ValidatorInfo `bun:"rel:has-one,join:depositor_address=self_delegate_address"`
@@ -164,6 +168,10 @@ func (p ProposalDeposit) NodeID() NodeID {
 type ProposalDepositConnection = Connection[ProposalDeposit]
 type ProposalDepositEdge = Edge[ProposalDeposit]
 
+type ProposalVoteKey struct {
+	ProposalID int
+	Address    string
+}
 type ProposalVote struct {
 	bun.BaseModel `bun:"table:proposal_vote"`
 
@@ -216,6 +224,11 @@ func (p ProposalVote) NodeID() NodeID {
 type ProposalVoteConnection = Connection[ProposalVote]
 type ProposalVoteEdge = Edge[ProposalVote]
 
+type ProposalVoteOptionCount struct {
+	Option ProposalVoteOption
+	Count  bunbig.Int
+}
+
 type ProposalTallyResult struct {
 	bun.BaseModel `bun:"table:proposal_tally_result"`
 
@@ -225,4 +238,9 @@ type ProposalTallyResult struct {
 	Abstain    *bunbig.Int `bun:"column:abstain,notnull"`
 	NoWithVeto *bunbig.Int `bun:"column:no_with_veto,notnull"`
 	Height     int64       `bun:"column:height,notnull"`
+}
+
+type ProposalTurnout struct {
+	ProposalID int
+	Turnout    float64
 }

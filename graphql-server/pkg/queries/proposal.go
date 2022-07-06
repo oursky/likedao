@@ -6,6 +6,7 @@ import (
 
 	"github.com/forbole/bdjuno/database/types"
 	"github.com/oursky/likedao/pkg/config"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -13,13 +14,17 @@ import (
 
 type IProposalQuery interface {
 	ScopeProposalStatus(filter models.ProposalStatus) IProposalQuery
-	ScopeRelatedAddress(address string) IProposalQuery
+	ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery
 	QueryPaginatedProposalDeposits(proposalID int, first int, after int, orderBy *models.ProposalDepositSort, excludeAddresses []string) (*Paginated[models.ProposalDeposit], error)
 	QueryPaginatedProposalVotes(proposalID int, first int, after int, orderBy *models.ProposalVoteSort, excludeAddresses []string) (*Paginated[models.ProposalVote], error)
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 	QueryProposalDepositTotal(id int) ([]types.DbDecCoin, error)
+	QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
+	QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error)
+	QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error)
+	QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error)
 }
 
 type ProposalQuery struct {
@@ -28,13 +33,17 @@ type ProposalQuery struct {
 	session *bun.DB
 
 	scopedProposalStatus models.ProposalStatus
-	scopedRelatedAddress string
+	scopedAddressFilter  *models.ProposalAddressFilter
 }
 
 func NewProposalQuery(ctx context.Context, config config.Config, session *bun.DB) IProposalQuery {
 	return &ProposalQuery{ctx: ctx, config: config, session: session}
 }
 
+// generate new select query with filters applied.
+// when both status and address filters are applied, results satisfying both filters are returned.
+// when multiple sub-filters in address filter (ie. isDepositor, IsSubmitter, IsVoter), results satisfying
+// any one of the sub-filters are returned
 func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 	query := q.session.NewSelect().Model((*models.Proposal)(nil))
 
@@ -42,16 +51,29 @@ func (q *ProposalQuery) NewQuery() *bun.SelectQuery {
 		query = query.Where("status = ?", q.scopedProposalStatus)
 	}
 
-	if q.scopedRelatedAddress != "" {
+	if q.scopedAddressFilter != nil {
 
-		relatedDeposits := q.session.NewSelect().Model((*models.ProposalDeposit)(nil)).Column("proposal_id").Where("depositor_address = ?", q.scopedRelatedAddress)
-		relatedVotes := q.session.NewSelect().Model((*models.ProposalVote)(nil)).Column("proposal_id").Where("voter_address = ?", q.scopedRelatedAddress)
+		query = query.WhereGroup(" AND ", func(query *bun.SelectQuery) *bun.SelectQuery {
+			if q.scopedAddressFilter.IsDepositor {
+				depositedProposalIDs := q.session.NewSelect().
+					Model((*models.ProposalDeposit)(nil)).
+					Column("proposal_id").
+					Where("depositor_address = ?", q.scopedAddressFilter.Address)
+				query = query.WhereOr("id IN (?)", depositedProposalIDs)
+			}
+			if q.scopedAddressFilter.IsVoter {
+				votedProposalIDs := q.session.NewSelect().
+					Model((*models.ProposalVote)(nil)).
+					Column("proposal_id").
+					Where("voter_address = ?", q.scopedAddressFilter.Address)
+				query = query.WhereOr("id IN (?)", votedProposalIDs)
+			}
 
-		relatedProposals := relatedDeposits.Union(relatedVotes)
-
-		query = query.
-			WhereOr("id IN (?)", relatedProposals).
-			WhereOr("proposal.proposer_address = ?", q.scopedRelatedAddress)
+			if q.scopedAddressFilter.IsSubmitter {
+				query = query.WhereOr("proposal.proposer_address = ?", q.scopedAddressFilter.Address)
+			}
+			return query
+		})
 	}
 
 	return query
@@ -63,9 +85,9 @@ func (q *ProposalQuery) ScopeProposalStatus(status models.ProposalStatus) IPropo
 	return &newQuery
 }
 
-func (q *ProposalQuery) ScopeRelatedAddress(address string) IProposalQuery {
+func (q *ProposalQuery) ScopeProposalAddress(filter *models.ProposalAddressFilter) IProposalQuery {
 	var newQuery = *q
-	newQuery.scopedRelatedAddress = address
+	newQuery.scopedAddressFilter = filter
 	return &newQuery
 }
 
@@ -279,4 +301,144 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int) ([]types.DbDecCoin, er
 		return []types.DbDecCoin{}, err
 	}
 	return res, nil
+}
+
+func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error) {
+	var turnouts []models.ProposalTurnout
+	err := q.session.NewSelect().
+		Model((*models.ProposalTallyResult)(nil)).
+		Column("proposal_id").
+		ColumnExpr(`(
+				proposal_tally_result.yes::bigint + 
+				proposal_tally_result.no::bigint + 
+				proposal_tally_result.abstain::bigint + 
+				proposal_tally_result.no_with_veto::bigint
+			) / staking_pool.bonded_tokens::numeric as turnout`).
+		Join(`
+			INNER JOIN proposal_staking_pool_snapshot AS staking_pool 
+			ON staking_pool.proposal_id = proposal_tally_result.proposal_id
+		`).
+		Where("proposal_tally_result.proposal_id IN (?)", bun.In(ids)).
+		Scan(q.ctx, &turnouts)
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// Reorder query results by order of input ids
+	result := make([]*float64, 0, len(turnouts))
+	idToTurnout := make(map[int]models.ProposalTurnout, len(turnouts))
+	for _, turnout := range turnouts {
+		idToTurnout[turnout.ProposalID] = turnout
+	}
+
+	for _, id := range ids {
+		turnout, exists := idToTurnout[id]
+		if exists {
+			result = append(result, &turnout.Turnout)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	var votes []*models.ProposalVote
+	err := q.session.NewSelect().
+		With("keys", q.session.NewValues(&keys).WithOrder()).
+		Model(&votes).
+		Join("INNER JOIN keys ON (proposal_vote.proposal_id, proposal_vote.voter_address) = (keys.proposal_id, keys.address)").
+		Scan(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reorder query results by order of input keys
+	result := make([]*models.ProposalVote, 0, len(votes))
+	keyToVote := make(map[models.ProposalVoteKey]models.ProposalVote, len(votes))
+	for _, vote := range votes {
+		keyToVote[models.ProposalVoteKey{ProposalID: vote.ProposalID, Address: vote.VoterAddress}] = *vote
+	}
+
+	for _, key := range keys {
+		vote, exists := keyToVote[key]
+		if exists {
+			result = append(result, &vote)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	var deposits []*models.ProposalDeposit
+	err := q.session.NewSelect().
+		With("keys", q.session.NewValues(&keys).WithOrder()).
+		Model(&deposits).
+		Join(", keys").
+		Where("(proposal_deposit.proposal_id, proposal_deposit.depositor_address) = (keys.proposal_id, keys.address)").
+		Scan(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reorder query results by order of input keys
+	result := make([]*models.ProposalDeposit, 0, len(deposits))
+	keyToVote := make(map[models.ProposalDepositKey]models.ProposalDeposit, len(deposits))
+	for _, deposit := range deposits {
+		keyToVote[models.ProposalDepositKey{ProposalID: deposit.ProposalID, Address: deposit.DepositorAddress}] = *deposit
+	}
+
+	for _, key := range keys {
+		deposit, exists := keyToVote[key]
+		if exists {
+			result = append(result, &deposit)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error) {
+	res := make([]*models.ProposalVoteOptionCount, 4)
+	err := q.session.NewSelect().
+		Model((*models.ProposalVote)(nil)).
+		Column("option").
+		ColumnExpr("count(*)").
+		Where("voter_address = ?", address).
+		Group("option").
+		Scan(q.ctx, &res)
+
+	if err != nil {
+		return nil, nil
+	}
+
+	distribution := models.ProposalTallyResult{}
+	for _, voteCount := range res {
+		switch voteCount.Option {
+		case models.ProposalVoteOptionYes:
+			distribution.Yes = &voteCount.Count
+		case models.ProposalVoteOptionNo:
+			distribution.No = &voteCount.Count
+		case models.ProposalVoteOptionAbstain:
+			distribution.Abstain = &voteCount.Count
+		case models.ProposalVoteOptionNoWithVeto:
+			distribution.NoWithVeto = &voteCount.Count
+		default:
+			return nil, servererrors.InternalError.NewError(q.ctx, "invalid vote option encountered")
+		}
+	}
+	return &distribution, nil
 }

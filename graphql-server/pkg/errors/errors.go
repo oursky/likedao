@@ -17,6 +17,7 @@ const (
 	QueryError        ServerErrorCode = "QUERY_ERROR"
 	MutationError     ServerErrorCode = "MUTATION_ERROR"
 	Unauthenticated   ServerErrorCode = "UNAUTHENTICATED"
+	BadUserInput      ServerErrorCode = "BAD_USER_INPUT"
 )
 
 var defaultErrorMessage = map[ServerErrorCode]string{
@@ -27,6 +28,7 @@ var defaultErrorMessage = map[ServerErrorCode]string{
 	Unknown:           "Unknown error",
 	QueryError:        "Query error",
 	MutationError:     "Mutation error",
+	BadUserInput:      "User input error",
 }
 
 func (c ServerErrorCode) NewErrorWithDefaultMessage(ctx context.Context) *gqlerror.Error {

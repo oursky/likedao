@@ -51,6 +51,36 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 	return tally, nil
 }
 
+func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*float64, error) {
+	turnout, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTurnout(obj.ID)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal turnout: %v", err))
+	}
+	if turnout == nil {
+		return nil, nil
+	}
+
+	return turnout, nil
+}
+
+func (r *proposalResolver) VoteByAddress(ctx context.Context, obj *models.Proposal, address string) (*models.ProposalVote, error) {
+	key := models.ProposalVoteKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalVote(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
+}
+
+func (r *proposalResolver) DepositByAddress(ctx context.Context, obj *models.Proposal, address string) (*models.ProposalDeposit, error) {
+	key := models.ProposalDepositKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalDeposit(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
+}
+
 func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
 	reactionCounts, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
 	if err != nil {
@@ -298,17 +328,6 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 	return nil, nil
 }
 
-func (r *proposalDepositResolver) Amount(ctx context.Context, obj *models.ProposalDeposit) ([]types.DbDecCoin, error) {
-	coins := make([]types.DbDecCoin, 0, len(obj.Amount))
-	for _, coin := range obj.Amount {
-		coins = append(coins, types.DbDecCoin{
-			Denom:  coin.Denom,
-			Amount: coin.Amount,
-		})
-	}
-	return coins, nil
-}
-
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
 	if obj.Yes == nil {
 		return 0, nil
@@ -390,9 +409,16 @@ func (r *proposalVoteResolver) Option(ctx context.Context, obj *models.ProposalV
 
 func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposalsInput) (*models.Connection[models.Proposal], error) {
 	proposalQuery := pkgContext.GetQueriesFromCtx(ctx).Proposal
-	if input.Address != nil && input.Address.Address != "" {
-		proposalQuery = proposalQuery.ScopeRelatedAddress(input.Address.Address)
-	} else if input.Status != nil {
+	if input.Address != nil {
+		if !input.Address.IsDepositor && !input.Address.IsSubmitter && !input.Address.IsVoter {
+			return nil, servererrors.BadUserInput.NewError(
+				ctx,
+				"invalid address filter: at least one of isDepositor, isSubmitter, isVoter in address filter should be true",
+			)
+		}
+		proposalQuery = proposalQuery.ScopeProposalAddress(input.Address)
+	}
+	if input.Status != nil {
 		proposalQuery = proposalQuery.ScopeProposalStatus((*input.Status).ToProposalStatus())
 	}
 
@@ -422,6 +448,14 @@ func (r *queryResolver) ProposalByID(ctx context.Context, id models.NodeID) (*mo
 		return nil, err
 	}
 	return res, nil
+}
+
+func (r *queryResolver) ProposalVotesDistribution(ctx context.Context, address string) (*models.ProposalTallyResult, error) {
+	distribution, err := pkgContext.GetQueriesFromCtx(ctx).Proposal.QueryProposalVoteCountByAddress(address)
+	if err != nil {
+		return nil, err
+	}
+	return distribution, nil
 }
 
 // Proposal returns graphql1.ProposalResolver implementation.
