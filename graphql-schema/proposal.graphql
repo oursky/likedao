@@ -39,7 +39,7 @@ type Proposal implements Node {
   submitTime: DateTime!
   depositEndTime: DateTime
   "Sum of all deposit in chain's coin denom (non chain's coin denom deposits excluded)"
-  depositTotal: BigInt!
+  depositTotal: [Coin!]!
   votingStartTime: DateTime
   votingEndTime: DateTime
   proposerAddress: String!

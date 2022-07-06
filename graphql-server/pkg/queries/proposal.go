@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/forbole/bdjuno/database/types"
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/extra/bunbig"
 )
 
 type IProposalQuery interface {
@@ -19,7 +19,7 @@ type IProposalQuery interface {
 	QueryPaginatedProposals(first int, after int) (*Paginated[models.Proposal], error)
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
-	QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error)
+	QueryProposalDepositTotal(id int) ([]types.DbDecCoin, error)
 }
 
 type ProposalQuery struct {
@@ -262,32 +262,21 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 	return result, nil
 }
 
-func (q *ProposalQuery) QueryProposalDepositTotal(id int, denom string) (bunbig.Int, error) {
-	var res bunbig.Int
+func (q *ProposalQuery) QueryProposalDepositTotal(id int) ([]types.DbDecCoin, error) {
+	var res []types.DbDecCoin
 	depositCoinsQuery := q.session.NewSelect().
 		Model((*models.ProposalDeposit)(nil)).
 		ColumnExpr("unnest(amount) AS coin").
 		Where("proposal_id = ?", id)
 
 	query := q.session.NewSelect().
-		ColumnExpr("SUM((deposit.coin).amount::BIGINT)").
+		ColumnExpr("(deposit.coin).denom, SUM((deposit.coin).amount::BIGINT) as amount").
 		TableExpr("(?) AS deposit", depositCoinsQuery).
-		Where("(deposit.coin).denom = ?", denom).
 		GroupExpr("(deposit.coin).denom")
 
-	// In case there are no deposits for a proposal
-	// this happens for some reason even if min proposal deposit is positive
-	count, err := query.Count(q.ctx)
+	err := query.Scan(q.ctx, &res)
 	if err != nil {
-		return bunbig.Int{}, err
-	}
-	if count == 0 {
-		return bunbig.Int{}, nil
-	}
-
-	err = query.Scan(q.ctx, &res)
-	if err != nil {
-		return bunbig.Int{}, err
+		return []types.DbDecCoin{}, err
 	}
 	return res, nil
 }

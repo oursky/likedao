@@ -33,6 +33,8 @@ import {
   ProposalVoteVoter,
 } from "./ProposalDetailScreenModel";
 
+const CoinMinimalToken = Config.chainInfo.currency.coinMinimalDenom;
+
 const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
   if (!tallyResult) {
     return 0;
@@ -427,7 +429,10 @@ export function useProposalQuery(): {
             proposal.votingStartTime &&
             proposal.votingEndTime &&
             differenceInDays(new Date(proposal.votingEndTime), Date.now()),
-          depositTotal: convertMinimalTokenToToken(proposal.depositTotal),
+          depositTotal: new BigNumber(
+            proposal.depositTotal.find((t) => t.denom === CoinMinimalToken)
+              ?.amount ?? 0
+          ),
           tallyResult: proposal.tallyResult && {
             yes: convertMinimalTokenToToken(proposal.tallyResult.yes),
             no: convertMinimalTokenToToken(proposal.tallyResult.no),

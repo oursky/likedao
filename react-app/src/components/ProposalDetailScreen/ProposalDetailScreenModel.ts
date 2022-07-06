@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import {
   ProposalDetailScreenProposalFragment,
   ProposalDetailProposalVoteFragment as ProposalVoteFragment,
@@ -22,6 +23,7 @@ export interface Proposal
     | "reactions"
     | "votes"
     | "deposits"
+    | "depositTotal"
   > {
   votingStartTime: Date | null;
   votingEndTime: Date | null;
@@ -38,6 +40,8 @@ export interface Proposal
   remainingVotingDays: number | null;
 
   reactions: ReactionItem[];
+
+  depositTotal: BigNumber;
 }
 
 export type ProposalVoteVoter = ProposalVoteVoterFragment;

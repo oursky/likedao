@@ -61,7 +61,10 @@ fragment ProposalDetailScreenProposal on Proposal {
   votingEndTime
   proposerAddress
   status
-  depositTotal
+  depositTotal {
+    denom
+    amount
+  }
   tallyResult {
     yes
     no
