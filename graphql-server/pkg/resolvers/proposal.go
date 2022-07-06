@@ -63,6 +63,24 @@ func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*
 	return turnout, nil
 }
 
+func (r *proposalResolver) VoteByAddress(ctx context.Context, obj *models.Proposal, address string) (*models.ProposalVote, error) {
+	key := models.ProposalVoteKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalVote(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
+}
+
+func (r *proposalResolver) DepositByAddress(ctx context.Context, obj *models.Proposal, address string) (*models.ProposalDeposit, error) {
+	key := models.ProposalDepositKey{ProposalID: obj.ID, Address: address}
+	vote, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalDeposit(key)
+	if err != nil {
+		return nil, err
+	}
+	return vote, nil
+}
+
 func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
 	reactionCounts, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
 	if err != nil {
@@ -308,17 +326,6 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 	}
 
 	return nil, nil
-}
-
-func (r *proposalDepositResolver) Amount(ctx context.Context, obj *models.ProposalDeposit) ([]types.DbDecCoin, error) {
-	coins := make([]types.DbDecCoin, 0, len(obj.Amount))
-	for _, coin := range obj.Amount {
-		coins = append(coins, types.DbDecCoin{
-			Denom:  coin.Denom,
-			Amount: coin.Amount,
-		})
-	}
-	return coins, nil
 }
 
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {

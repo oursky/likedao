@@ -47,6 +47,8 @@ type Proposal implements Node {
   tallyResult: ProposalTallyResult
   "all tally over total staking pool"
   turnout: Float
+  voteByAddress(address: String!): ProposalVote
+  depositByAddress(address: String!): ProposalDeposit
 
   reactions: [ReactionCount!]!
   myReaction: String

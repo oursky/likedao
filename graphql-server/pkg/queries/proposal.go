@@ -21,6 +21,8 @@ type IProposalQuery interface {
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 	QueryProposalDepositTotal(id int) ([]types.DbDecCoin, error)
 	QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
+	QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error)
+	QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error)
 }
 
 type ProposalQuery struct {
@@ -332,6 +334,73 @@ func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
 		turnout, exists := idToTurnout[id]
 		if exists {
 			result = append(result, &turnout.Turnout)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	var votes []*models.ProposalVote
+	err := q.session.NewSelect().
+		With("keys", q.session.NewValues(&keys).WithOrder()).
+		Model(&votes).
+		Join("INNER JOIN keys ON (proposal_vote.proposal_id, proposal_vote.voter_address) = (keys.proposal_id, keys.address)").
+		Scan(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reorder query results by order of input keys
+	result := make([]*models.ProposalVote, 0, len(votes))
+	keyToVote := make(map[models.ProposalVoteKey]models.ProposalVote, len(votes))
+	for _, vote := range votes {
+		keyToVote[models.ProposalVoteKey{ProposalID: vote.ProposalID, Address: vote.VoterAddress}] = *vote
+	}
+
+	for _, key := range keys {
+		vote, exists := keyToVote[key]
+		if exists {
+			result = append(result, &vote)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
+}
+
+func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error) {
+	if len(keys) == 0 {
+		return nil, nil
+	}
+	var deposits []*models.ProposalDeposit
+	err := q.session.NewSelect().
+		With("keys", q.session.NewValues(&keys).WithOrder()).
+		Model(&deposits).
+		Join(", keys").
+		Where("(proposal_deposit.proposal_id, proposal_deposit.depositor_address) = (keys.proposal_id, keys.address)").
+		Scan(q.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reorder query results by order of input keys
+	result := make([]*models.ProposalDeposit, 0, len(deposits))
+	keyToVote := make(map[models.ProposalDepositKey]models.ProposalDeposit, len(deposits))
+	for _, deposit := range deposits {
+		keyToVote[models.ProposalDepositKey{ProposalID: deposit.ProposalID, Address: deposit.DepositorAddress}] = *deposit
+	}
+
+	for _, key := range keys {
+		deposit, exists := keyToVote[key]
+		if exists {
+			result = append(result, &deposit)
 		} else {
 			result = append(result, nil)
 		}
