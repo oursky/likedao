@@ -51,6 +51,18 @@ func (r *proposalResolver) TallyResult(ctx context.Context, obj *models.Proposal
 	return tally, nil
 }
 
+func (r *proposalResolver) Turnout(ctx context.Context, obj *models.Proposal) (*float64, error) {
+	turnout, err := pkgContext.GetDataLoadersFromCtx(ctx).Proposal.LoadProposalTurnout(obj.ID)
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposal turnout: %v", err))
+	}
+	if turnout == nil {
+		return nil, nil
+	}
+
+	return turnout, nil
+}
+
 func (r *proposalResolver) Reactions(ctx context.Context, obj *models.Proposal) ([]models.ReactionCount, error) {
 	reactionCounts, err := pkgContext.GetDataLoadersFromCtx(ctx).Reaction.LoadProposalReactionCount(obj.ID)
 	if err != nil {

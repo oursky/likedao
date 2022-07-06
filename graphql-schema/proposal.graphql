@@ -45,6 +45,8 @@ type Proposal implements Node {
   proposerAddress: String!
   status: ProposalStatus!
   tallyResult: ProposalTallyResult
+  "all tally over total staking pool"
+  turnout: Float
 
   reactions: [ReactionCount!]!
   myReaction: String

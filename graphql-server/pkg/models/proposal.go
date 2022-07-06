@@ -226,3 +226,8 @@ type ProposalTallyResult struct {
 	NoWithVeto *bunbig.Int `bun:"column:no_with_veto,notnull"`
 	Height     int64       `bun:"column:height,notnull"`
 }
+
+type ProposalTurnout struct {
+	ProposalID int
+	Turnout    float64
+}

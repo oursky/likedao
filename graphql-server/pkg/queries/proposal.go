@@ -20,6 +20,7 @@ type IProposalQuery interface {
 	QueryProposalTallyResults(id []int) ([]*models.ProposalTallyResult, error)
 	QueryProposalByIDs(ids []string) ([]*models.Proposal, error)
 	QueryProposalDepositTotal(id int) ([]types.DbDecCoin, error)
+	QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
 }
 
 type ProposalQuery struct {
@@ -296,4 +297,45 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int) ([]types.DbDecCoin, er
 		return []types.DbDecCoin{}, err
 	}
 	return res, nil
+}
+
+func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error) {
+	var turnouts []models.ProposalTurnout
+	err := q.session.NewSelect().
+		Model((*models.ProposalTallyResult)(nil)).
+		Column("proposal_id").
+		ColumnExpr(`(
+				proposal_tally_result.yes::bigint + 
+				proposal_tally_result.no::bigint + 
+				proposal_tally_result.abstain::bigint + 
+				proposal_tally_result.no_with_veto::bigint
+			) / staking_pool.bonded_tokens::numeric as turnout`).
+		Join(`
+			INNER JOIN proposal_staking_pool_snapshot AS staking_pool 
+			ON staking_pool.proposal_id = proposal_tally_result.proposal_id
+		`).
+		Where("proposal_tally_result.proposal_id IN (?)", bun.In(ids)).
+		Scan(q.ctx, &turnouts)
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// Reorder query results by order of input ids
+	result := make([]*float64, 0, len(turnouts))
+	idToTurnout := make(map[int]models.ProposalTurnout, len(turnouts))
+	for _, turnout := range turnouts {
+		idToTurnout[turnout.ProposalID] = turnout
+	}
+
+	for _, id := range ids {
+		turnout, exists := idToTurnout[id]
+		if exists {
+			result = append(result, &turnout.Turnout)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
 }

@@ -10,6 +10,7 @@ type ProposalDataloader interface {
 	Load(id string) (*models.Proposal, error)
 	LoadAll(ids []string) ([]*models.Proposal, []error)
 	LoadProposalTallyResult(id int) (*models.ProposalTallyResult, error)
+	LoadProposalTurnout(id int) (*float64, error)
 }
 
 type ProposalLoader interface {
@@ -22,9 +23,15 @@ type ProposalTallyResultDataloader interface {
 	LoadAll(ids []int) ([]*models.ProposalTallyResult, []error)
 }
 
+type ProposalTurnoutDataloader interface {
+	Load(id int) (*float64, error)
+	LoadAll(ids []int) ([]*float64, []error)
+}
+
 type IProposalDataloader struct {
 	proposalLoader            ProposalLoader
 	proposalTallyResultLoader ProposalTallyResultDataloader
+	proposalTurnoutDataloader ProposalTurnoutDataloader
 }
 
 func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloader {
@@ -60,9 +67,26 @@ func NewProposalDataloader(proposalQuery queries.IProposalQuery) ProposalDataloa
 		Wait:     DefaultWait,
 	})
 
+	proposalTurnoutDataloader := godataloader.NewDataLoader(godataloader.DataLoaderConfig[int, *float64]{
+		Fetch: func(ids []int) ([]*float64, []error) {
+			turnouts, err := proposalQuery.QueryTurnoutByProposalIDs(ids)
+			if err != nil {
+				errors := make([]error, 0, len(ids))
+				for range ids {
+					errors = append(errors, err)
+				}
+				return nil, errors
+			}
+			return turnouts, nil
+		},
+		MaxBatch: DefaultMaxBatch,
+		Wait:     DefaultWait,
+	})
+
 	return &IProposalDataloader{
 		proposalLoader:            proposalLoader,
 		proposalTallyResultLoader: proposalTallyResultLoader,
+		proposalTurnoutDataloader: proposalTurnoutDataloader,
 	}
 }
 
@@ -76,4 +100,8 @@ func (d *IProposalDataloader) LoadAll(ids []string) ([]*models.Proposal, []error
 
 func (d IProposalDataloader) LoadProposalTallyResult(id int) (*models.ProposalTallyResult, error) {
 	return d.proposalTallyResultLoader.Load(id)
+}
+
+func (d IProposalDataloader) LoadProposalTurnout(id int) (*float64, error) {
+	return d.proposalTurnoutDataloader.Load(id)
 }
