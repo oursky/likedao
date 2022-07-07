@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import BigNumber from "bignumber.js";
 import { differenceInDays } from "date-fns";
 import {
   ProposalDetailScreenQuery,
@@ -410,7 +409,7 @@ export function useProposalQuery(): {
             proposal.votingStartTime &&
             proposal.votingEndTime &&
             differenceInDays(new Date(proposal.votingEndTime), Date.now()),
-          depositTotal: new BigNumber(
+          depositTotal: convertMinimalTokenToToken(
             proposal.depositTotal.find((t) => t.denom === CoinMinimalDenom)
               ?.amount ?? 0
           ),
