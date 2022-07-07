@@ -60,8 +60,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     <th
       scope="col"
       className={cn(
-        "w-80",
-        "min-w-max",
         "font-medium",
         "tracking-wider",
         "leading-4",
@@ -178,14 +176,14 @@ export const TableCell: React.FC<TableCellProps> = ({
 
 const Table: React.FC<TableProps> = ({ children, className }) => {
   return (
-    <table
+    <div
       className={cn(
-        "inline-block overflow-x-auto w-full min-w-full rounded-lg shadow-md",
+        "inline-block overflow-x-auto rounded-lg w-full min-w-full shadow-md",
         className
       )}
     >
-      {children}
-    </table>
+      <table className={cn("table-auto rounded-lg w-full")}>{children}</table>
+    </div>
   );
 };
 
