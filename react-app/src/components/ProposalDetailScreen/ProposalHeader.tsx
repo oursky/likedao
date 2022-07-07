@@ -129,7 +129,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         </div>
         <div className={cn("flex", "flex-col", "items-center", "grow")}>
           <LocalizedText messageID="ProposalDetail.turnOut" />
-          <p>{turnout}%</p>
+          <p>{turnout != null ? `${(turnout * 100).toFixed(2)}%` : "-"}</p>
         </div>
       </div>
     </div>

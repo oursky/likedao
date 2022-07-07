@@ -33,25 +33,6 @@ import {
   ProposalVoteVoter,
 } from "./ProposalDetailScreenModel";
 
-const CoinMinimalToken = Config.chainInfo.currency.coinMinimalDenom;
-
-const calculateTurnout = (tallyResult: Proposal["tallyResult"]) => {
-  if (!tallyResult) {
-    return 0;
-  }
-
-  const { yes, no, noWithVeto, abstain } = tallyResult;
-  const total = BigNumber.sum(yes, no, noWithVeto, abstain);
-  if (total.isZero()) {
-    return 0;
-  }
-  const turnout = new BigNumber(100).minus(
-    abstain.dividedBy(total).multipliedBy(100)
-  );
-
-  return turnout.toNumber();
-};
-
 const getVoterOrDepositorAddress = (
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   voterOrDepositor: ProposalVoteVoter | ProposalDepositDepositor
@@ -424,13 +405,13 @@ export function useProposalQuery(): {
             ? new Date(proposal.depositEndTime)
             : null,
           submitTime: new Date(proposal.submitTime),
-          turnout: calculateTurnout(proposal.tallyResult), // TODO: fetch from grahpql api instead
+          turnout: proposal.turnout ?? null,
           remainingVotingDays:
             proposal.votingStartTime &&
             proposal.votingEndTime &&
             differenceInDays(new Date(proposal.votingEndTime), Date.now()),
           depositTotal: new BigNumber(
-            proposal.depositTotal.find((t) => t.denom === CoinMinimalToken)
+            proposal.depositTotal.find((t) => t.denom === CoinMinimalDenom)
               ?.amount ?? 0
           ),
           tallyResult: proposal.tallyResult && {

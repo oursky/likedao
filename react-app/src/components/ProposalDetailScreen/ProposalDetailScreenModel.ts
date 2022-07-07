@@ -32,7 +32,7 @@ export interface Proposal
   /**
    * Turn out rate in percentages
    */
-  turnout: number;
+  turnout: number | null;
   /**
    * Number of days left until voting closes
    * null when voting dates are not yet available

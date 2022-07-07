@@ -135,7 +135,9 @@ const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
                 "text-black"
               )}
             >
-              {` ${proposal.turnout.toFixed(1)}%`}
+              {proposal.turnout != null
+                ? ` ${(proposal.turnout * 100).toFixed(1)}%`
+                : " -"}
             </span>
           </span>
           <span
