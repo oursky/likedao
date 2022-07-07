@@ -1,14 +1,5 @@
-import { ProposalScreenProposalFragment } from "../../generated/graphql";
-import { ReactionType } from "../reactions/ReactionModel";
+import { Proposal } from "../proposals/ProposalModel";
 
-export interface ReactionItem {
-  type: ReactionType;
-  count: number;
-}
-export interface Proposal
-  extends Omit<ProposalScreenProposalFragment, "reactions"> {
-  reactions: ReactionItem[];
-}
 export interface PaginatedProposals {
   proposals: Proposal[];
   totalCount: number;

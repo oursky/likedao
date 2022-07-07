@@ -5,7 +5,7 @@ import {
   getVoteOptionTextColorCn,
   getVoteOptionMessage,
 } from "../ProposalVoteOption/utils";
-import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
+import ProposalStatusBadge from "../proposals/ProposalStatusBadge";
 import Table, {
   TableCell,
   TableHead,

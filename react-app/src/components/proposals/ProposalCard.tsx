@@ -5,12 +5,12 @@ import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
 import LocalizedText from "../common/Localized/LocalizedText";
 import ColorBar, { ColorBarData } from "../common/ColorBar/ColorBar";
-import { getProposalTypeMessage } from "../ProposalStatusBadge/utils";
-import ProposalStatusBadge from "../ProposalStatusBadge/ProposalStatusBadge";
 import { ReactionList } from "../reactions";
 import { DefaultReactionMap } from "../reactions/ReactionModel";
-import { ProposalInsight } from "./ProposalInsight";
-import { Proposal } from "./ProposalScreenModel";
+import { ProposalInsight } from "../ProposalScreen/ProposalInsight";
+import { getProposalTypeMessage } from "./utils";
+import ProposalStatusBadge from "./ProposalStatusBadge";
+import { Proposal } from "./ProposalModel";
 
 interface ProposalCardProps {
   proposal: Proposal;
