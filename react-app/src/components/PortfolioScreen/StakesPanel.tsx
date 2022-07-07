@@ -62,7 +62,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
         </h2>
       </div>
 
-      <Table className="inline-block overflow-x-auto w-full min-w-full rounded-lg shadow-md">
+      <Table>
         <TableHead>
           <TableRow>
             <ColumnSortContext.Provider value={columnSortContextValue}>

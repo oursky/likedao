@@ -8,6 +8,7 @@ import {
   ProposalHistory as ProposalHistoryModel,
   ProposalHistoryFilterKey,
 } from "./ProposalHistoryModel";
+import ProposalHistoryTable from "./ProposalHistoryTable";
 
 export type ProposalHistoryTabItem = IFilterTabItem<ProposalHistoryFilterKey>;
 
@@ -49,6 +50,8 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
           />
         </div>
       )}
+
+      <ProposalHistoryTable className="my-4 min-w-full" data={proposals} />
 
       <PageContoller
         offsetBased={true}
