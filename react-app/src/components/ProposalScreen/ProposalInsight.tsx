@@ -4,7 +4,7 @@ import { ProposalStatus } from "../../generated/graphql";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { MessageID } from "../../i18n/LocaleModel";
-import { VoteOptionIndicator } from "./VoteOptionIndicator";
+import VoteOptionIndicator from "../ProposalVoteOption/VoteOptionIndicator";
 import { Proposal } from "./ProposalScreenModel";
 
 interface ProposalInsightProps {

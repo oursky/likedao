@@ -14,6 +14,11 @@ interface TableHeadProps {
   children: React.ReactNode;
 }
 
+interface TableHeaderProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
 interface TableRowProps {
   className?: string;
   children: React.ReactNode;
@@ -45,6 +50,31 @@ export const TableHead: React.FC<TableHeadProps> = ({
   className,
 }) => {
   return <thead className={cn("bg-white", className)}>{children}</thead>;
+};
+
+export const TableHeader: React.FC<TableHeaderProps> = ({
+  children,
+  className,
+}) => {
+  return (
+    <th
+      scope="col"
+      className={cn(
+        "font-medium",
+        "tracking-wider",
+        "leading-4",
+        "uppercase",
+        "text-xs",
+        "py-3",
+        "px-6",
+        "text-left",
+        "text-likecoin-green",
+        className
+      )}
+    >
+      {children}
+    </th>
+  );
 };
 
 export const TableRow: React.FC<TableRowProps> = ({
@@ -146,9 +176,14 @@ export const TableCell: React.FC<TableCellProps> = ({
 
 const Table: React.FC<TableProps> = ({ children, className }) => {
   return (
-    <table className={cn("min-w-full rounded-lg shadow-md", className)}>
-      {children}
-    </table>
+    <div
+      className={cn(
+        "inline-block overflow-x-auto rounded-lg w-full min-w-full shadow-md",
+        className
+      )}
+    >
+      <table className={cn("table-auto rounded-lg w-full")}>{children}</table>
+    </div>
   );
 };
 
