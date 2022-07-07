@@ -323,10 +323,10 @@ func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
 		Model((*models.ProposalTallyResult)(nil)).
 		Column("proposal_id").
 		ColumnExpr(`(
-				proposal_tally_result.yes::bigint + 
-				proposal_tally_result.no::bigint + 
-				proposal_tally_result.abstain::bigint + 
-				proposal_tally_result.no_with_veto::bigint
+				proposal_tally_result.yes::numeric + 
+				proposal_tally_result.no::numeric + 
+				proposal_tally_result.abstain::numeric + 
+				proposal_tally_result.no_with_veto::numeric
 			) / staking_pool.bonded_tokens::numeric as turnout`).
 		Join(`
 			INNER JOIN proposal_staking_pool_snapshot AS staking_pool 
