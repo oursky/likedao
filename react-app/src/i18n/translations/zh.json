@@ -98,7 +98,7 @@
   "ProposalDetail.votes.voter": "Voter",
   "ProposalDetail.votes.voter.validator": "Validator",
   "ProposalDetail.votingDateRange": "{from} 至 {to}",
-  "ProposalDetail.votingDaysRemaining": "{days} days left",
+  "ProposalDetail.votingDurationRemaining": "剩餘{duration}",
   "ProposalDetail.votingPeriod": "Voting Period",
   "ProposalHistory.comment": "Comment",
   "ProposalHistory.filters.deposited": "Deposited Proposals",

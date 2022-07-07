@@ -3,6 +3,8 @@ import {
   LocaleProvider,
   Context as MFContext,
 } from "@oursky/react-messageformat";
+import { zhTW, enUS } from "date-fns/locale";
+import { Locale as DateFnsLocale } from "date-fns";
 import {
   Locale,
   MessageArgs,
@@ -24,6 +26,11 @@ interface LocalizationContextValue {
 const LocalizationContext = React.createContext<LocalizationContextValue>(
   null as any
 );
+
+const localeToDateFnsMap = {
+  [Locale.en]: enUS,
+  [Locale.zh]: zhTW,
+};
 
 const AppLocaleProvider: React.FC<AppLocaleProviderProps> = (props) => {
   const { children } = props;
@@ -69,13 +76,19 @@ export default AppLocaleProvider;
 
 export const useLocale = (): {
   locale: Locale;
+  dateFnsLocale: DateFnsLocale;
   setLocale: (locale: Locale) => void;
   translate: (messageID: MessageID, messageArgs?: MessageArgs) => string;
 } => {
   const { locale, renderToString } = React.useContext(MFContext);
   const { setLocale } = React.useContext(LocalizationContext);
+  const dateFnsLocale = useMemo(
+    () => localeToDateFnsMap[locale as Locale],
+    [locale]
+  );
   return {
     locale: locale as Locale,
+    dateFnsLocale,
     setLocale,
     translate: renderToString,
   };

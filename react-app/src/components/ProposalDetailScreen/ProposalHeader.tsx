@@ -49,7 +49,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
     votingStartTime,
     votingEndTime,
-    remainingVotingDays,
+    remainingVotingDuration,
     depositTotal,
     turnout,
   } = proposal;
@@ -100,14 +100,13 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "-"
           )}
         </p>
-        {remainingVotingDays && remainingVotingDays > 0 && (
-          <Badge color="likecoin-yellow">
-            <LocalizedText
-              messageID="ProposalDetail.votingDaysRemaining"
-              messageArgs={{ days: remainingVotingDays }}
-            />
-          </Badge>
-        )}
+
+        <Badge color="likecoin-yellow">
+          <LocalizedText
+            messageID="ProposalDetail.votingDurationRemaining"
+            messageArgs={{ duration: remainingVotingDuration }}
+          />
+        </Badge>
       </div>
       <div
         className={cn(

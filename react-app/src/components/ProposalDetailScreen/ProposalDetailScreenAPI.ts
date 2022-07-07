@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { differenceInDays } from "date-fns";
+import { formatDistance } from "date-fns";
 import {
   ProposalDetailScreenQuery,
   ProposalDetailScreenQueryQuery,
@@ -21,6 +21,7 @@ import { getReactionType } from "../reactions/ReactionModel";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import Config from "../../config/Config";
+import { useLocale } from "../../providers/AppLocaleProvider";
 import {
   PaginatedProposalVotes,
   PaginatedProposalDeposits,
@@ -364,6 +365,8 @@ export function useProposalQuery(): {
   requestState: RequestState<Proposal | null>;
   fetch: (id: number) => void;
 } {
+  const { dateFnsLocale } = useLocale();
+
   const [fetch, { requestState }] = useLazyGraphQLQuery<
     ProposalDetailScreenQueryQuery,
     ProposalDetailScreenQueryQueryVariables
@@ -387,6 +390,7 @@ export function useProposalQuery(): {
   const data = useMemo(() => {
     return mapRequestData<ProposalDetailScreenQueryQuery, Proposal | null>(
       requestState,
+      // eslint-disable-next-line complexity
       (r) => {
         if (!r.proposalByID) {
           return null;
@@ -405,10 +409,12 @@ export function useProposalQuery(): {
             : null,
           submitTime: new Date(proposal.submitTime),
           turnout: proposal.turnout ?? null,
-          remainingVotingDays:
+          remainingVotingDuration:
             proposal.votingStartTime &&
             proposal.votingEndTime &&
-            differenceInDays(new Date(proposal.votingEndTime), Date.now()),
+            formatDistance(new Date(proposal.votingEndTime), new Date(), {
+              locale: dateFnsLocale,
+            }),
           depositTotal: convertMinimalTokenToToken(
             proposal.depositTotal.find((t) => t.denom === CoinMinimalDenom)
               ?.amount ?? 0
@@ -430,7 +436,7 @@ export function useProposalQuery(): {
         };
       }
     );
-  }, [requestState]);
+  }, [dateFnsLocale, requestState]);
 
   return {
     requestState: data,
