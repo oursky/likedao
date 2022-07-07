@@ -1,0 +1,30 @@
+query PortfolioScreenQuery(
+  $first: Int!
+  $after: Int!
+  $isVoter: Boolean!
+  $isSubmitter: Boolean!
+  $isDepositor: Boolean!
+  $address: String!
+  $searchTerm: String
+  $order: ProposalSort
+) {
+  proposalVotesDistribution(address: $address) {
+    ...PortfolioHistoryProposalVotesDistribution
+  }
+  proposals(
+    input: {
+      first: $first
+      after: $after
+      address: {
+        address: $address
+        isVoter: $isVoter
+        isSubmitter: $isSubmitter
+        isDepositor: $isDepositor
+      }
+      searchTerm: $searchTerm
+      order: $order
+    }
+  ) {
+    ...PortfolioHistoryProposalConnection
+  }
+}

@@ -15,9 +15,57 @@ import {
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
 import { ColumnOrder } from "../SectionedTable/SectionedTable";
-import PortfolioScreenModel, { Portfolio, Stake } from "./PortfolioScreenModel";
+import {
+  PortfolioScreenQuery,
+  PortfolioScreenQueryQuery,
+  PortfolioScreenQueryQueryVariables,
+  Sort,
+} from "../../generated/graphql";
+import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
+import { useLazyGraphQLQuery } from "../../hooks/graphql";
+import PortfolioScreenModel, {
+  Portfolio,
+  PortfolioScreenGraphql,
+  Stake,
+} from "./PortfolioScreenModel";
 
 type PortfolioScreenRequestState = RequestState<PortfolioScreenModel>;
+
+interface UseProposalHistoryQuery {
+  (): {
+    requestState: RequestState<PortfolioScreenGraphql>;
+    fetch: ({
+      first,
+      after,
+      tab,
+      address,
+    }: {
+      first: number;
+      after: number;
+      tab: ProposalHistoryFilterKey;
+      address: string;
+    }) => void;
+  };
+}
+
+interface ProposalHistoryFilter {
+  address: string;
+  isVoter: boolean;
+  isSubmitter: boolean;
+  isDepositor: boolean;
+}
+
+function getFilterVariables(
+  tab: ProposalHistoryFilterKey,
+  address: string
+): ProposalHistoryFilter {
+  return {
+    address: address,
+    isVoter: tab === "voted",
+    isSubmitter: tab === "submitted",
+    isDepositor: tab === "deposited",
+  };
+}
 
 export const usePortfolioQuery = (): {
   requestState: PortfolioScreenRequestState;
@@ -193,5 +241,48 @@ export const usePortfolioQuery = (): {
     fetch,
     stakesOrder,
     setStakesOrder,
+  };
+};
+
+export const useProposalHistoryQuery: UseProposalHistoryQuery = () => {
+  const [fetch, { requestState }] = useLazyGraphQLQuery<
+    PortfolioScreenQueryQuery,
+    PortfolioScreenQueryQueryVariables
+  >(PortfolioScreenQuery, {
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+  });
+
+  const callFetch = useCallback(
+    ({
+      first,
+      after,
+      tab,
+      address,
+    }: {
+      first: number;
+      after: number;
+      tab: ProposalHistoryFilterKey;
+      address: string;
+    }) => {
+      // Errors are handled by the requestState
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetch({
+        variables: {
+          first,
+          after,
+          order: {
+            submitTime: Sort.Asc,
+          },
+          ...getFilterVariables(tab, address),
+        },
+      });
+    },
+    [fetch]
+  );
+
+  return {
+    requestState,
+    fetch: callFetch,
   };
 };
