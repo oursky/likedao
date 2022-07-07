@@ -422,6 +422,10 @@ func (r *queryResolver) Proposals(ctx context.Context, input models.QueryProposa
 		proposalQuery = proposalQuery.ScopeProposalStatus((*input.Status).ToProposalStatus())
 	}
 
+	if input.Order != nil {
+		proposalQuery = proposalQuery.ScopeProposalOrder(input.Order)
+	}
+
 	res, err := proposalQuery.QueryPaginatedProposals(input.First, input.After)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load proposals: %v", err))
