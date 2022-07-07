@@ -65,6 +65,7 @@ fragment ProposalDetailScreenProposal on Proposal {
     denom
     amount
   }
+  turnout
   tallyResult {
     yes
     no
