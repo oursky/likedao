@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
-import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { translateAddress, truncateAddress } from "../../utils/address";
@@ -23,6 +22,7 @@ import {
 } from "../../generated/graphql";
 import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
+import { useBankAPI } from "../../api/bankAPI";
 import PortfolioScreenModel, {
   Portfolio,
   PortfolioScreenGraphql,
@@ -77,10 +77,10 @@ export const usePortfolioQuery = (): {
     useState<PortfolioScreenRequestState>(RequestStateInitial);
 
   const wallet = useWallet();
-  const cosmosAPI = useCosmosAPI();
-  const staking = useStakingAPI();
+  const bankAPI = useBankAPI();
+  const stakingAPI = useStakingAPI();
   const distribution = useDistributionAPI();
-  const { desmosQuery, stargateQuery } = useQueryClient();
+  const { desmosQuery, query } = useQueryClient();
 
   const [stakesOrder, setStakesOrder] = useState({
     id: "name",
@@ -90,13 +90,13 @@ export const usePortfolioQuery = (): {
   const isValidAddress = useCallback(
     async (address: string) => {
       try {
-        await stargateQuery.getAccount(address);
+        const account = await query.auth.account(address);
+        return account != null;
       } catch {
         return false;
       }
-      return true;
     },
-    [stargateQuery]
+    [query]
   );
 
   const fetchAddressPortfolio = useCallback<
@@ -111,9 +111,9 @@ export const usePortfolioQuery = (): {
         reward,
         profile,
       ] = await Promise.all([
-        cosmosAPI.getAddressBalance(address),
-        cosmosAPI.getAddressStakedBalance(address),
-        staking.getUnstakingAmount(address),
+        bankAPI.getAddressBalance(address),
+        stakingAPI.getAddressStakedBalance(address),
+        stakingAPI.getUnstakingAmount(address),
         distribution.getAddressTotalCommission(address),
         distribution.getAddressTotalDelegationRewards(address),
         desmosQuery.getProfile(translateAddress(address, "desmos")),
@@ -139,13 +139,13 @@ export const usePortfolioQuery = (): {
         address,
       };
     },
-    [cosmosAPI, staking, distribution, desmosQuery]
+    [bankAPI, stakingAPI, distribution, desmosQuery]
   );
 
   const fetchStakes = useCallback(
     async (address: string) => {
       // get stakes amount and validator address of each delegation
-      const delegations = await staking.getDelegatorStakes(address);
+      const delegations = await stakingAPI.getDelegatorStakes(address);
 
       // get rewards of each delegations
       const validatorAddresses = delegations.map(
@@ -168,7 +168,7 @@ export const usePortfolioQuery = (): {
 
       return stakeEntries;
     },
-    [distribution, staking]
+    [distribution, stakingAPI]
   );
 
   const fetch = useCallback(

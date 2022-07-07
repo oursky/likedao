@@ -12,11 +12,11 @@ import {
   isRequestStateError,
   isRequestStateLoaded,
 } from "../../models/RequestState";
-import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useTransaction } from "../../providers/TransactionProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import Config from "../../config/Config";
+import { useBankAPI } from "../../api/bankAPI";
 import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
@@ -64,7 +64,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
   const { translate } = useLocale();
 
   const wallet = useWallet();
-  const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
   const transaction = useTransaction();
 
   const chainHealthRequestState = useChainHealthQuery();
@@ -84,7 +84,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
 
   useEffect(() => {
     if (wallet.status !== ConnectionStatus.Connected) return;
-    cosmosAPI
+    bankAPI
       .getBalance()
       .then((balance) => {
         setUserInfo({ balance, address: wallet.account.address });
@@ -92,7 +92,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
       .catch((e) => {
         console.error("Failed to fetch user balance =", e);
       });
-  }, [cosmosAPI, wallet]);
+  }, [bankAPI, wallet]);
 
   useEffectOnce(
     () => {
