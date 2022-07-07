@@ -131,12 +131,3 @@ models:
     fields:
       id:
         fieldName: NodeID
-
-  GovParams:
-    model: github.com/oursky/likedao/pkg/models.GovParams
-  DepositParams:
-    model: github.com/oursky/likedao/pkg/models.DepositParams
-  TallyParams:
-    model: github.com/oursky/likedao/pkg/models.TallyParams
-  VotingParams:
-    model: github.com/oursky/likedao/pkg/models.VotingParams

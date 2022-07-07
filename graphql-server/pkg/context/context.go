@@ -29,7 +29,6 @@ type QueryContext struct {
 	StakingPool   queries.IStakingPoolQuery
 	Supply        queries.ISupplyQuery
 	Proposal      queries.IProposalQuery
-	Gov           queries.IGovQuery
 	Reaction      queries.IReactionQuery
 	Validator     queries.IValidatorQuery
 }
@@ -67,7 +66,6 @@ func NewRequestContext(
 		StakingPool:   queries.NewStakingPoolQuery(ctx, chainDB),
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
-		Gov:           queries.NewGovQuery(ctx, chainDB),
 		Reaction:      queries.NewReactionQuery(ctx, serverDB),
 		Validator:     queries.NewValidatorQuery(ctx, chainDB),
 	}
