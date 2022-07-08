@@ -6,7 +6,9 @@ Built using React, GraphQL, Golang and PostgreSQL. Deployed with Kubernetes and 
 
 ## Architecture
 
-See [Architecture Docs](./docs/Architecture.md) for diagram and descriptions.
+![Architecture Diagram](./docs/ArchDiagram.png)
+
+See [Architecture Docs](./docs/Architecture.md) for more details.
 
 ## Development
 
