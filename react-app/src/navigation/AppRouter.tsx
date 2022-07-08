@@ -37,6 +37,10 @@ const AppRouter: React.FC = () => {
         </Route>
 
         <Route
+          path={AppRoutes.NotFound}
+          element={<ErrorView type={ErrorType.NotFound} />}
+        />
+        <Route
           path={AppRoutes.ErrorInvalidAddress}
           element={<ErrorView type={ErrorType.InvalidAddress} />}
         />
