@@ -4,6 +4,8 @@ const AppRoutes = Object.freeze({
   Proposals: "/proposals",
   ProposalDetail: "/proposals/:id",
   NewProposal: "/proposals/new",
+  Validator: "/validator",
+  ValidatorDetail: "validator/:address",
   Portfolio: "/portfolio",
   OtherPortfolio: "/portfolio/:address",
   ErrorInvalidAddress: "/invalid-address",
