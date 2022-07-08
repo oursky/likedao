@@ -1,4 +1,4 @@
-fragment PortfolioHistoryProposalConnection on ProposalConnection {
+fragment ProposalHistoryProposalConnection on ProposalConnection {
   pageInfo {
     startCursor
     endCursor
@@ -18,9 +18,40 @@ fragment PortfolioHistoryProposalConnection on ProposalConnection {
   }
 }
 
-fragment PortfolioHistoryProposalVotesDistribution on ProposalTallyResult {
+fragment ProposalHistoryProposalVotesDistribution on ProposalTallyResult {
   yes
   no
   abstain
   noWithVeto
+}
+
+query ProposalHistoryQuery(
+  $first: Int!
+  $after: Int!
+  $isVoter: Boolean!
+  $isSubmitter: Boolean!
+  $isDepositor: Boolean!
+  $address: String!
+  $searchTerm: String
+  $order: ProposalSort
+) {
+  proposalVotesDistribution(address: $address) {
+    ...ProposalHistoryProposalVotesDistribution
+  }
+  proposals(
+    input: {
+      first: $first
+      after: $after
+      address: {
+        address: $address
+        isVoter: $isVoter
+        isSubmitter: $isSubmitter
+        isDepositor: $isDepositor
+      }
+      searchTerm: $searchTerm
+      order: $order
+    }
+  ) {
+    ...ProposalHistoryProposalConnection
+  }
 }
