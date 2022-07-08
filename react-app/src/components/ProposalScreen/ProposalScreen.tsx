@@ -97,10 +97,10 @@ const ProposalScreen: React.FC = () => {
     (tab: FilterKey) => {
       setSearchParams({
         tab: tab,
-        page: (after / PROPOSAL_LIST_PAGE_SIZE + 1).toString(),
+        page: "1",
       });
     },
-    [after, setSearchParams]
+    [setSearchParams]
   );
 
   useEffect(() => {
