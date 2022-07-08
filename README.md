@@ -4,7 +4,13 @@ LikeDAO is a web app to facilitate participation and discussion in LikeCoin Chai
 
 Built using React, GraphQL, Golang and PostgreSQL. Deployed with Kubernetes and Helm.
 
-## Quick Start
+## Architecture
+
+See [Architecture Docs](./docs/Architecture.md) for diagram and descriptions.
+
+## Development
+
+### Quick Start
 
 ```
 make setup
@@ -16,12 +22,6 @@ make -C react-app dev
 ```
 
 Then visit http://localhost:3000
-
-## Architecture
-
-See [Architecture Docs](./docs/Architecture.md) for diagram and descriptions.
-
-## Development
 
 ### Prerequisite
 
