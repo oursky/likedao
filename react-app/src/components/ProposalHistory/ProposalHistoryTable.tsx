@@ -1,5 +1,6 @@
 import React from "react";
 import cn from "classnames";
+import { Link } from "react-router-dom";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
   getVoteOptionTextColorCn,
@@ -12,6 +13,7 @@ import Table, {
   TableHeader,
   TableRow,
 } from "../common/Table/Table";
+import AppRoutes from "../../navigation/AppRoutes";
 import { ProposalConnection } from "./ProposalHistoryModel";
 
 interface ProposalHistoryTableProps {
@@ -56,10 +58,16 @@ const ProposalHistoryTable: React.FC<ProposalHistoryTableProps> = ({
       <tbody>
         {data.edges.map(({ node: proposal }) => (
           <TableRow key={proposal.proposalId}>
-            <TableCell className="items-center py-4">
-              <p className="mb-3 text-sm font-medium leading-5 text-likecoin-green">
+            <TableCell className="flex flex-col items-start py-4">
+              <Link
+                to={AppRoutes.ProposalDetail.replace(
+                  ":id",
+                  proposal.proposalId.toString()
+                )}
+                className="mb-3 text-sm font-medium leading-5 text-likecoin-green"
+              >
                 #{proposal.proposalId} {proposal.title}
-              </p>
+              </Link>
               <ProposalStatusBadge status={proposal.status} />
             </TableCell>
             <TableCell className="items-center py-4">
