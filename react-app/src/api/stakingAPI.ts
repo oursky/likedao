@@ -62,14 +62,11 @@ export const useStakingAPI = (): IStakingAPI => {
         throw new Error("Wallet not connected");
       }
 
-      const coinAmount = convertTokenToMinimalToken(amount);
-
       const { address } = wallet.account;
 
       const balance = await bank.getBalance();
-      const coinBalance = convertTokenToMinimalToken(balance.amount);
 
-      if (coinBalance.isLessThan(coinAmount)) {
+      if (balance.amount.isLessThan(amount)) {
         throw new Error("Insufficient funds");
       }
 
@@ -78,7 +75,7 @@ export const useStakingAPI = (): IStakingAPI => {
         validatorAddress: validator,
         amount: {
           denom: CoinMinimalDenom,
-          amount: coinAmount.toFixed(),
+          amount: convertTokenToMinimalToken(amount).toFixed(),
         },
       });
 

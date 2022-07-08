@@ -77,7 +77,6 @@ export const useGovAPI = (): IGovAPI => {
       const { address } = wallet.account;
 
       const balance = await bank.getBalance();
-      const minimalDeposit = convertTokenToMinimalToken(initialDeposit);
 
       if (balance.amount.isLessThan(initialDeposit)) {
         throw new Error("Insufficient funds");
@@ -88,7 +87,7 @@ export const useGovAPI = (): IGovAPI => {
         : [
             {
               denom: CoinMinimalDenom,
-              amount: minimalDeposit.toFixed(),
+              amount: convertTokenToMinimalToken(initialDeposit).toFixed(),
             },
           ];
 
@@ -131,15 +130,14 @@ export const useGovAPI = (): IGovAPI => {
       const { address } = wallet.account;
 
       const balance = await bank.getBalance();
-      const minimalDeposit = convertTokenToMinimalToken(amount);
 
-      if (balance.amount.isLessThan(minimalDeposit)) {
+      if (balance.amount.isLessThan(amount)) {
         throw new Error("Insufficient funds");
       }
 
       const deposit = {
         denom: CoinMinimalDenom,
-        amount: minimalDeposit.toFixed(),
+        amount: convertTokenToMinimalToken(amount).toFixed(),
       };
 
       const request = gov.makeDepositMessage({
