@@ -10,6 +10,7 @@ import WalletConnectingScreen from "../components/WalletConnectingScreen/WalletC
 import { useWallet, ConnectionStatus } from "../providers/WalletProvider";
 import AppScaffold from "../components/AppScaffold/AppScaffold";
 import ProposalDetailRouter from "../components/ProposalDetailScreen/ProposalDetailRouter";
+import ValidatorDetailScreen from "../components/ValidatorDetailScreen/ValidatorDetailScreen";
 import AppRoutes from "./AppRoutes";
 
 const AppRouter: React.FC = () => {
@@ -29,6 +30,10 @@ const AppRouter: React.FC = () => {
             path={`${AppRoutes.ProposalDetail}/*`}
             element={<ProposalDetailRouter />}
           />
+          <Route
+            path={`${AppRoutes.ValidatorDetail}/*`}
+            element={<ValidatorDetailScreen />}
+          />
           <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
           <Route
             path={AppRoutes.OtherPortfolio}
@@ -36,6 +41,10 @@ const AppRouter: React.FC = () => {
           />
         </Route>
 
+        <Route
+          path={AppRoutes.NotFound}
+          element={<ErrorView type={ErrorType.NotFound} />}
+        />
         <Route
           path={AppRoutes.ErrorInvalidAddress}
           element={<ErrorView type={ErrorType.InvalidAddress} />}
