@@ -12,4 +12,10 @@ export default defineConfig({
       extensions: [".js", ".ts"],
     }),
   ],
+  build: {
+    outDir: "build",
+  },
+  preview: {
+    port: 3000,
+  },
 });
