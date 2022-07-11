@@ -17,6 +17,10 @@ interface IDistributionAPI {
   getTotalCommission(): Promise<BigNumberCoin>;
   getAddressTotalDelegationRewards(address: string): Promise<BigNumberCoin>;
   getAddressTotalCommission(address: string): Promise<BigNumberCoin>;
+  getDelegationRewardsByValidator(
+    delegatorAddress: string,
+    validatorAddress: string
+  ): Promise<BigNumberCoin | null>;
   getDelegationRewardsByValidators(
     delegatorAddress: string,
     validatorAddresses: string[]
@@ -85,6 +89,36 @@ export const useDistributionAPI = (): IDistributionAPI => {
       amount: convertMinimalTokenToToken(rewardAmount),
     };
   }, [wallet, query]);
+
+  const getDelegationRewardsByValidator = useCallback(
+    async (delegatorAddress: string, validatorAddress: string) => {
+      try {
+        const rewardRespond = await query.distribution.delegationRewards(
+          delegatorAddress,
+          validatorAddress
+        );
+
+        const reward = rewardRespond.rewards.find(
+          (r) => r.denom === CoinMinimalDenom
+        );
+        // Default cosmos decimal places is 18
+        const rewardAmount = new BigNumber(reward?.amount ?? 0).shiftedBy(-18);
+        return {
+          denom: CoinDenom,
+          amount: convertMinimalTokenToToken(rewardAmount),
+        };
+      } catch (err: unknown) {
+        if (
+          err instanceof Error &&
+          err.message.includes("delegation does not exist")
+        ) {
+          return null;
+        }
+        throw err;
+      }
+    },
+    [query]
+  );
 
   const getDelegationRewardsByValidators = useCallback(
     async (delegatorAddress: string, validatorAddresses: string[]) => {
@@ -206,6 +240,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getTotalCommission,
       getAddressTotalDelegationRewards,
       getAddressTotalCommission,
+      getDelegationRewardsByValidator,
       getDelegationRewardsByValidators,
     }),
     [
@@ -214,6 +249,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getTotalCommission,
       getAddressTotalDelegationRewards,
       getAddressTotalCommission,
+      getDelegationRewardsByValidator,
       getDelegationRewardsByValidators,
     ]
   );
