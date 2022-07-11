@@ -142,3 +142,13 @@ func VerificationHandler(sessionConfig config.SessionConfig) gin.HandlerFunc {
 		c.Status(204)
 	}
 }
+
+//nolint:errcheck
+func LogoutHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Remove session token
+		RemoveSignedCookie(c, SessionCookieName, "/")
+
+		c.Status(200)
+	}
+}
