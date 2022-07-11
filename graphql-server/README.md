@@ -31,6 +31,13 @@ By default docker will start the server with GIN_MODE=debug, visit http://localh
 4. Implement resolver in the [resolvers](./pkg/resolvers/) folder
 5. Write tests if needed
 
+## Data Paths
+
+```
+Gin -> GraphQL Handler -> Resolver -> Data Loader -> Query -> DB
+Gin -> GraphQL Handler -> Resolver -> Mutator -> DB
+```
+
 ## Migrations
 
 ### Create migration
