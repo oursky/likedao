@@ -1,6 +1,6 @@
 # Deployment
 
-To execute a deployment for the LikeDAO system, please review the files in the [deployment folder](./deploy/) and follow the instructions below.
+To execute a deployment for the LikeDAO system, please review the files in this folder and follow the instructions below.
 
 ### Prerequisite
 
@@ -15,12 +15,7 @@ To execute a deployment for the LikeDAO system, please review the files in the [
 
 ### Procedure
 
-#### Building and deploying new docker images
-
-1. Run `make docker-build`
-2. Run `make docker-push`
-
-#### Deploy to k8s
+Decide which version you would like to deploy, specific via `buildTag` or checkout specific version and build the docker images yourself.
 
 1. Run `make -C deploy make-deployment-assets` to create a set of deployment configuration files
 2. Review each file in the [asset](./deploy/likedao/static/) folder and update if necessary

@@ -52,7 +52,12 @@ Please visit [here](./bdjuno/README.md#development) for more information
 
 ## Deployment
 
-Please visit [here](./deploy/README.md) for more information
+Pick what version you would like to deploy, or build the images yourself as follow.
+
+1. Run `make docker-build`
+2. Run `make docker-push`
+
+After ensure the images are in place, follow the instruction in [deploy folder](./deploy/README.md).
 
 ## Contributing
 
