@@ -39,6 +39,10 @@ interface IStakingAPI {
     account: string
   ): Promise<{ delegation: Delegation; balance: BigNumberCoin }[]>;
   getPool(): Promise<Pool>;
+  getDelegation(
+    delegatorAddress: string,
+    validatorAddress: string
+  ): Promise<{ delegation: Delegation; balance: BigNumberCoin } | null>;
 }
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -231,6 +235,42 @@ export const useStakingAPI = (): IStakingAPI => {
     return poolRespond.pool;
   }, [query.staking]);
 
+  const getDelegation = useCallback(
+    async (delegatorAddress: string, validatorAddress: string) => {
+      try {
+        const queryDelegationRespond = await query.staking.delegation(
+          delegatorAddress,
+          validatorAddress
+        );
+        if (!queryDelegationRespond.delegationResponse) {
+          return null;
+        }
+
+        const delegationResponse = queryDelegationRespond.delegationResponse;
+
+        if (!delegationResponse.balance || !delegationResponse.delegation) {
+          throw new Error("Failed to fetch delegation");
+        }
+
+        return {
+          delegation: delegationResponse.delegation,
+          balance: {
+            amount: convertMinimalTokenToToken(
+              delegationResponse.balance.amount
+            ),
+            denom: CoinDenom,
+          },
+        };
+      } catch (err: unknown) {
+        if (err instanceof Error && err.message.includes("NotFound")) {
+          return null;
+        }
+        throw err;
+      }
+    },
+    [query.staking]
+  );
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
@@ -240,6 +280,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getUnstakingAmount,
       getDelegatorStakes,
       getPool,
+      getDelegation,
     }),
     [
       signDelegateTokenTx,
@@ -249,6 +290,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getUnstakingAmount,
       getDelegatorStakes,
       getPool,
+      getDelegation,
     ]
   );
 };
