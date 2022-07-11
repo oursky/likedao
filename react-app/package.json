@@ -57,6 +57,7 @@
     "@graphql-codegen/typescript-operations": "^2.4.0",
     "@oursky/eslint-plugin": "^8.0.0",
     "@oursky/stylelint-oursky": "^3.0.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/react-hooks": "^8.0.0",
