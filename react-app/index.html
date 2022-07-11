@@ -16,6 +16,11 @@
     -->
     <link rel="manifest" href="/manifest.json" />
     <title>LikeDAO</title>
+    <script>
+      if (typeof global === "undefined") {
+        var global = globalThis;
+      }
+    </script>
     <script src="/config.js"></script>
     <script src="/keplr.js"></script>
   </head>
