@@ -19,6 +19,13 @@ export default defineConfig({
       plugins: [nodePolyfills()],
     },
   },
+  esbuild: {
+    logOverride: {
+      // Workaround false warning until plugin-react@2.0.0 is released
+      // Ref: https://github.com/vitejs/vite/issues/8644#issuecomment-1159308803
+      "this-is-undefined-in-esm": "silent",
+    },
+  },
   preview: {
     port: 3000,
   },
