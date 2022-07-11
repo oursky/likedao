@@ -81,10 +81,10 @@
     "vite": "^2.9.14"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "jest",
     "check-format": "prettier --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
     "format": "prettier --write --list-different 'src/**/*.{js,jsx,ts,tsx,css,scss}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
