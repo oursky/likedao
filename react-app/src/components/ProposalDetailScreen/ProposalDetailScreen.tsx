@@ -35,7 +35,6 @@ enum ProposalDetailModal {
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
-  const { fetch, requestState } = useProposalQuery();
   const { translate } = useLocale();
   const reactionAPI = useReactionAPI();
   const wallet = useWallet();
@@ -47,6 +46,8 @@ const ProposalDetailScreen: React.FC = () => {
   const proposalId = useMemo(() => {
     return id != null ? parseInt(id, 10) : null;
   }, [id]);
+
+  const { requestState } = useProposalQuery(proposalId);
 
   const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
     null
@@ -167,12 +168,6 @@ const ProposalDetailScreen: React.FC = () => {
     },
     [closeModals, cosmosAPI, govAPI, translate, wallet]
   );
-
-  useEffect(() => {
-    if (proposalId) {
-      fetch(proposalId);
-    }
-  }, [fetch, proposalId]);
 
   useEffect(() => {
     bankAPI
