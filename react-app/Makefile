@@ -54,3 +54,9 @@ dev:
 	cp ./config/config.debug.js ./public/config.js
 	cp ./config/keplr.debug.js ./public/keplr.js
 	yarn start
+
+.PHONY: preview
+preview:
+	cp ./config/config.debug.js ./public/config.js
+	cp ./config/keplr.debug.js ./public/keplr.js
+	yarn preview
