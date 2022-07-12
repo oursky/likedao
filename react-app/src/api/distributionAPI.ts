@@ -32,6 +32,7 @@ interface IDistributionAPI {
   ): Promise<BigNumberCoin[]>;
   getParams(): Promise<DistributionParam>;
   getAPR(): Promise<number>;
+  getValidatorExpectedReturn(address: string): Promise<number>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -279,6 +280,32 @@ export const useDistributionAPI = (): IDistributionAPI => {
     return apr;
   }, [bank, getParams, query.mint, staking]);
 
+  /**
+   * Expected return for delegators if they stake this validator
+   * takes validator operator address as input argument
+   * ref https://github.com/likecoin/lunie-ng/blob/60dbf7e18ceba41f4ebce304c23fa628a579c387/apis/cosmos-reducers.js#L689-L692
+   */
+  const getValidatorExpectedReturn = useCallback(
+    async (address: string) => {
+      const [annualProvisions, pool, validator] = await Promise.all([
+        query.mint.annualProvisions(),
+        staking.getPool(),
+        staking.getValidator(address),
+      ]);
+
+      const pctCommission = new BigNumber(1).minus(
+        validator.commission.commissionRates.rate
+      );
+
+      const provision = new BigNumber(annualProvisions.toString());
+      const bonded = new BigNumber(pool.bondedTokens);
+      const expectedRewards = pctCommission.times(provision.div(bonded));
+
+      return expectedRewards.toNumber();
+    },
+    [query.mint, staking]
+  );
+
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
@@ -290,6 +317,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
+      getValidatorExpectedReturn,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -301,6 +329,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
+      getValidatorExpectedReturn,
     ]
   );
 };
