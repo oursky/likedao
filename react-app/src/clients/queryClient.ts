@@ -13,6 +13,10 @@ import {
   GovExtension,
   TxExtension,
 } from "@cosmjs/stargate";
+import {
+  SlashingExtension,
+  setupSlashingExtension,
+} from "@cosmjs/stargate/build/modules";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { DesmosClient } from "@desmoslabs/desmjs";
 import { ChainInfo } from "../config/Config";
@@ -22,6 +26,7 @@ export type ExtendedQueryClient = QueryClient &
   BankExtension &
   DistributionExtension &
   StakingExtension &
+  SlashingExtension &
   GovExtension &
   TxExtension;
 
@@ -35,6 +40,7 @@ export const newQueryClient = async (
     setupBankExtension,
     setupDistributionExtension,
     setupStakingExtension,
+    setupSlashingExtension,
     setupGovExtension,
     setupTxExtension
   );
