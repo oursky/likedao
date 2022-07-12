@@ -45,7 +45,9 @@ const GovernanceInfoPanel: React.FC = () => {
       const params = await govAPI.getAllParams();
       setGovParams(params);
     } catch {
-      toast.error(translate("GovernanceInfoPanel.error"));
+      toast.error(translate("GovernanceInfoPanel.error"), {
+        toastId: "governance-info-panel-error",
+      });
     }
   }, [govAPI, translate]);
 
