@@ -1,19 +1,20 @@
 import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import cn from "classnames";
-import Config from "../../config/Config";
-import { ChainHealth } from "../../generated/graphql";
+import Config from "../../../config/Config";
+import { ChainStatus as IChainStatus } from "../AppSideBarModel";
 import { ChainSwitcherItem } from "./ChainSwitcherItem";
 import { ChainStatus } from "./ChainStatus";
 
 interface ChainSwitcherProps {
-  chainHealth?: ChainHealth;
+  latestBlockHeight: number | null;
+  chainStatus: IChainStatus | null;
 }
 
 const ChainSwitcher: React.FC<ChainSwitcherProps> = (props) => {
   const { chainInfo, chainLinks } = Config;
 
-  const { chainHealth } = props;
+  const { latestBlockHeight, chainStatus } = props;
 
   return (
     <Menu as="div" className={cn("relative", "inline-block", "text-left")}>
@@ -26,7 +27,11 @@ const ChainSwitcher: React.FC<ChainSwitcherProps> = (props) => {
             "rounded-md"
           )}
         >
-          <ChainStatus chainId={chainInfo.chainId} chainHealth={chainHealth} />
+          <ChainStatus
+            chainId={chainInfo.chainId}
+            latestBlockHeight={latestBlockHeight}
+            chainStatus={chainStatus}
+          />
         </Menu.Button>
       </div>
       <Transition

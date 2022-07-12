@@ -1,25 +1,23 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
-import {
-  ChainHealth,
-  ChainStatus as ChainStatusStatus,
-} from "../../generated/graphql";
-import { Icon, IconType } from "../common/Icons/Icons";
-import LocalizedText from "../common/Localized/LocalizedText";
+import { Icon, IconType } from "../../common/Icons/Icons";
+import LocalizedText from "../../common/Localized/LocalizedText";
+import { ChainStatus as IChainStatus } from "../AppSideBarModel";
 
 interface ChainStatusProps {
   chainId: string;
-  chainHealth?: ChainHealth;
+  latestBlockHeight: number | null;
+  chainStatus: IChainStatus | null;
 }
 
-function getStatusColour(status: ChainStatusStatus) {
+function getStatusColour(status: IChainStatus) {
   switch (status) {
-    case ChainStatusStatus.Online:
+    case IChainStatus.Online:
       return "bg-likecoin-vote-color-yes";
-    case ChainStatusStatus.Congested:
+    case IChainStatus.Congested:
       // Pending design for congested colour
       return "bg-yellow-400";
-    case ChainStatusStatus.Offline:
+    case IChainStatus.Halted:
       return "bg-likecoin-vote-color-no";
     default:
       throw new Error("Unknown chain status");
@@ -27,16 +25,12 @@ function getStatusColour(status: ChainStatusStatus) {
 }
 
 const ChainStatus: React.FC<ChainStatusProps> = (props) => {
-  const { chainId, chainHealth } = props;
+  const { chainId, chainStatus, latestBlockHeight } = props;
 
   const [statusColor, displayedHeight] = useMemo(() => {
-    if (chainHealth == null) return [null, null];
-
-    return [
-      getStatusColour(chainHealth.status),
-      chainHealth.height.toLocaleString(),
-    ];
-  }, [chainHealth]);
+    if (!chainStatus || !latestBlockHeight) return [null, null];
+    return [getStatusColour(chainStatus), latestBlockHeight.toLocaleString()];
+  }, [chainStatus, latestBlockHeight]);
 
   return (
     <div className={cn("flex", "flex-row", "gap-x-2", "items-center")}>
