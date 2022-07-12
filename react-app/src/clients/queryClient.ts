@@ -5,12 +5,14 @@ import {
   setupDistributionExtension,
   setupStakingExtension,
   setupGovExtension,
+  setupMintExtension,
   setupTxExtension,
   AuthExtension,
   BankExtension,
   DistributionExtension,
   StakingExtension,
   GovExtension,
+  MintExtension,
   TxExtension,
   StargateClient,
 } from "@cosmjs/stargate";
@@ -29,6 +31,7 @@ export type ExtendedQueryClient = QueryClient &
   StakingExtension &
   SlashingExtension &
   GovExtension &
+  MintExtension &
   TxExtension;
 
 export const newQueryClient = async (
@@ -43,6 +46,7 @@ export const newQueryClient = async (
     setupStakingExtension,
     setupSlashingExtension,
     setupGovExtension,
+    setupMintExtension,
     setupTxExtension
   );
 };

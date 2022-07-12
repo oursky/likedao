@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import BigNumber from "bignumber.js";
 import { newSendMessage } from "../models/cosmos/bank";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import {
@@ -13,6 +14,7 @@ import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 interface IBankAPI {
   getBalance(): Promise<BigNumberCoin>;
   getAddressBalance(address: string): Promise<BigNumberCoin>;
+  getTotalSupply(): Promise<BigNumberCoin>;
   signSendTokenTx(
     recipent: string,
     amount: string,
@@ -58,6 +60,15 @@ export const useBankAPI = (): IBankAPI => {
     [query.bank]
   );
 
+  const getTotalSupply = useCallback(async () => {
+    const supplyAllDenom = await query.bank.totalSupply();
+    const supply = supplyAllDenom.find((c) => c.denom === CoinMinimalDenom);
+    return {
+      amount: new BigNumber(supply?.amount ?? 0),
+      denom: CoinMinimalDenom,
+    };
+  }, [query.bank]);
+
   const signSendTokenTx = useCallback(
     async (recipent: string, amount: string, memo?: string) => {
       if (wallet.status !== ConnectionStatus.Connected) {
@@ -95,8 +106,9 @@ export const useBankAPI = (): IBankAPI => {
     () => ({
       getBalance,
       getAddressBalance,
+      getTotalSupply,
       signSendTokenTx,
     }),
-    [getAddressBalance, getBalance, signSendTokenTx]
+    [getAddressBalance, getBalance, getTotalSupply, signSendTokenTx]
   );
 };

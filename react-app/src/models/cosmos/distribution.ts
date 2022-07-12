@@ -18,4 +18,11 @@ function newWithdrawDelegatorRewardMessage(
   };
 }
 
+export interface DistributionParam {
+  communityTax: number;
+  baseProposerReward: number;
+  bonusProposerReward: number;
+  withdrawAddrEnabled: boolean;
+}
+
 export { newWithdrawDelegatorRewardMessage };

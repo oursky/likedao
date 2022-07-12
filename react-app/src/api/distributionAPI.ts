@@ -3,12 +3,17 @@ import BigNumber from "bignumber.js";
 import { QueryDelegationRewardsResponse } from "cosmjs-types/cosmos/distribution/v1beta1/query";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
-import { newWithdrawDelegatorRewardMessage } from "../models/cosmos/distribution";
+import {
+  DistributionParam,
+  newWithdrawDelegatorRewardMessage,
+} from "../models/cosmos/distribution";
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { convertMinimalTokenToToken } from "../utils/coin";
 import { BigNumberCoin } from "../models/coin";
 import { translateAddress } from "../utils/address";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
+import { useStakingAPI } from "./stakingAPI";
+import { useBankAPI } from "./bankAPI";
 
 interface IDistributionAPI {
   signWithdrawDelegationRewardsTx(memo?: string): Promise<SignedTx>;
@@ -25,6 +30,8 @@ interface IDistributionAPI {
     delegatorAddress: string,
     validatorAddresses: string[]
   ): Promise<BigNumberCoin[]>;
+  getParams(): Promise<DistributionParam>;
+  getAPR(): Promise<number>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -34,6 +41,8 @@ const Bech32PrefixValAddr = Config.chainInfo.bech32Config.bech32PrefixValAddr;
 export const useDistributionAPI = (): IDistributionAPI => {
   const wallet = useWallet();
   const cosmos = useCosmosAPI();
+  const bank = useBankAPI();
+  const staking = useStakingAPI();
   const { query } = useQueryClient();
 
   const signWithdrawDelegationRewardsTx = useCallback(
@@ -233,6 +242,43 @@ export const useDistributionAPI = (): IDistributionAPI => {
     [query]
   );
 
+  const getParams = useCallback(async () => {
+    const paramsRes = await query.distribution.params();
+    if (!paramsRes.params) {
+      throw new Error("Failed to fetch distribution parameters");
+    }
+
+    // Default cosmos decimal places is 18
+    return {
+      communityTax: new BigNumber(paramsRes.params.communityTax)
+        .shiftedBy(-18)
+        .toNumber(),
+      baseProposerReward: new BigNumber(paramsRes.params.baseProposerReward)
+        .shiftedBy(-18)
+        .toNumber(),
+      bonusProposerReward: new BigNumber(paramsRes.params.bonusProposerReward)
+        .shiftedBy(-18)
+        .toNumber(),
+      withdrawAddrEnabled: paramsRes.params.withdrawAddrEnabled,
+    };
+  }, [query.distribution]);
+
+  const getAPR = useCallback(async () => {
+    const [params, inflation, pool, totalSupply] = await Promise.all([
+      getParams(),
+      query.mint.inflation(),
+      staking.getPool(),
+      bank.getTotalSupply(),
+    ]);
+
+    const apr = totalSupply.amount
+      .times(1 - params.communityTax)
+      .times(inflation.toString())
+      .div(pool.bondedTokens)
+      .toNumber();
+    return apr;
+  }, [bank, getParams, query.mint, staking]);
+
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
@@ -242,6 +288,8 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getAddressTotalCommission,
       getDelegationRewardsByValidator,
       getDelegationRewardsByValidators,
+      getParams,
+      getAPR,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -251,6 +299,8 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getAddressTotalCommission,
       getDelegationRewardsByValidator,
       getDelegationRewardsByValidators,
+      getParams,
+      getAPR,
     ]
   );
 };
