@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import {
   Delegation,
   DelegationResponse,
+  Pool,
 } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { assert } from "@cosmjs/utils";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
@@ -37,6 +38,7 @@ interface IStakingAPI {
   getDelegatorStakes(
     account: string
   ): Promise<{ delegation: Delegation; balance: BigNumberCoin }[]>;
+  getPool(): Promise<Pool>;
 }
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -221,6 +223,14 @@ export const useStakingAPI = (): IStakingAPI => {
     [query.staking]
   );
 
+  const getPool = useCallback(async () => {
+    const poolRespond = await query.staking.pool();
+    if (!poolRespond.pool) {
+      throw new Error("Failed to fetch staking pool");
+    }
+    return poolRespond.pool;
+  }, [query.staking]);
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
@@ -229,6 +239,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getAddressStakedBalance,
       getUnstakingAmount,
       getDelegatorStakes,
+      getPool,
     }),
     [
       signDelegateTokenTx,
@@ -237,6 +248,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getAddressStakedBalance,
       getUnstakingAmount,
       getDelegatorStakes,
+      getPool,
     ]
   );
 };
