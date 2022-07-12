@@ -14,7 +14,6 @@ export type ProposalHistoryTabItem = IFilterTabItem<ProposalHistoryFilterKey>;
 
 interface ProposalHistoryProps {
   data: ProposalHistoryModel;
-  tabs: ProposalHistoryTabItem[];
   selectedTab: ProposalHistoryFilterKey;
   onSelectTab: (tab: ProposalHistoryFilterKey) => void;
   pageSize: number;
@@ -22,9 +21,25 @@ interface ProposalHistoryProps {
   onPageChange: (after: number) => void;
 }
 
+export const PROPOSAL_HISTORY_PAGE_SIZE = 2;
+
+export const filterItems: ProposalHistoryTabItem[] = [
+  {
+    value: "voted",
+    label: "ProposalHistory.filters.voted",
+  },
+  {
+    value: "submitted",
+    label: "ProposalHistory.filters.submitted",
+  },
+  {
+    value: "deposited",
+    label: "ProposalHistory.filters.deposited",
+  },
+];
+
 const ProposalHistory: React.FC<ProposalHistoryProps> = ({
   data,
-  tabs,
   selectedTab,
   onSelectTab,
   pageSize,
@@ -36,7 +51,7 @@ const ProposalHistory: React.FC<ProposalHistoryProps> = ({
     <Paper>
       <FilterTabs<ProposalHistoryFilterKey>
         className="mb-4"
-        tabs={tabs}
+        tabs={filterItems}
         selectedTab={selectedTab}
         onSelectTab={onSelectTab}
       />

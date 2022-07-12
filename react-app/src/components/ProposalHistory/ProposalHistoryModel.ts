@@ -1,6 +1,6 @@
 import {
-  PortfolioHistoryProposalVotesDistributionFragment as ProposalVotesDistribution,
-  PortfolioHistoryProposalConnectionFragment as ProposalConnection,
+  ProposalHistoryProposalVotesDistributionFragment as ProposalVotesDistribution,
+  ProposalHistoryProposalConnectionFragment as ProposalConnection,
 } from "../../generated/graphql";
 
 export type ProposalHistoryFilterKey = "voted" | "submitted" | "deposited";

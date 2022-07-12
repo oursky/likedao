@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import cn from "classnames";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   isRequestStateError,
   isRequestStateLoaded,
@@ -10,43 +10,18 @@ import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import AppRoutes from "../../navigation/AppRoutes";
-import { ProposalHistoryFilterKey } from "../ProposalHistory/ProposalHistoryModel";
 import Paper from "../common/Paper/Paper";
 import ProposalHistory, {
-  ProposalHistoryTabItem,
+  PROPOSAL_HISTORY_PAGE_SIZE,
 } from "../ProposalHistory/ProposalHistory";
-import {
-  usePortfolioQuery,
-  useProposalHistoryQuery,
-} from "./PortfolioScreenAPI";
+import { useProposalHistory } from "../ProposalHistory/ProposalHistoryAPI";
+import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
 import StakesPanel from "./StakesPanel";
-
-const PROPOSAL_HISTORY_PAGE_SIZE = 2;
-
-const filterItems: ProposalHistoryTabItem[] = [
-  {
-    value: "voted",
-    label: "ProposalHistory.filters.voted",
-  },
-  {
-    value: "submitted",
-    label: "ProposalHistory.filters.submitted",
-  },
-  {
-    value: "deposited",
-    label: "ProposalHistory.filters.deposited",
-  },
-];
 
 const PortfolioScreen: React.FC = () => {
   const { address: addressFromUrl } = useParams();
   const navigate = useNavigate();
-
-  const [searchParams, setSearchParams] = useSearchParams({
-    tab: "voted",
-    page: "1",
-  });
 
   const {
     requestState: portfolioRequestState,
@@ -56,9 +31,13 @@ const PortfolioScreen: React.FC = () => {
   } = usePortfolioQuery();
 
   const {
+    selectedTab,
+    after,
+    handlePageChange,
+    handleSelectTab,
     requestState: proposalHistoryRequestState,
     fetch: fetchProposalHistory,
-  } = useProposalHistoryQuery();
+  } = useProposalHistory();
 
   const { translate } = useLocale();
   const wallet = useWallet();
@@ -74,38 +53,6 @@ const PortfolioScreen: React.FC = () => {
   }, [addressFromUrl, wallet]);
 
   const isYourPortfolio = useMemo(() => !addressFromUrl, [addressFromUrl]);
-
-  const after = useMemo(() => {
-    return (
-      (parseInt(searchParams.get("page") ?? "1", 10) - 1) *
-      PROPOSAL_HISTORY_PAGE_SIZE
-    );
-  }, [searchParams]);
-
-  const selectedTab = useMemo(
-    () => (searchParams.get("tab") ?? "voted") as ProposalHistoryFilterKey,
-    [searchParams]
-  );
-
-  const handleSelectTab = useCallback(
-    (tab: ProposalHistoryFilterKey) => {
-      setSearchParams({
-        tab: tab,
-        page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
-      });
-    },
-    [after, setSearchParams]
-  );
-
-  const handlePageChange = useCallback(
-    (after: number) => {
-      setSearchParams({
-        tab: selectedTab,
-        page: (after / PROPOSAL_HISTORY_PAGE_SIZE + 1).toString(),
-      });
-    },
-    [selectedTab, setSearchParams]
-  );
 
   useEffect(() => {
     if (wallet.status === ConnectionStatus.Idle && !address) {
@@ -184,7 +131,6 @@ const PortfolioScreen: React.FC = () => {
       isRequestStateLoaded(portfolioRequestState) ? (
         <ProposalHistory
           data={proposalHistoryRequestState.data}
-          tabs={filterItems}
           selectedTab={selectedTab}
           onSelectTab={handleSelectTab}
           pageSize={PROPOSAL_HISTORY_PAGE_SIZE}
