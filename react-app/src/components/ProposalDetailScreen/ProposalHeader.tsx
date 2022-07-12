@@ -323,7 +323,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = (props) => {
     onDepositClick,
   } = props;
 
-  const handleRectionSelect = useCallback(
+  const handleReactionSelect = useCallback(
     (type: ReactionType) => {
       if (type === proposal.myReaction) {
         onUnsetReaction();
@@ -341,7 +341,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = (props) => {
       <ProposalTypeAndProposer proposal={proposal} />
       <ProposalActionArea
         proposal={proposal}
-        handleReactionSelect={handleRectionSelect}
+        handleReactionSelect={handleReactionSelect}
         onVoteClick={onVoteClick}
         onDepositClick={onDepositClick}
       />
