@@ -19,7 +19,7 @@ const ActiveProposalsPanel: React.FC<ActiveProposalsPanelProps> = ({
       <div className="flex items-center">
         <Icon icon={IconType.Vote} className="mr-3 fill-likecoin-black" />
         <h2 className="text-lg font-bold leading-none">
-          <LocalizedText messageID="OverviewScreen.activeProposals" />
+          <LocalizedText messageID="OverviewScreen.recentProposals" />
         </h2>
       </div>
       <ProposalList proposals={proposals} className="py-4" />

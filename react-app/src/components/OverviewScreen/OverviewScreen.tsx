@@ -12,7 +12,7 @@ import { useLocale } from "../../providers/AppLocaleProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
 import { useCommunityStatusQuery } from "./OverviewScreenAPI";
-import ActiveProposalsPanel from "./ActiveProposalsPanel";
+import ActiveProposalsPanel from "./RecentProposalsPanel";
 
 const OverviewScreen: React.FC = () => {
   const communityStatusRequestState = useCommunityStatusQuery();
