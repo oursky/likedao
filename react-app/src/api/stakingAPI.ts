@@ -5,7 +5,6 @@ import {
   DelegationResponse,
   Pool,
 } from "cosmjs-types/cosmos/staking/v1beta1/staking";
-import { assert } from "@cosmjs/utils";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import {
@@ -158,8 +157,11 @@ export const useStakingAPI = (): IStakingAPI => {
           previousValue: BigNumber,
           currentValue: DelegationResponse
         ): BigNumber => {
-          // Safe because field is set to non-nullable (https://github.com/cosmos/cosmos-sdk/blob/v0.45.3/proto/cosmos/staking/v1beta1/staking.proto#L295)
-          assert(currentValue.balance);
+          if (!currentValue.balance) {
+            throw new Error(
+              `Failed to fetch delegation for ${address}'s staked balance`
+            );
+          }
           return BigNumber.sum(
             new BigNumber(currentValue.balance.amount),
             previousValue
