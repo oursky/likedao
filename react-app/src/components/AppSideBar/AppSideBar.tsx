@@ -117,6 +117,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
         "gap-x-4",
         "gap-y-6",
         "justify-center",
+        "sm:justify-start",
         "sm:gap-y-4",
         "sm:flex-row",
         "relative",
