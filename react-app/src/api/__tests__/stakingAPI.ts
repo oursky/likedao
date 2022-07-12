@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook } from "@testing-library/react";
 import BigNumber from "bignumber.js";
 import { useStakingAPI } from "../stakingAPI";
 const WALLET_ADDRESS = "like1ewpwcdfgsdfdu0jj2unwhjjl58yshm9xnvr9c2";
@@ -65,6 +64,7 @@ describe("useStaking", () => {
     it("should sum amount of all unbounding entries", () => {
       const { result } = renderHook(() => useStakingAPI());
 
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       result.current.getUnstakingAmount(WALLET_ADDRESS).then(({ amount }) => {
         expect(amount).toStrictEqual(new BigNumber(4000000000000000000));
       });
