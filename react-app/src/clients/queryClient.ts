@@ -12,6 +12,7 @@ import {
   StakingExtension,
   GovExtension,
   TxExtension,
+  StargateClient,
 } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { DesmosClient } from "@desmoslabs/desmjs";
@@ -44,4 +45,10 @@ export const newDesmosQueryClient = async (
   desmosRpc: string
 ): Promise<DesmosClient> => {
   return DesmosClient.connect(desmosRpc);
+};
+
+export const newStargateClient = async (
+  chainInfo: ChainInfo
+): Promise<StargateClient> => {
+  return StargateClient.connect(chainInfo.chainRpc);
 };
