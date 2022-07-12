@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { DesmosClient } from "@desmoslabs/desmjs";
+import { StargateClient } from "@cosmjs/stargate";
 import Config from "../config/Config";
 import {
   ExtendedQueryClient,
   newQueryClient,
   newDesmosQueryClient,
+  newStargateClient,
 } from "../clients/queryClient";
 
 interface QueryClientProviderProps {
@@ -14,6 +16,7 @@ interface QueryClientProviderProps {
 interface QueryClientProviderContextValue {
   query: ExtendedQueryClient;
   desmosQuery: DesmosClient;
+  stargateQuery: StargateClient;
 }
 
 const QueryClientContext = React.createContext<QueryClientProviderContextValue>(
@@ -30,13 +33,17 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   );
   const [desmosQueryClient, setDesmosQueryClient] =
     useState<DesmosClient | null>(null);
+  const [stargateClient, setStargateClient] = useState<StargateClient | null>(
+    null
+  );
 
   const value = useMemo(
     (): QueryClientProviderContextValue => ({
       query: queryClient!,
       desmosQuery: desmosQueryClient!,
+      stargateQuery: stargateClient!,
     }),
-    [queryClient, desmosQueryClient]
+    [queryClient, desmosQueryClient, stargateClient]
   );
 
   useEffect(() => {
@@ -58,6 +65,16 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
         console.log("Error creating desmos query client", err);
       });
   }, [desmosRpc]);
+
+  useEffect(() => {
+    newStargateClient(chainInfo)
+      .then((client) => {
+        setStargateClient(client);
+      })
+      .catch((err) => {
+        console.log("Error creating stargate query client", err);
+      });
+  }, [chainInfo]);
 
   return (
     <QueryClientContext.Provider value={value}>
