@@ -2,15 +2,16 @@ import React from "react";
 import cn from "classnames";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { ReactComponent as LikeLogo } from "../../assets/likecoin-logo.svg";
-import { ChainHealth } from "../../generated/graphql";
-import ChainSwitcher from "../ChainSwitcher/ChainSwitcher";
+import ChainSwitcher from "./ChainSwitcher/ChainSwitcher";
+import { ChainStatus } from "./AppSideBarModel";
 
 interface HeaderProps {
-  chainHealth?: ChainHealth;
+  chainStatus: ChainStatus | null;
+  latestBlockHeight: number | null;
 }
 
 const Header: React.FC<HeaderProps> = (props) => {
-  const { chainHealth } = props;
+  const { chainStatus, latestBlockHeight } = props;
   return (
     <div
       className={cn(
@@ -37,7 +38,10 @@ const Header: React.FC<HeaderProps> = (props) => {
       >
         <LocalizedText messageID="AppSideBar.title" />
       </h1>
-      <ChainSwitcher chainHealth={chainHealth} />
+      <ChainSwitcher
+        chainStatus={chainStatus}
+        latestBlockHeight={latestBlockHeight}
+      />
     </div>
   );
 };

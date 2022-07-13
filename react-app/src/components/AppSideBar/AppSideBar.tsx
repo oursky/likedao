@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -67,7 +67,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
   const bankAPI = useBankAPI();
   const transaction = useTransaction();
 
-  const chainHealthRequestState = useChainHealthQuery();
+  const { requestState } = useChainHealthQuery();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const chainId = Config.chainInfo.chainId;
 
@@ -81,6 +81,14 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
 
   // TODO: Handle shortcuts
   const onReinvest = useCallback(() => {}, []);
+
+  const [chainStatus, latestBlockHeight] = useMemo(() => {
+    if (!isRequestStateLoaded(requestState)) {
+      return [null, null];
+    }
+
+    return [requestState.data.chainStatus, requestState.data.latestHeight];
+  }, [requestState]);
 
   useEffect(() => {
     if (wallet.status !== ConnectionStatus.Connected) return;
@@ -96,7 +104,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
 
   useEffectOnce(
     () => {
-      if (isRequestStateError(chainHealthRequestState)) {
+      if (isRequestStateError(requestState)) {
         toast.error(
           translate("AppSideBar.requestState.error", {
             chainId,
@@ -105,8 +113,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
       }
     },
     () =>
-      isRequestStateError(chainHealthRequestState) ||
-      isRequestStateLoaded(chainHealthRequestState)
+      isRequestStateError(requestState) || isRequestStateLoaded(requestState)
   );
 
   return (
@@ -140,11 +147,8 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
       >
         <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
           <Header
-            chainHealth={
-              isRequestStateLoaded(chainHealthRequestState)
-                ? chainHealthRequestState.data
-                : undefined
-            }
+            chainStatus={chainStatus}
+            latestBlockHeight={latestBlockHeight}
           />
           <IconButton
             icon={isMenuOpen ? IconType.X : IconType.Menu}

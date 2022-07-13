@@ -1,14 +1,3 @@
-enum ChainStatus {
-  Online
-  Congested
-  Offline
-}
-
-type ChainHealth {
-  height: Int!
-  status: ChainStatus!
-}
-
 type Coin {
   denom: String!
   amount: BigInt!
@@ -21,6 +10,6 @@ type CommunityStatus {
 }
 
 extend type Query {
-  chainHealth: ChainHealth!
+  averageBlockTime: Float!
   communityStatus: CommunityStatus!
 }

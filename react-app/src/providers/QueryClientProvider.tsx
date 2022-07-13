@@ -78,7 +78,10 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
 
   return (
     <QueryClientContext.Provider value={value}>
-      {queryClient != null && desmosQueryClient != null && children}
+      {queryClient != null &&
+        desmosQueryClient != null &&
+        stargateClient != null &&
+        children}
     </QueryClientContext.Provider>
   );
 };
