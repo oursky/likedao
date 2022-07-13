@@ -10,11 +10,15 @@ import ProposalHistory, {
   PROPOSAL_HISTORY_PAGE_SIZE,
 } from "../ProposalHistory/ProposalHistory";
 import { useProposalHistory } from "../ProposalHistory/ProposalHistoryAPI";
+import ValidatorDetailDescriptionPanel from "./ValidatorDetailDescriptionPanel";
+import { useValidatorQuery } from "./ValidatorDetailScreenAPI";
 
 const Bech32PrefixAccAddr = Config.chainInfo.bech32Config.bech32PrefixAccAddr;
 
 const ValidatorDetailScreen: React.FC = () => {
   const { address: operatorAddress } = useParams();
+  const { requestState: validatorRequestState, fetch: fetchValidator } =
+    useValidatorQuery();
 
   const selfDelegateAddress = useMemo(
     // eslint-disable-next-line no-confusing-arrow
@@ -46,8 +50,23 @@ const ValidatorDetailScreen: React.FC = () => {
     }
   }, [fetchProposalHistory, after, selectedTab, selfDelegateAddress]);
 
+  useEffect(() => {
+    if (operatorAddress) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchValidator(operatorAddress);
+    }
+  }, [fetchValidator, operatorAddress]);
+
   return (
     <div>
+      <ValidatorDetailDescriptionPanel
+        isLoading={!isRequestStateLoaded(validatorRequestState)}
+        data={
+          isRequestStateLoaded(validatorRequestState)
+            ? validatorRequestState.data
+            : null
+        }
+      />
       {isRequestStateLoaded(proposalHistoryRequestState) ? (
         <ProposalHistory
           data={proposalHistoryRequestState.data}
