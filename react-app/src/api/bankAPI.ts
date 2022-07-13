@@ -30,24 +30,6 @@ export const useBankAPI = (): IBankAPI => {
   const cosmos = useCosmosAPI();
   const { query } = useQueryClient();
 
-  const getBalance = useCallback(async () => {
-    if (wallet.status !== ConnectionStatus.Connected) {
-      throw new Error("Wallet not connected");
-    }
-
-    const balance = await wallet.provider.getBalance(
-      wallet.account.address,
-      CoinMinimalDenom
-    );
-
-    const amount = convertMinimalTokenToToken(balance.amount);
-
-    return {
-      denom: CoinDenom,
-      amount,
-    };
-  }, [wallet]);
-
   const getAddressBalance = useCallback(
     async (address: string) => {
       const balance = await query.bank.balance(address, CoinMinimalDenom);
@@ -68,6 +50,14 @@ export const useBankAPI = (): IBankAPI => {
       denom: CoinMinimalDenom,
     };
   }, [query.bank]);
+
+  const getBalance = useCallback(async () => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      throw new Error("Wallet not connected");
+    }
+
+    return getAddressBalance(wallet.account.address);
+  }, [getAddressBalance, wallet]);
 
   const signSendTokenTx = useCallback(
     async (recipent: string, amount: string, memo?: string) => {
