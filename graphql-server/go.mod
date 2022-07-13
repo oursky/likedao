@@ -18,7 +18,6 @@ require (
 	github.com/uptrace/bun/extra/bunbig v1.1.5
 	github.com/uptrace/bun/extra/bundebug v1.1.4
 	github.com/vektah/gqlparser/v2 v2.4.2
-	github.com/xplorfin/gql-bigint v0.4.0
 )
 
 require (
