@@ -11,6 +11,7 @@ import Config from "../config/Config";
 import {
   newDelegateMessage,
   newUndelegateMessage,
+  ValidatorRPC,
 } from "../models/cosmos/staking";
 import {
   convertMinimalTokenToToken,
@@ -18,6 +19,7 @@ import {
 } from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
+import { pubKeyToBech32, translateAddress } from "../utils/address";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 import { useBankAPI } from "./bankAPI";
 
@@ -43,6 +45,7 @@ interface IStakingAPI {
     delegatorAddress: string,
     validatorAddress: string
   ): Promise<{ delegation: Delegation; balance: BigNumberCoin } | null>;
+  getValidator(address: string): Promise<ValidatorRPC>;
 }
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -271,6 +274,84 @@ export const useStakingAPI = (): IStakingAPI => {
     [query.staking]
   );
 
+  const getValidator = useCallback(
+    async (address: string) => {
+      const validatorResponse = await query.staking.validator(address);
+      const validator = validatorResponse.validator;
+
+      if (!validator) {
+        throw new Error(`validator with address ${address} not found`);
+      }
+
+      const consensusPubkey = validator.consensusPubkey;
+      if (!consensusPubkey) {
+        throw new Error("Validator consensus public key not found");
+      }
+      const consensusPubAddr = pubKeyToBech32(
+        consensusPubkey,
+        Config.chainInfo.bech32Config.bech32PrefixConsAddr
+      );
+
+      const commissionRaw = validator.commission;
+      const commission = {
+        commissionRates: {
+          // Default cosmos decimal places is 18
+          rate: new BigNumber(
+            commissionRaw?.commissionRates?.rate ?? 0
+          ).shiftedBy(-18),
+          maxRate: new BigNumber(
+            commissionRaw?.commissionRates?.maxRate ?? 0
+          ).shiftedBy(-18),
+          maxChangeRate: new BigNumber(
+            commissionRaw?.commissionRates?.maxChangeRate ?? 0
+          ).shiftedBy(-18),
+        },
+        updateTime: commissionRaw?.updateTime
+          ? new Date(commissionRaw.updateTime.seconds.toNumber())
+          : null,
+      };
+
+      const tokens = {
+        amount: new BigNumber(validator.tokens),
+        denom: CoinMinimalDenom,
+      };
+
+      const unbondingTime = validator.unbondingTime
+        ? new Date(validator.unbondingTime.seconds.toNumber())
+        : null;
+
+      const minSelfDelegation = {
+        amount: new BigNumber(validator.minSelfDelegation),
+        denom: CoinMinimalDenom,
+      };
+
+      const selfDelegation = (
+        await getDelegation(
+          translateAddress(
+            validator.operatorAddress,
+            Config.chainInfo.bech32Config.bech32PrefixAccAddr
+          ),
+          validator.operatorAddress
+        )
+      )?.balance;
+
+      const pool = await getPool();
+      const votePower = tokens.amount.div(pool.bondedTokens).toNumber();
+
+      return {
+        ...validator,
+        consensusPubAddr,
+        commission,
+        tokens,
+        unbondingTime,
+        minSelfDelegation,
+        selfDelegation,
+        votePower,
+      } as ValidatorRPC;
+    },
+    [getDelegation, getPool, query.staking]
+  );
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
@@ -281,6 +362,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getDelegatorStakes,
       getPool,
       getDelegation,
+      getValidator,
     }),
     [
       signDelegateTokenTx,
@@ -291,6 +373,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getDelegatorStakes,
       getPool,
       getDelegation,
+      getValidator,
     ]
   );
 };
