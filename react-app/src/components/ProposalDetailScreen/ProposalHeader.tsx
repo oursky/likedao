@@ -1,11 +1,12 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { isBefore, isWithinInterval } from "date-fns";
+import { Link } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
 import Badge from "../common/Badge/Badge";
 import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
-import { truncateAddress } from "../../utils/address";
+import { translateAddress, truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
@@ -14,6 +15,8 @@ import { ReactionList, ReactionPicker } from "../reactions";
 import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
 import ProposalStatusBadge from "../proposals/ProposalStatusBadge";
 import { ProposalStatus } from "../../generated/graphql";
+import AppRoutes from "../../navigation/AppRoutes";
+import { useQueryClient } from "../../providers/QueryClientProvider";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -49,7 +52,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
     votingStartTime,
     votingEndTime,
-    remainingVotingDays,
+    remainingVotingDuration,
     depositTotal,
     turnout,
   } = proposal;
@@ -100,14 +103,13 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "-"
           )}
         </p>
-        {remainingVotingDays && remainingVotingDays > 0 && (
-          <Badge color="likecoin-yellow">
-            <LocalizedText
-              messageID="ProposalDetail.votingDaysRemaining"
-              messageArgs={{ days: remainingVotingDays }}
-            />
-          </Badge>
-        )}
+
+        <Badge color="likecoin-yellow">
+          <LocalizedText
+            messageID="ProposalDetail.votingDurationRemaining"
+            messageArgs={{ duration: remainingVotingDuration }}
+          />
+        </Badge>
       </div>
       <div
         className={cn(
@@ -140,6 +142,23 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   proposal,
 }) => {
   const { type, proposerAddress, submitTime } = proposal;
+
+  const [proposerName, setProposerName] = useState<string>();
+  const { desmosQuery } = useQueryClient();
+
+  useEffect(() => {
+    desmosQuery
+      .getProfile(translateAddress(proposerAddress, "desmos"))
+      .then((res) => {
+        if (res) {
+          setProposerName(res.dtag);
+        }
+      })
+      .catch((err) => {
+        console.error("failed to fetch desmos profile =", err);
+      });
+  }, [desmosQuery, proposerAddress]);
+
   return (
     <div
       className={cn(
@@ -162,20 +181,23 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
         <LocalizedText messageID="ProposalDetail.publishedBy" />
       </p>
       <div>
-        {/* TODO: Get proposer name from Desmos API*/}
-        <span className={cn("text-sm", "text-likecoin-green")}>
-          {truncateAddress(proposerAddress)}
-        </span>
-        <span
-          className={cn(
-            "text-xs",
-            "text-likecoin-lightgreen",
-            "ml-2",
-            "text-xs"
-          )}
+        <Link
+          to={AppRoutes.OtherPortfolio.replace(":address", proposerAddress)}
         >
-          {truncateAddress(proposerAddress)}
-        </span>
+          <span className={cn("text-sm", "text-likecoin-green")}>
+            {proposerName ?? truncateAddress(proposerAddress)}
+          </span>
+          <span
+            className={cn(
+              "text-xs",
+              "text-likecoin-lightgreen",
+              "ml-2",
+              "text-xs"
+            )}
+          >
+            {truncateAddress(proposerAddress)}
+          </span>
+        </Link>
       </div>
       <UTCDatetime className={cn("text-xs")} date={submitTime} />
     </div>

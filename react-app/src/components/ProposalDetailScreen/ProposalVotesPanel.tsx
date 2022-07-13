@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import cn from "classnames";
-import { useOutletContext, useSearchParams } from "react-router-dom";
+import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import TallyResultIndicator from "../TallyResultIndicator/TallyResultIndicator";
 import * as SectionedTable from "../SectionedTable/SectionedTable";
@@ -13,6 +13,7 @@ import {
 import PageContoller from "../common/PageController/PageController";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppButton from "../common/Buttons/AppButton";
+import AppRoutes from "../../navigation/AppRoutes";
 import {
   Proposal,
   ProposalVote,
@@ -28,7 +29,8 @@ const PROPOSAL_VOTE_PAGE_SIZE = 5;
 const ProposalVoter: React.FC<{ voter: ProposalVoteVoter }> = ({ voter }) => {
   if (voter.__typename === "StringObject") {
     return (
-      <span
+      <Link
+        to={AppRoutes.OtherPortfolio.replace(":address", voter.value)}
         className={cn(
           "text-sm",
           "leading-5",
@@ -37,13 +39,14 @@ const ProposalVoter: React.FC<{ voter: ProposalVoteVoter }> = ({ voter }) => {
         )}
       >
         {voter.value}
-      </span>
+      </Link>
     );
   }
 
   if (voter.__typename === "Validator") {
     return (
       <div className={cn("flex", "flex-col", "gap-y-0.5")}>
+        {/* TODO: link to validator portfolio page */}
         <span
           className={cn(
             "text-sm",

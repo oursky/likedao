@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
-import { useOutletContext, useSearchParams } from "react-router-dom";
+import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import BigNumber from "bignumber.js";
 import * as SectionedTable from "../SectionedTable/SectionedTable";
@@ -15,6 +15,7 @@ import { BigNumberCoin } from "../../models/coin";
 import ColorBar from "../common/ColorBar/ColorBar";
 import Config from "../../config/Config";
 import { useGovAPI } from "../../api/govAPI";
+import AppRoutes from "../../navigation/AppRoutes";
 import {
   Proposal,
   ProposalDeposit,
@@ -37,7 +38,8 @@ const ProposalDepositor: React.FC<{
   }
   if (depositor.__typename === "StringObject") {
     return (
-      <span
+      <Link
+        to={AppRoutes.OtherPortfolio.replace(":address", depositor.value)}
         className={cn(
           "text-sm",
           "leading-5",
@@ -46,7 +48,7 @@ const ProposalDepositor: React.FC<{
         )}
       >
         {depositor.value}
-      </span>
+      </Link>
     );
   }
 

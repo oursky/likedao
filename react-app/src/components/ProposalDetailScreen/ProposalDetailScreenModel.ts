@@ -37,7 +37,7 @@ export interface Proposal
    * Number of days left until voting closes
    * null when voting dates are not yet available
    */
-  remainingVotingDays: number | null;
+  remainingVotingDuration: string;
 
   reactions: ReactionItem[];
 

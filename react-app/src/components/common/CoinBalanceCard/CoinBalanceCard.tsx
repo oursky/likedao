@@ -1,7 +1,10 @@
 import React from "react";
 import cn from "classnames";
 import BigNumber from "bignumber.js";
-import { convertBigNumberToFixedPointString } from "../../../utils/number";
+import {
+  convertBigNumberToFixedPointString,
+  convertBigNumberToMillifiedIntegerString,
+} from "../../../utils/number";
 
 interface CoinBalanceCardProps {
   balance: BigNumber;
@@ -25,7 +28,7 @@ const CoinBalanceCard: React.FC<CoinBalanceCardProps> = ({
           "break-all"
         )}
       >
-        {`${convertBigNumberToFixedPointString(balance)} ${denom}`}
+        {`${convertBigNumberToMillifiedIntegerString(balance)} ${denom}`}
       </h3>
       <p
         className={cn(
