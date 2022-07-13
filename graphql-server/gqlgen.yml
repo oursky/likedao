@@ -50,11 +50,11 @@ models:
 
   BigInt:
     model:
-      - github.com/xplorfin/gql-bigint.BigInt
+      - github.com/oursky/likedao/pkg/models.BigInt
       - github.com/99designs/gqlgen/graphql.String
   BigFloat:
     model: github.com/99designs/gqlgen/graphql.String
-    
+
   ID:
     model: github.com/oursky/likedao/pkg/models.NodeID
   Int:
@@ -84,9 +84,9 @@ models:
     model: github.com/oursky/likedao/pkg/models.ProposalStatus
   ProposalEdge:
     model: github.com/oursky/likedao/pkg/models.ProposalEdge
-  ProposalConnection: 
+  ProposalConnection:
     model: github.com/oursky/likedao/pkg/models.ProposalConnection
-  ProposalTallyResult: 
+  ProposalTallyResult:
     model: github.com/oursky/likedao/pkg/models.ProposalTallyResult
   ProposalVoteOption:
     model: github.com/oursky/likedao/pkg/models.ProposalVoteOption
@@ -122,7 +122,7 @@ models:
 
   PageInfo:
     model: github.com/oursky/likedao/pkg/models.PageInfo
-    
+
   Coin:
     model: github.com/forbole/bdjuno/database/types.DbDecCoin
 
