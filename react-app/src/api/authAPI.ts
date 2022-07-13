@@ -5,6 +5,7 @@ import Config from "../config/Config";
 interface IAuthAPI {
   getNonce(): Promise<string>;
   verify: (signDoc: StdSignDoc, signature: StdSignature) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 export const useAuthAPI = (): IAuthAPI => {
@@ -32,11 +33,19 @@ export const useAuthAPI = (): IAuthAPI => {
     [endPoint]
   );
 
+  const logout = useCallback(async () => {
+    await fetch(`${endPoint}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  }, [endPoint]);
+
   return useMemo(
     () => ({
       getNonce,
       verify,
+      logout,
     }),
-    [getNonce, verify]
+    [getNonce, verify, logout]
   );
 };

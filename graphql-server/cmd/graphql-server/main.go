@@ -60,6 +60,7 @@ func main() {
 	{
 		auth.GET("/nonce", handlers.NonceHandler(config.Session))
 		auth.POST("/verify", handlers.VerificationHandler(config.Session))
+		auth.POST("/logout", handlers.LogoutHandler())
 	}
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
