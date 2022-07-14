@@ -101,8 +101,6 @@ export function useChainHealthQuery(): {
     }
   }, [stargateQuery, averageBlockTimeRequestState]);
 
-  console.log(requestState);
-
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   useInterval(fetchChainHealth, 3000);
 
