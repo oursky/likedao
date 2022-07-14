@@ -12,6 +12,7 @@ import ProposalHistory, {
 import { useProposalHistory } from "../ProposalHistory/ProposalHistoryAPI";
 import ValidatorDetailDescriptionPanel from "./ValidatorDetailDescriptionPanel";
 import { useValidatorQuery } from "./ValidatorDetailScreenAPI";
+import ValidatorDetailScreenInformationPanel from "./ValidatorDetailScreenInformationPanel";
 
 const Bech32PrefixAccAddr = Config.chainInfo.bech32Config.bech32PrefixAccAddr;
 
@@ -81,6 +82,14 @@ const ValidatorDetailScreen: React.FC = () => {
           <LoadingSpinner />
         </Paper>
       )}
+      <ValidatorDetailScreenInformationPanel
+        isLoading={!isRequestStateLoaded(validatorRequestState)}
+        data={
+          isRequestStateLoaded(validatorRequestState)
+            ? validatorRequestState.data
+            : undefined
+        }
+      />
     </div>
   );
 };
