@@ -33,6 +33,7 @@ interface IDistributionAPI {
   getParams(): Promise<DistributionParam>;
   getAPR(): Promise<number>;
   getValidatorExpectedReturn(address: string): Promise<number>;
+  getBatchValidatorExpectedReturn(addresses: string[]): Promise<number[]>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -306,6 +307,27 @@ export const useDistributionAPI = (): IDistributionAPI => {
     [query.mint, staking]
   );
 
+  const getBatchValidatorExpectedReturn = useCallback(
+    async (addresses: string[]) => {
+      const [annualProvisions, pool, validators] = await Promise.all([
+        query.mint.annualProvisions(),
+        staking.getPool(),
+        staking.getValidators(addresses),
+      ]);
+      return validators.map((validator) => {
+        const pctCommission = new BigNumber(1).minus(
+          validator.commission.commissionRates.rate
+        );
+        const provision = new BigNumber(annualProvisions.toString());
+        const bonded = new BigNumber(pool.bondedTokens);
+        const expectedRewards = pctCommission.times(provision.div(bonded));
+
+        return expectedRewards.toNumber();
+      });
+    },
+    [query.mint, staking]
+  );
+
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
@@ -318,6 +340,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getParams,
       getAPR,
       getValidatorExpectedReturn,
+      getBatchValidatorExpectedReturn,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -330,6 +353,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getParams,
       getAPR,
       getValidatorExpectedReturn,
+      getBatchValidatorExpectedReturn,
     ]
   );
 };
