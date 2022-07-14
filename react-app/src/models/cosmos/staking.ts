@@ -80,6 +80,7 @@ export interface ValidatorRPC {
   commission: ValidatorCommission;
   minSelfDelegation: BigNumberCoin;
   selfDelegation?: BigNumberCoin;
+  selfDelegationAddress: string;
   votePower: number;
 }
 

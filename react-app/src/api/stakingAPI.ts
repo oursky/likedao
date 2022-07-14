@@ -293,6 +293,15 @@ export const useStakingAPI = (): IStakingAPI => {
       );
 
       const commissionRaw = validator.commission;
+
+      let commissionUpdateTime: Date | null = null;
+      if (commissionRaw?.updateTime) {
+        commissionUpdateTime = new Date(0);
+        commissionUpdateTime.setUTCSeconds(
+          commissionRaw.updateTime.seconds.toNumber()
+        );
+      }
+
       const commission = {
         commissionRates: {
           // Default cosmos decimal places is 18
@@ -306,9 +315,7 @@ export const useStakingAPI = (): IStakingAPI => {
             commissionRaw?.commissionRates?.maxChangeRate ?? 0
           ).shiftedBy(-18),
         },
-        updateTime: commissionRaw?.updateTime
-          ? new Date(commissionRaw.updateTime.seconds.toNumber())
-          : null,
+        updateTime: commissionUpdateTime,
       };
 
       const tokens = {
@@ -325,14 +332,13 @@ export const useStakingAPI = (): IStakingAPI => {
         denom: CoinMinimalDenom,
       };
 
+      const selfDelegationAddress = translateAddress(
+        validator.operatorAddress,
+        Config.chainInfo.bech32Config.bech32PrefixAccAddr
+      );
+
       const selfDelegation = (
-        await getDelegation(
-          translateAddress(
-            validator.operatorAddress,
-            Config.chainInfo.bech32Config.bech32PrefixAccAddr
-          ),
-          validator.operatorAddress
-        )
+        await getDelegation(selfDelegationAddress, validator.operatorAddress)
       )?.balance;
 
       const pool = await getPool();
@@ -347,6 +353,7 @@ export const useStakingAPI = (): IStakingAPI => {
           denom: Config.chainInfo.currency.coinDenom,
         },
         unbondingTime,
+        selfDelegationAddress,
         minSelfDelegation,
         selfDelegation: selfDelegation
           ? {
