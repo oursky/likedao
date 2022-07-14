@@ -24,7 +24,7 @@ export enum ConnectionStatus {
 
 export enum AutoConnectWalletType {
   Keplr = "keplr",
-  // WalletConnect doesn't support auto reconnect
+  WalletConnect = "walletConnect",
 }
 
 interface WalletProviderProps {
@@ -150,6 +150,7 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
 
       const [account] = await wallet.offlineSigner.getAccounts();
       setAccount(account);
+      setAutoConnectWalletType(AutoConnectWalletType.WalletConnect);
       setWalletStatus(ConnectionStatus.Connected);
       // Logout anyway to prevent the case where the logged in wallet has a different account than the authenticated address
       await authAPI.logout();
@@ -158,7 +159,14 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       toast.error(translate("ConnectWallet.prompt.failed"));
       setWalletStatus(ConnectionStatus.Idle);
     }
-  }, [authAPI, chainInfo, translate, closeConnectWalletModal, disconnect]);
+  }, [
+    authAPI,
+    chainInfo,
+    translate,
+    closeConnectWalletModal,
+    setAutoConnectWalletType,
+    disconnect,
+  ]);
 
   useEffect(() => {
     if (activeWallet !== null || walletStatus !== ConnectionStatus.Idle) return;
@@ -168,10 +176,21 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         connectToKeplr();
         break;
+      case AutoConnectWalletType.WalletConnect:
+        // Error handled by function
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        connectToWalletConnect();
+        break;
       default:
         break;
     }
-  }, [activeWallet, autoConnectWalletType, connectToKeplr, walletStatus]);
+  }, [
+    activeWallet,
+    autoConnectWalletType,
+    connectToKeplr,
+    connectToWalletConnect,
+    walletStatus,
+  ]);
 
   // https://docs.keplr.app/api/#change-key-store-event
   useWindowEvent("keplr_keystorechange", () => {

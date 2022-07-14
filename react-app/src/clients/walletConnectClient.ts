@@ -13,6 +13,12 @@ import {
 } from "../models/cosmos/tx";
 import { ArbitrarySigner, BaseWallet, WalletProvider } from "./baseWallet";
 
+const WALLET_CONNECT_PEER_ID = "LS/WalletConnectPeerId";
+
+function getWalletConnectPeerStoreKey(peerId: string): string {
+  return `${WALLET_CONNECT_PEER_ID}-${peerId}`;
+}
+
 interface WalletConnectWalletConnectOptions {
   onDisconnect: () => void;
 }
@@ -43,26 +49,38 @@ export class WalletConnectWallet extends BaseWallet {
       },
     });
 
-    if (connector.connected) {
-      await connector.killSession();
-      return WalletConnectWallet.connect(chainInfo, options);
-    }
-
     connector.on("disconnect", () => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      connector.killSession();
       options?.onDisconnect();
     });
 
-    await connector.connect();
+    let account: any;
+    if (!connector.connected) {
+      await connector.connect();
+      [account] = await connector.sendCustomRequest({
+        id: payloadId(),
+        jsonrpc: "2.0",
+        method: "cosmos_getAccounts",
+        params: [chainInfo.chainId],
+      });
+      window.localStorage.setItem(
+        getWalletConnectPeerStoreKey(connector.peerId),
+        JSON.stringify(account)
+      );
+    } else {
+      const serializedAccount = window.localStorage.getItem(
+        getWalletConnectPeerStoreKey(connector.peerId)
+      );
 
-    const [account] = await connector.sendCustomRequest({
-      id: payloadId(),
-      jsonrpc: "2.0",
-      method: "cosmos_getAccounts",
-      params: [chainInfo.chainId],
-    });
+      if (serializedAccount) {
+        account = JSON.parse(serializedAccount);
+      }
+    }
 
     if (!account) {
-      throw new Error(`Failed to connect to WalletConnect`);
+      await connector.killSession();
+      return WalletConnectWallet.connect(chainInfo, options);
     }
 
     const { address: hexAddress, algo, pubKey: pubKeyHex } = account;
