@@ -45,6 +45,7 @@ interface IStakingAPI {
     validatorAddress: string
   ): Promise<{ delegation: Delegation; balance: BigNumberCoin } | null>;
   getValidator(address: string): Promise<ValidatorRPC>;
+  getValidators(addresses: string[]): Promise<ValidatorRPC[]>;
 }
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -351,6 +352,18 @@ export const useStakingAPI = (): IStakingAPI => {
     [getDelegation, getPool, query.staking]
   );
 
+  const getValidators = useCallback(
+    async (addresses: string[]) => {
+      const validatorPromises: Promise<ValidatorRPC>[] = [];
+      for (const address of addresses) {
+        validatorPromises.push(getValidator(address));
+      }
+      const validators = await Promise.all(validatorPromises);
+      return validators;
+    },
+    [getValidator]
+  );
+
   return useMemo(
     () => ({
       signDelegateTokenTx,
@@ -362,6 +375,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getPool,
       getDelegation,
       getValidator,
+      getValidators,
     }),
     [
       signDelegateTokenTx,
@@ -373,6 +387,7 @@ export const useStakingAPI = (): IStakingAPI => {
       getPool,
       getDelegation,
       getValidator,
+      getValidators,
     ]
   );
 };
