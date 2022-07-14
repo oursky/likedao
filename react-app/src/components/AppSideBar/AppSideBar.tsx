@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -16,11 +16,10 @@ import { useTransaction } from "../../providers/TransactionProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import Config from "../../config/Config";
-import { useBankAPI } from "../../api/bankAPI";
 import { useChainHealthQuery } from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
-import { UserInfo, UserInfoPanel } from "./UserInfoPanel";
+import { UserInfoPanel } from "./UserInfoPanel";
 import { AddressBar } from "./AddressBar";
 
 interface AppSideBarProps {
@@ -64,11 +63,9 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
   const { translate } = useLocale();
 
   const wallet = useWallet();
-  const bankAPI = useBankAPI();
   const transaction = useTransaction();
 
   const { requestState } = useChainHealthQuery();
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const chainId = Config.chainInfo.chainId;
 
   const toggleMobileMenuMenu = useCallback(() => {
@@ -90,17 +87,14 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
     return [requestState.data.chainStatus, requestState.data.latestHeight];
   }, [requestState]);
 
-  useEffect(() => {
-    if (wallet.status !== ConnectionStatus.Connected) return;
-    bankAPI
-      .getBalance()
-      .then((balance) => {
-        setUserInfo({ balance, address: wallet.account.address });
-      })
-      .catch((e) => {
-        console.error("Failed to fetch user balance =", e);
-      });
-  }, [bankAPI, wallet]);
+  const userInfo = useMemo(() => {
+    if (wallet.status !== ConnectionStatus.Connected) return null;
+
+    return {
+      address: wallet.account.address,
+      balance: wallet.accountBalance,
+    };
+  }, [wallet]);
 
   useEffectOnce(
     () => {

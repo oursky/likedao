@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import BigNumber from "bignumber.js";
 import { TextProposal } from "cosmjs-types/cosmos/gov/v1beta1/gov";
@@ -16,12 +16,10 @@ import { ProposalType } from "../../models/cosmos/gov";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppRoutes from "../../navigation/AppRoutes";
 import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
-import { useBankAPI } from "../../api/bankAPI";
 
 const CreateProposalScreen: React.FC = () => {
   const wallet = useWallet();
   const cosmosAPI = useCosmosAPI();
-  const bankAPI = useBankAPI();
   const govAPI = useGovAPI();
   const { translate } = useLocale();
   const navigate = useNavigate();
@@ -31,10 +29,17 @@ const CreateProposalScreen: React.FC = () => {
     useState<boolean>(false);
   const [createProposalFormValues, setCreateProposalFormValues] =
     useState<CreateProposalFormValues | null>(null);
-  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
   const [minimumDeposit, setMinimumDeposit] = useState<BigNumber>(
     new BigNumber(0)
   );
+
+  const userBalance = useMemo(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      return new BigNumber(0);
+    }
+
+    return wallet.accountBalance.amount;
+  }, [wallet]);
 
   const onCloseModal = useCallback(() => {
     setIsSubmissionModalActive(false);
@@ -77,7 +82,7 @@ const CreateProposalScreen: React.FC = () => {
           success: translate("transaction.success"),
         });
 
-        await wallet.refreshAccounts();
+        await wallet.refreshAccount();
 
         navigate(AppRoutes.Proposals);
 
@@ -92,16 +97,15 @@ const CreateProposalScreen: React.FC = () => {
   );
 
   useEffect(() => {
-    // TODO: Handle query from bdjuno after implementing gov param display
-    Promise.all([bankAPI.getBalance(), govAPI.getMinDepositParams()])
-      .then(([balance, minDeposit]) => {
-        setUserBalance(balance.amount);
+    govAPI
+      .getMinDepositParams()
+      .then((minDeposit) => {
         setMinimumDeposit(minDeposit.amount);
       })
       .catch((err) => {
-        console.log("Failed to get balance", err);
+        console.log("Failed to get params", err);
       });
-  }, [chainInfo, bankAPI, govAPI, wallet]);
+  }, [chainInfo, govAPI]);
 
   return (
     <div className={cn("flex", "flex-col")}>
