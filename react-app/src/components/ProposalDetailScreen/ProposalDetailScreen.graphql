@@ -86,6 +86,7 @@ query ProposalDetailVotesPanelQuery(
   $input: QueryProposalVotesInput!
 ) {
   proposalByID(id: $proposalId) {
+    id
     votes(input: $input) {
       totalCount
       edges {
@@ -102,6 +103,7 @@ query ProposalDetailDepositsPanelQuery(
   $input: QueryProposalDepositsInput!
 ) {
   proposalByID(id: $proposalId) {
+    id
     deposits(input: $input) {
       totalCount
       edges {
