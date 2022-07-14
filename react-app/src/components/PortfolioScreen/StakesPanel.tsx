@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
+import { Link } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
@@ -16,6 +17,7 @@ import Table, {
   TableRow,
 } from "../common/Table/Table";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
+import AppRoutes from "../../navigation/AppRoutes";
 import { Stake } from "./PortfolioScreenModel";
 
 interface StakesPanelProps {
@@ -119,7 +121,6 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
           {stakes.map((stake) => (
             <TableRow key={stake.delegation.validatorAddress}>
               <TableCell className="flex items-center py-4">
-                {/* TODO: Fetch from Graphql API */}
                 <div
                   className={cn(
                     "w-9",
@@ -131,7 +132,14 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                 />
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-likecoin-green">
-                    {stake.validator.description.moniker}
+                    <Link
+                      to={AppRoutes.ValidatorDetail.replace(
+                        ":address",
+                        stake.validator.operatorAddress
+                      )}
+                    >
+                      {stake.validator.description.moniker}
+                    </Link>
                   </h3>
                   <p
                     className={cn(
