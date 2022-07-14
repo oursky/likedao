@@ -15,16 +15,19 @@ import Table, {
   TableHead,
   TableRow,
 } from "../common/Table/Table";
+import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { Stake } from "./PortfolioScreenModel";
 
 interface StakesPanelProps {
-  stakes: Stake[];
+  isLoading: boolean;
+  stakes: Stake[] | null;
   isYourPortfolio: boolean;
   order: ColumnOrder;
   setOrder: (order: ColumnOrder) => void;
 }
 
 const StakesPanel: React.FC<StakesPanelProps> = ({
+  isLoading,
   stakes,
   isYourPortfolio,
   order,
@@ -34,6 +37,18 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
     () => ({ order, setOrder }),
     [order, setOrder]
   );
+
+  if (!stakes || isLoading) {
+    return (
+      <Paper className={cn("flex", "justify-center", "items-center")}>
+        <LoadingSpinner />
+      </Paper>
+    );
+  }
+
+  if (stakes.length === 0) {
+    return null;
+  }
 
   return (
     <Paper>

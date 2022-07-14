@@ -114,18 +114,17 @@ const PortfolioScreen: React.FC = () => {
         </Paper>
       )}
 
-      {isRequestStateLoaded(portfolioRequestState) ? (
-        <StakesPanel
-          stakes={portfolioRequestState.data.stakes}
-          isYourPortfolio={isYourPortfolio}
-          order={stakesOrder}
-          setOrder={setStakesOrder}
-        />
-      ) : (
-        <Paper className={cn("flex", "justify-center", "items-center")}>
-          <LoadingSpinner />
-        </Paper>
-      )}
+      <StakesPanel
+        isLoading={!isRequestStateLoaded(portfolioRequestState)}
+        stakes={
+          isRequestStateLoaded(portfolioRequestState)
+            ? portfolioRequestState.data.stakes
+            : null
+        }
+        isYourPortfolio={isYourPortfolio}
+        order={stakesOrder}
+        setOrder={setStakesOrder}
+      />
 
       {isRequestStateLoaded(proposalHistoryRequestState) &&
       isRequestStateLoaded(portfolioRequestState) ? (
