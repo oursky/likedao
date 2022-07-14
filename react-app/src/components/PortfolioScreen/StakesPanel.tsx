@@ -87,11 +87,13 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
               <SortableColumnHeader
                 id="expectedReturns"
                 titleId="StakesPanel.expectedReturns"
+                sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
               <SortableColumnHeader
                 id="votingPower"
                 titleId="StakesPanel.votingPower"
+                sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
             </ColumnSortContext.Provider>
@@ -114,7 +116,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                 />
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-likecoin-green">
-                    {stake.validator.moniker}
+                    {stake.validator.description.moniker}
                   </h3>
                   <p
                     className={cn(
@@ -138,13 +140,9 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                     )
                   : convertBigNumberToFixedPointString(stake.reward.amount, 9)}
               </TableCell>
+              <TableCell>{(stake.expectedReturn * 100).toFixed(2)}%</TableCell>
               <TableCell>
-                {/* TODO: Fetch from Graphql API */}
-                15.76%
-              </TableCell>
-              <TableCell>
-                {/* TODO: Fetch from Graphql API */}
-                3.69%
+                {(stake.validator.votePower * 100).toFixed(2)}%
               </TableCell>
             </TableRow>
           ))}
