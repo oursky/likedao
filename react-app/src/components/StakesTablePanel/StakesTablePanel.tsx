@@ -20,7 +20,7 @@ import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import AppRoutes from "../../navigation/AppRoutes";
 import { Stake } from "../PortfolioScreen/PortfolioScreenModel";
 
-interface StakesPanelProps {
+interface StakesTablePanelProps {
   isLoading: boolean;
   stakes: Stake[] | null;
   isYourPortfolio: boolean;
@@ -28,7 +28,7 @@ interface StakesPanelProps {
   setOrder: (order: ColumnOrder) => void;
 }
 
-const StakesPanel: React.FC<StakesPanelProps> = ({
+const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
   isLoading,
   stakes,
   isYourPortfolio,
@@ -40,7 +40,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
     [order, setOrder]
   );
 
-  if (!stakes || isLoading) {
+  if (isLoading) {
     return (
       <Paper className={cn("flex", "justify-center", "items-center")}>
         <LoadingSpinner />
@@ -48,7 +48,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
     );
   }
 
-  if (stakes.length === 0) {
+  if (!stakes || stakes.length === 0) {
     return null;
   }
 
@@ -170,4 +170,4 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
   );
 };
 
-export default StakesPanel;
+export default StakesTablePanel;

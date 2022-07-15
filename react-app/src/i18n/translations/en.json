@@ -54,6 +54,7 @@
   "PortfolioScreen.account": "Account",
   "PortfolioScreen.portfolio.requestState.error": "Failed to fetch portfolio, please try again later.",
   "PortfolioScreen.proposalHistory.requestState.error": "Failed to fetch proposal history, please try again later.",
+  "PortfolioScreen.stakes.requestState.error": "Failed to fetch stakes, please try again later.",
   "PortfolioScreen.yourPortfolio": "Your Portfolio",
   "PortfolioScreen.yourPortfolio.available": "Available",
   "PortfolioScreen.yourPortfolio.commission": "Commission",
