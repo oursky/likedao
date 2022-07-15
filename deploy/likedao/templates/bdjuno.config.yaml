@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bdjuno-config-{{ .Values.deploymentTag }}
+data:
+  config.yaml: |
+    chain:
+        bech32_prefix:
+            {{- range .Values.bdjuno.config.chain.bech32Prefix }}
+              - {{ . }}
+            {{- end}}
+        modules:
+            - modules
+            - messages
+            - auth
+            - bank
+            - consensus
+            - gov
+            - mint
+            - slashing
+            - staking
+            - distribution
+            {{- range .Values.bdjuno.config.chain.additionalModules }}
+              - {{ . }}
+            {{- end}}
+    node:
+        type: remote
+        config:
+            rpc:
+                client_name: {{ .Values.bdjuno.config.rpc.clientName }}
+                address: {{ .Values.bdjuno.config.rpc.address }}
+                max_connections: {{ .Values.bdjuno.config.rpc.maxConnections }}
+            grpc:
+                address: {{ .Values.bdjuno.config.grpc.address }}
+                insecure: true
+    parsing:
+        workers: {{ .Values.bdjuno.config.parsing.workers }}
+        listen_new_blocks: true
+        parse_old_blocks: true
+        parse_genesis: true
+        start_height: {{ .Values.bdjuno.config.parsing.startHeight }}
+        average_block_time: {{ .Values.bdjuno.config.parsing.averageBlockTime }}
+    database:
+        name: {{ .Values.bdjuno.config.database.name }}
+        host: {{ .Values.bdjuno.config.database.host }}
+        port: {{ .Values.bdjuno.config.database.port }}
+        user: {{ .Values.bdjuno.config.database.user }}
+        password: {{ .Values.bdjuno.config.database.password }}
+        schema: {{ .Values.bdjuno.config.database.schema }}
+        max_open_connections: {{ .Values.bdjuno.config.database.maxConnections }}
+        max_idle_connections: {{ .Values.bdjuno.config.database.maxConnections }}
+        partition_size: {{ .Values.bdjuno.config.database.partitionSize }}
+        partition_batch: {{ .Values.bdjuno.config.database.partitionBatch }}
+    logging:
+        level: {{ .Values.bdjuno.config.loggingLevel }}
+        format: text
+    actions:
+        port: 3000

@@ -41,11 +41,3 @@ spec:
             name: bdjuno-config-{{ .Values.deploymentTag }}
         - name: bdjuno-home
           emptyDir: {}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: bdjuno-config-{{ .Values.deploymentTag }}
-data:
-  config.yaml: |-
-{{ .Files.Get "static/bdjuno.config.yaml" | indent 4 }}
