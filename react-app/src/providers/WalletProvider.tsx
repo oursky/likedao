@@ -12,6 +12,8 @@ import Config from "../config/Config";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useWindowEvent } from "../hooks/useWindowEvent";
 import { useAuthAPI } from "../api/authAPI";
+import { BigNumberCoin } from "../models/coin";
+import { convertMinimalTokenToToken } from "../utils/coin";
 import { useLocale } from "./AppLocaleProvider";
 
 const AUTO_CONNECT_WALLET_TYPE_KEY = "LS/AutoConnectWalletType";
@@ -24,7 +26,7 @@ export enum ConnectionStatus {
 
 export enum AutoConnectWalletType {
   Keplr = "keplr",
-  // WalletConnect doesn't support auto reconnect
+  WalletConnect = "walletConnect",
 }
 
 interface WalletProviderProps {
@@ -44,7 +46,8 @@ interface ConnectedWalletContextValue {
   status: ConnectionStatus.Connected;
   provider: IWalletProvider;
   account: AccountData;
-  refreshAccounts: () => Promise<void>;
+  accountBalance: BigNumberCoin;
+  refreshAccount: () => Promise<void>;
   disconnect: () => void;
 }
 
@@ -72,6 +75,9 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     ConnectionStatus.Idle
   );
   const [account, setAccount] = useState<AccountData | null>(null);
+  const [accountBalance, setAccountBalance] = useState<BigNumberCoin | null>(
+    null
+  );
 
   const openConnectWalletModal = useCallback(() => {
     setIsConnectWalletModalActive(true);
@@ -81,14 +87,25 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     setIsConnectWalletModalActive(false);
   }, [setIsConnectWalletModalActive]);
 
-  const refreshAccounts = useCallback(async () => {
+  const refreshAccount = useCallback(async () => {
     if (!activeWallet || walletStatus !== ConnectionStatus.Connected) {
       return;
     }
 
     const [account] = await activeWallet.offlineSigner.getAccounts();
 
+    const balance = await activeWallet.provider.getBalance(
+      account.address,
+      Config.chainInfo.currency.coinMinimalDenom
+    );
+
+    const accountBalance = {
+      denom: balance.denom,
+      amount: convertMinimalTokenToToken(balance.amount),
+    };
+
     setAccount(account);
+    setAccountBalance(accountBalance);
   }, [activeWallet, walletStatus]);
 
   const disconnect = useCallback(() => {
@@ -114,11 +131,21 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
     try {
       const wallet = await KeplrWallet.connect(chainInfo);
 
-      setActiveWallet(wallet);
-
       const [account] = await wallet.offlineSigner.getAccounts();
 
+      const balance = await wallet.provider.getBalance(
+        account.address,
+        Config.chainInfo.currency.coinMinimalDenom
+      );
+
+      const accountBalance = {
+        denom: balance.denom,
+        amount: convertMinimalTokenToToken(balance.amount),
+      };
+
+      setActiveWallet(wallet);
       setAccount(account);
+      setAccountBalance(accountBalance);
       setAutoConnectWalletType(AutoConnectWalletType.Keplr);
       setWalletStatus(ConnectionStatus.Connected);
       // Logout anyway to prevent the case where the logged in wallet has a different account than the authenticated address
@@ -146,10 +173,22 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         onDisconnect: disconnect,
       });
 
-      setActiveWallet(wallet);
-
       const [account] = await wallet.offlineSigner.getAccounts();
+
+      const balance = await wallet.provider.getBalance(
+        account.address,
+        Config.chainInfo.currency.coinMinimalDenom
+      );
+
+      const accountBalance = {
+        denom: balance.denom,
+        amount: convertMinimalTokenToToken(balance.amount),
+      };
+
+      setActiveWallet(wallet);
       setAccount(account);
+      setAccountBalance(accountBalance);
+      setAutoConnectWalletType(AutoConnectWalletType.WalletConnect);
       setWalletStatus(ConnectionStatus.Connected);
       // Logout anyway to prevent the case where the logged in wallet has a different account than the authenticated address
       await authAPI.logout();
@@ -158,7 +197,14 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       toast.error(translate("ConnectWallet.prompt.failed"));
       setWalletStatus(ConnectionStatus.Idle);
     }
-  }, [authAPI, chainInfo, translate, closeConnectWalletModal, disconnect]);
+  }, [
+    authAPI,
+    chainInfo,
+    translate,
+    closeConnectWalletModal,
+    setAutoConnectWalletType,
+    disconnect,
+  ]);
 
   useEffect(() => {
     if (activeWallet !== null || walletStatus !== ConnectionStatus.Idle) return;
@@ -168,15 +214,26 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         connectToKeplr();
         break;
+      case AutoConnectWalletType.WalletConnect:
+        // Error handled by function
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        connectToWalletConnect();
+        break;
       default:
         break;
     }
-  }, [activeWallet, autoConnectWalletType, connectToKeplr, walletStatus]);
+  }, [
+    activeWallet,
+    autoConnectWalletType,
+    connectToKeplr,
+    connectToWalletConnect,
+    walletStatus,
+  ]);
 
   // https://docs.keplr.app/api/#change-key-store-event
   useWindowEvent("keplr_keystorechange", () => {
     // Unauthenticating as the selected account is now changed
-    Promise.all([authAPI.logout(), refreshAccounts()]).catch((e) => {
+    Promise.all([authAPI.logout(), refreshAccount()]).catch((e) => {
       console.error("Failed to refresh accounts = ", e);
     });
   });
@@ -200,15 +257,17 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       status: walletStatus,
       provider: activeWallet.provider,
       account: account!,
-      refreshAccounts,
+      accountBalance: accountBalance!,
+      refreshAccount,
       disconnect,
     };
   }, [
     account,
     activeWallet,
     walletStatus,
+    accountBalance,
     openConnectWalletModal,
-    refreshAccounts,
+    refreshAccount,
     disconnect,
   ]);
 

@@ -42,10 +42,17 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   const { translate } = useLocale();
 
   const [activeModal, setActiveModal] = useState<TransactionModal | null>(null);
-  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
   const [availableRewards, setAvailableRewards] = useState<BigNumber>(
     new BigNumber(0)
   );
+
+  const userBalance = useMemo(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      return new BigNumber(0);
+    }
+
+    return wallet.accountBalance.amount;
+  }, [wallet]);
 
   const openSendTokenModal = useCallback(() => {
     setActiveModal(TransactionModal.SendToken);
@@ -81,7 +88,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
           success: translate("transaction.success"),
         });
 
-        await wallet.refreshAccounts();
+        await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
         toast.error(translate("transaction.failure"));
@@ -107,7 +114,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
           success: translate("transaction.success"),
         });
 
-        await wallet.refreshAccounts();
+        await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
         toast.error(translate("transaction.failure"));
@@ -118,18 +125,16 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
   );
 
   useEffect(() => {
-    Promise.all([
-      bankAPI.getBalance(),
-      distributionAPI.getTotalDelegationRewards(),
-    ])
-      .then(([balance, rewards]) => {
-        setUserBalance(balance.amount);
+    if (wallet.status !== ConnectionStatus.Connected) return;
+    distributionAPI
+      .getTotalDelegationRewards()
+      .then((rewards) => {
         setAvailableRewards(rewards.amount);
       })
       .catch((err) => {
         console.error("Failed to get balance and rewards", err);
       });
-  }, [bankAPI, distributionAPI]);
+  }, [distributionAPI, wallet]);
 
   const contextValue = useMemo((): TransactionProviderContextValue => {
     return {

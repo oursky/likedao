@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import cn from "classnames";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -22,7 +22,6 @@ import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useGovAPI } from "../../api/govAPI";
 import { DepositProposalFormValues } from "../forms/DepositProposalForm/DepositProposalFormModel";
 import DepositProposalModal from "../TransactionModals/DepositProposalModal";
-import { useBankAPI } from "../../api/bankAPI";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
@@ -41,7 +40,6 @@ const ProposalDetailScreen: React.FC = () => {
   const navigate = useNavigate();
   const govAPI = useGovAPI();
   const cosmosAPI = useCosmosAPI();
-  const bankAPI = useBankAPI();
 
   const proposalId = useMemo(() => {
     return id != null ? parseInt(id, 10) : null;
@@ -52,7 +50,14 @@ const ProposalDetailScreen: React.FC = () => {
   const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
     null
   );
-  const [userBalance, setUserBalance] = useState<BigNumber>(new BigNumber(0));
+
+  const userBalance = useMemo(() => {
+    if (wallet.status !== ConnectionStatus.Connected) {
+      return new BigNumber(0);
+    }
+
+    return wallet.accountBalance.amount;
+  }, [wallet]);
 
   const onSetReaction = useCallback(
     async (type: ReactionType): Promise<void> => {
@@ -138,7 +143,7 @@ const ProposalDetailScreen: React.FC = () => {
           success: translate("transaction.success"),
         });
 
-        await wallet.refreshAccounts();
+        await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
         toast.error(translate("transaction.failure"));
@@ -166,7 +171,7 @@ const ProposalDetailScreen: React.FC = () => {
           success: translate("transaction.success"),
         });
 
-        await wallet.refreshAccounts();
+        await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
         toast.error(translate("transaction.failure"));
@@ -175,17 +180,6 @@ const ProposalDetailScreen: React.FC = () => {
     },
     [closeModals, cosmosAPI, govAPI, translate, wallet]
   );
-
-  useEffect(() => {
-    bankAPI
-      .getBalance()
-      .then((balance) => {
-        setUserBalance(balance.amount);
-      })
-      .catch((err) => {
-        console.error("Failed to get balance and rewards", err);
-      });
-  }, [bankAPI]);
 
   useEffectOnce(
     () => {
