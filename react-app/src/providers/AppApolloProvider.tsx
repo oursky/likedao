@@ -94,6 +94,7 @@ const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
         if (error.extensions.code === API_UNAUTHENTICATED) {
           isLoggingIn.current = true;
           return new Observable((observer) => {
+            toast.info(translate("ProposalDetail.setReaction.requesting"));
             authRef.current
               .signInWithCosmos()
               .then(() => {
