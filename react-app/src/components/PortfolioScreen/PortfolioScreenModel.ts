@@ -22,8 +22,3 @@ export interface Portfolio {
 }
 
 export interface PortfolioScreenGraphql extends ProposalHistory {}
-
-export default interface PortfolioScreenModel {
-  portfolio: Portfolio;
-  stakes: Stake[];
-}

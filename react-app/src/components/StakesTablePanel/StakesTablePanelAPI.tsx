@@ -1,7 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import BigNumber from "bignumber.js";
-import { useQueryClient } from "../../providers/QueryClientProvider";
-import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
+import { useDistributionAPI } from "../../api/distributionAPI";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
   isRequestStateLoaded,
@@ -11,109 +9,10 @@ import {
   RequestStateLoaded,
   RequestStateLoading,
 } from "../../models/RequestState";
-import { useDistributionAPI } from "../../api/distributionAPI";
-import { ColumnOrder } from "../SectionedTable/SectionedTable";
-import { useBankAPI } from "../../api/bankAPI";
-import { Portfolio, Stake } from "./PortfolioScreenModel";
-
-export const usePortfolioQuery = (): {
-  requestState: RequestState<Portfolio>;
-  fetch: (address?: string) => Promise<void>;
-} => {
-  const [requestState, setRequestState] =
-    useState<RequestState<Portfolio>>(RequestStateInitial);
-
-  const wallet = useWallet();
-  const bankAPI = useBankAPI();
-  const stakingAPI = useStakingAPI();
-  const distribution = useDistributionAPI();
-  const { query } = useQueryClient();
-
-  const isValidAddress = useCallback(
-    async (address: string) => {
-      try {
-        const account = await query.auth.account(address);
-        return account != null;
-      } catch {
-        return false;
-      }
-    },
-    [query]
-  );
-
-  const fetchAddressPortfolio = useCallback<
-    (address: string) => Promise<Portfolio>
-  >(
-    async (address) => {
-      const [
-        availableBalance,
-        stakedBalance,
-        unstakingBalance,
-        commission,
-        reward,
-      ] = await Promise.all([
-        bankAPI.getAddressBalance(address),
-        stakingAPI.getAddressStakedBalance(address),
-        stakingAPI.getUnstakingAmount(address),
-        distribution.getAddressTotalCommission(address),
-        distribution.getAddressTotalDelegationRewards(address),
-      ]);
-
-      const balance = {
-        amount: BigNumber.sum(
-          availableBalance.amount,
-          stakedBalance.amount,
-          unstakingBalance.amount
-        ),
-        denom: availableBalance.denom,
-      };
-
-      return {
-        balance,
-        stakedBalance,
-        unstakingBalance,
-        availableBalance,
-        commission,
-        reward,
-        address,
-      };
-    },
-    [bankAPI, stakingAPI, distribution]
-  );
-
-  const fetch = useCallback(
-    async (address?: string) => {
-      setRequestState(RequestStateLoading);
-
-      try {
-        if (address) {
-          if (!(await isValidAddress(address))) {
-            throw new Error("Invalid address");
-          }
-          const portfolio = await fetchAddressPortfolio(address);
-          setRequestState(RequestStateLoaded(portfolio));
-        } else {
-          if (wallet.status !== ConnectionStatus.Connected) {
-            throw new Error("Wallet not connected.");
-          }
-          const portfolio = await fetchAddressPortfolio(wallet.account.address);
-          setRequestState(RequestStateLoaded(portfolio));
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setRequestState(RequestStateError(err));
-        }
-        console.error("Failed to handle fetch portfolio error =", err);
-      }
-    },
-    [fetchAddressPortfolio, isValidAddress, wallet]
-  );
-
-  return {
-    requestState,
-    fetch,
-  };
-};
+import { useQueryClient } from "../../providers/QueryClientProvider";
+import { useWallet, ConnectionStatus } from "../../providers/WalletProvider";
+import { ColumnOrder } from "../common/Table/Table";
+import { Stake } from "./StakesTablePanelModel";
 
 export const useStakesQuery = (): {
   requestState: RequestState<Stake[]>;
@@ -197,11 +96,7 @@ export const useStakesQuery = (): {
           setRequestState(RequestStateLoaded(stakes));
         }
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setRequestState(RequestStateError(err));
-        }
-        setRequestState(RequestStateError(new Error("Unknown error")));
-        console.error("Failed to handle fetch portfolio error =", err);
+        setRequestState(RequestStateError(err as Error));
       }
     },
     [fetchStakes, isValidAddress, wallet]

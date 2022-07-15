@@ -18,7 +18,7 @@ import Table, {
 } from "../common/Table/Table";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import AppRoutes from "../../navigation/AppRoutes";
-import { Stake } from "./PortfolioScreenModel";
+import { Stake } from "../PortfolioScreen/PortfolioScreenModel";
 
 interface StakesPanelProps {
   isLoading: boolean;
