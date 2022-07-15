@@ -14,7 +14,7 @@ import {
   ProposalDepositSort,
   Sort,
 } from "../../generated/graphql";
-import { useLazyGraphQLQuery } from "../../hooks/graphql";
+import { useGraphQLQuery, useLazyGraphQLQuery } from "../../hooks/graphql";
 import { mapRequestData, RequestState } from "../../models/RequestState";
 import { convertMinimalTokenToToken } from "../../utils/coin";
 import { getReactionType } from "../reactions/ReactionModel";
@@ -361,31 +361,22 @@ export const useProposalDepositsQuery: UseProposalDepositsQuery = (
   };
 };
 
-export function useProposalQuery(): {
+export function useProposalQuery(id: number | null): {
   requestState: RequestState<Proposal | null>;
-  fetch: (id: number) => void;
 } {
   const { dateFnsLocale } = useLocale();
 
-  const [fetch, { requestState }] = useLazyGraphQLQuery<
+  const requestState = useGraphQLQuery<
     ProposalDetailScreenQueryQuery,
     ProposalDetailScreenQueryQueryVariables
   >(ProposalDetailScreenQuery, {
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-  });
-
-  const callFetch = useCallback(
-    (id: number) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetch({
-        variables: {
-          id: `proposal_${id}`,
-        },
-      });
+    skip: id == null,
+    variables: {
+      id: `proposal_${id}`,
     },
-    [fetch]
-  );
+  });
 
   const data = useMemo(() => {
     return mapRequestData<ProposalDetailScreenQueryQuery, Proposal | null>(
@@ -440,6 +431,5 @@ export function useProposalQuery(): {
 
   return {
     requestState: data,
-    fetch: callFetch,
   };
 }

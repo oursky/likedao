@@ -14,7 +14,7 @@ import { Icon, IconType } from "../common/Icons/Icons";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { ReactionType } from "../reactions/ReactionModel";
 import { useLocale } from "../../providers/AppLocaleProvider";
-import { useReactionAPI } from "../../api/reactionAPI";
+import { ReactionTargetType, useReactionAPI } from "../../api/reactionAPI";
 import VoteProposalModal from "../TransactionModals/VoteProposalModal";
 import { VoteProposalFormValues } from "../forms/VoteProposalForm/VoteProposalFormModel";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
@@ -35,7 +35,6 @@ enum ProposalDetailModal {
 
 const ProposalDetailScreen: React.FC = () => {
   const { id } = useParams();
-  const { fetch, requestState } = useProposalQuery();
   const { translate } = useLocale();
   const reactionAPI = useReactionAPI();
   const wallet = useWallet();
@@ -47,6 +46,8 @@ const ProposalDetailScreen: React.FC = () => {
   const proposalId = useMemo(() => {
     return id != null ? parseInt(id, 10) : null;
   }, [id]);
+
+  const { requestState } = useProposalQuery(proposalId);
 
   const [activeModal, setActiveModal] = useState<ProposalDetailModal | null>(
     null
@@ -65,7 +66,11 @@ const ProposalDetailScreen: React.FC = () => {
       }
 
       try {
-        await reactionAPI.setReaction(requestState.data.id, type);
+        await reactionAPI.setReaction(
+          ReactionTargetType.Proposal,
+          requestState.data.id,
+          type
+        );
       } catch (e: unknown) {
         console.error("Error while setting reaction", e);
         toast.error(translate("ProposalDetail.setReaction.failure"));
@@ -85,7 +90,10 @@ const ProposalDetailScreen: React.FC = () => {
     }
 
     try {
-      await reactionAPI.unsetReaction(requestState.data.id);
+      await reactionAPI.unsetReaction(
+        ReactionTargetType.Proposal,
+        requestState.data.id
+      );
     } catch (e: unknown) {
       console.error("Error while setting reaction", e);
       toast.error(translate("ProposalDetail.setReaction.failure"));
@@ -167,12 +175,6 @@ const ProposalDetailScreen: React.FC = () => {
     },
     [closeModals, cosmosAPI, govAPI, translate, wallet]
   );
-
-  useEffect(() => {
-    if (proposalId) {
-      fetch(proposalId);
-    }
-  }, [fetch, proposalId]);
 
   useEffect(() => {
     bankAPI

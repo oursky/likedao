@@ -14,6 +14,7 @@ import {
   InMemoryCache,
   Observable,
   PossibleTypesMap,
+  TypePolicies,
 } from "@apollo/client";
 import { withScalars } from "apollo-link-scalars";
 import { toast } from "react-toastify";
@@ -23,7 +24,19 @@ import { API_UNAUTHENTICATED } from "../models/error";
 import { useAuth } from "./AuthProvider";
 import { useLocale } from "./AppLocaleProvider";
 
-const typePolicies = {};
+const typePolicies: TypePolicies = {
+  Proposal: {
+    keyFields: ["id"],
+    fields: {
+      reactions: {
+        merge(_, incoming: any[]) {
+          return incoming;
+        },
+      },
+    },
+  },
+};
+
 const possibleTypes: PossibleTypesMap = {
   ProposalVoter: ["Validator", "StringObject"],
   ProposalDepositor: ["Validator", "StringObject"],

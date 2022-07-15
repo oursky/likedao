@@ -61,7 +61,6 @@ export const ReactionBadge: React.FC<ReactionBadgeProps> = (props) => {
         "items-center",
         "pr-4",
         "h-9",
-        // TODO: Review this color
         isActive ? "bg-likecoin-secondarygreen" : backgroundColorClass,
         !onClick && "pointer-events-none",
         className
@@ -75,8 +74,7 @@ export const ReactionBadge: React.FC<ReactionBadgeProps> = (props) => {
           "h-9",
           "w-9",
           "rounded-full",
-          // TODO: Review this color
-          isActive ? "bg-likecoin-secondarygreen" : "bg-likecoin-lightgrey"
+          "bg-likecoin-lightgrey"
         )}
       >
         <div

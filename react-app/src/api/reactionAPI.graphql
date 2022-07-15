@@ -3,33 +3,11 @@ mutation ReactionAPISetReactionMutation($input: SetReactionInput!) {
     id
     address
     reaction
-    target {
-      ... on Proposal {
-        id
-        reactions {
-          reaction
-          count
-        }
-
-        myReaction
-      }
-    }
   }
 }
 
 mutation ReactionAPIUnsetReactionMutation($input: UnsetReactionInput!) {
   unsetReaction(input: $input) {
     id
-    target {
-      ... on Proposal {
-        id
-        reactions {
-          reaction
-          count
-        }
-
-        myReaction
-      }
-    }
   }
 }
