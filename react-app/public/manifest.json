@@ -1,6 +1,7 @@
 {
   "short_name": "LikeDAO",
   "name": "LikeDAO",
+  "description": "LikeCoin is a community-owned network where LIKE holders make decisions collectively via liquid democracy.",
   "icons": [
     {
       "src": "favicon.ico",
