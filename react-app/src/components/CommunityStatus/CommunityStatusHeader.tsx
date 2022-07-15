@@ -39,8 +39,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
                 "text-md",
                 "leading-5",
                 "font-medium",
-                "text-black",
-                "break-all"
+                "text-black"
               )}
             >
               {convertBigNumberToLocalizedIntegerString(

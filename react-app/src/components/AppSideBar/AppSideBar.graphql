@@ -1,3 +1,18 @@
+fragment AppSideBarCommunityStatus on CommunityStatus {
+  bondedRatio
+  inflation
+  communityPool {
+    denom
+    amount
+  }
+}
+
 query AppSideBarQueryAverageBlockTime {
   averageBlockTime
+}
+
+query AppSideBarQueryCommunityStatus {
+  communityStatus {
+    ...AppSideBarCommunityStatus
+  }
 }
