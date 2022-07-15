@@ -124,6 +124,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
         "gap-x-4",
         "gap-y-6",
         "justify-center",
+        "sm:justify-start",
         "sm:gap-y-4",
         "sm:flex-row",
         "relative",
@@ -209,7 +210,9 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           closeMobileMenu={onMenuClose}
         />
       </div>
-      <main className={cn("grow", "px-3", "sm:px-0")}>{children}</main>
+      <main className={cn("grow", "px-3", "min-w-0", "sm:px-0")}>
+        {children}
+      </main>
     </div>
   );
 };

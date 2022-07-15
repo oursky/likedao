@@ -22,9 +22,12 @@ const AppScaffold: React.FC = () => {
         "flex-col",
         "min-h-screen",
         "justify-between",
+        "sm:justify-start",
         "w-full",
+        "sm:w-full",
+        "min-w-0",
         "sm:p-8",
-        "sm:overflow-auto",
+        "sm:overflow-x-auto",
         isMenuOpen && cn("overflow-hidden", "h-screen")
       )}
     >

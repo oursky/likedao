@@ -179,7 +179,7 @@ const SectionedTable: <T>(
     <div className={cn("inline-block", "min-w-full", "py-2", "align-middle")}>
       <div
         className={cn(
-          "overflow-hidden",
+          "overflow-x-auto",
           "shadow",
           "ring-1",
           "ring-black",
