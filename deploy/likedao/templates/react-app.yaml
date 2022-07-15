@@ -29,6 +29,10 @@ spec:
     metadata:
       labels:
         app: react-app-{{ .Values.deploymentTag }}
+      annotations:
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/react-app.nginx.yaml") . | sha256sum }}
+        checksum/keplr-config: {{ include (print $.Template.BasePath "/react-app.keplr.yaml") . | sha256sum }}
+        checksum/server-config: {{ include (print $.Template.BasePath "/react-app.config.yaml") . | sha256sum }}
     spec:
       restartPolicy: Always
       containers:
