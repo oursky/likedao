@@ -23,9 +23,75 @@ graphqlServer:
     bech32Prefix: like
 reactApp:
   imageName: ghcr.io/oursky/likedao-react-app
+  sentry:
+    dsn: dsn
+  chainId: likecoin-mainnet-2
+  chainRpc: https://mainnet-node.like.co:443/rpc/
+  chainRest: https://mainnet-node.like.co
+  graphqlEndpoint: http://localhost:8080/graphql
+  authEndpoint: http://localhost:8080/auth
+  chainLinks:
+    - chainId: likecoin-mainnet-2
+      link: http://localhost:3000
+  footerLinks:
+    osmosis: https://app.osmosis.zone/?from=ATOM&to=LIKE
+    liquid: https://app.liquid.com/exchange/LIKEUSDT
+    emeris: https://app.emeris.com/welcome
+    contactSupport: https://go.crisp.chat/chat/embed/?website_id=5c009125-5863-4059-ba65-43f177ca33f7
+  bech32Config:
+    bech32PrefixAccAddr: like
+    bech32PrefixAccPub: likepub
+    bech32PrefixValAddr: likevaloper
+    bech32PrefixValPub: likevaloperpub
+    bech32PrefixConsAddr: likevalcons
+    bech32PrefixConsPub: likevalconspub
+  currency:
+    coinDenom: LIKE
+    coinMinimalDenom: nanolike
+    coinDecimals: 9
+    geckoId: likecoin
+  walletConnect:
+    gasPrice: 10nanolike
+  keplr:
+    chainId: likecoin-mainnet-2
+    chainName: Likecoin Chain
+    walletUrlForStaking: https://stake.like.co
+    coinType: 118
+    gasPriceStep:
+      low: 1
+      average: 10
+      high: 1000
+
 bdjuno:
   imageName: ghcr.io/oursky/likedao-bdjuno
   genesisUrl: https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.json
+  config:
+    loggingLevel: debug
+    chain:
+      bech32Prefix:
+        - cosmos
+        - like
+      additionalModules:
+    rpc:
+      clientName: juno
+      address: https://mainnet-node-rpc.like.co:443
+      maxConnections: 20
+    grpc:
+      address: mainnet-node-grpc.like.co:80
+    parsing:
+      workers: 4
+      startHeight: 1
+      averageBlockTime: 6s
+    database:
+      name: bdjuno
+      host: bdjuno-db
+      port: 5432
+      user: bdjuno
+      password: bdjuno
+      schema: bdjuno
+      maxConnections: 1
+      partitionSize: 100000
+      partitionBatch: 1000
   resources:
     limits:
       cpu: 2
