@@ -14,7 +14,6 @@ import (
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
-	gql_bigint "github.com/xplorfin/gql-bigint"
 )
 
 func (r *proposalResolver) ProposalID(ctx context.Context, obj *models.Proposal) (int, error) {
@@ -328,32 +327,32 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 	return nil, nil
 }
 
-func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
 	if obj.Yes == nil {
-		return 0, nil
+		return models.NewBigInt(0), nil
 	}
-	return gql_bigint.BigInt(obj.Yes.ToInt64()), nil
+	return models.NewBigIntFromBunBigInt(obj.Yes), nil
 }
 
-func (r *proposalTallyResultResolver) No(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+func (r *proposalTallyResultResolver) No(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
 	if obj.No == nil {
-		return 0, nil
+		return models.NewBigInt(0), nil
 	}
-	return gql_bigint.BigInt(obj.No.ToInt64()), nil
+	return models.NewBigIntFromBunBigInt(obj.No), nil
 }
 
-func (r *proposalTallyResultResolver) NoWithVeto(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+func (r *proposalTallyResultResolver) NoWithVeto(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
 	if obj.NoWithVeto == nil {
-		return 0, nil
+		return models.NewBigInt(0), nil
 	}
-	return gql_bigint.BigInt(obj.NoWithVeto.ToInt64()), nil
+	return models.NewBigIntFromBunBigInt(obj.NoWithVeto), nil
 }
 
-func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.ProposalTallyResult) (gql_bigint.BigInt, error) {
+func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
 	if obj.Abstain == nil {
-		return 0, nil
+		return models.NewBigInt(0), nil
 	}
-	return gql_bigint.BigInt(obj.Abstain.ToInt64()), nil
+	return models.NewBigIntFromBunBigInt(obj.Abstain), nil
 }
 
 func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj *models.ProposalTallyResult) (*models.ProposalVoteOption, error) {
