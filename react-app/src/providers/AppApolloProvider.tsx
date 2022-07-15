@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef } from "react";
 import BigNumber from "bignumber.js";
 import {
   buildClientSchema,
@@ -82,19 +82,19 @@ interface AppApolloProviderProps {
 
 const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
   const { children } = props;
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const auth = useAuth();
+  const isLoggingIn = useRef<boolean>(false);
+  const authRef = useRef(useAuth());
   const { translate } = useLocale();
 
   const authErrorLink = useMemo(() => {
     // eslint-disable-next-line consistent-return
     return onError(({ graphQLErrors, operation, forward }) => {
-      if (!isLoggingIn && graphQLErrors && graphQLErrors.length > 0) {
+      if (!isLoggingIn.current && graphQLErrors && graphQLErrors.length > 0) {
         const error = graphQLErrors[0];
         if (error.extensions.code === API_UNAUTHENTICATED) {
-          setIsLoggingIn(true);
+          isLoggingIn.current = true;
           return new Observable((observer) => {
-            auth
+            authRef.current
               .signInWithCosmos()
               .then(() => {
                 forward(operation).subscribe(observer);
@@ -104,13 +104,13 @@ const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
                 observer.error(error);
               })
               .finally(() => {
-                setIsLoggingIn(false);
+                isLoggingIn.current = false;
               });
           });
         }
       }
     });
-  }, [auth, isLoggingIn, translate]);
+  }, [isLoggingIn, translate]);
 
   const link = useMemo(() => {
     return ApolloLink.from([
