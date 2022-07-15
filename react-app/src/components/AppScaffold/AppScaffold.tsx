@@ -25,7 +25,7 @@ const AppScaffold: React.FC = () => {
         "sm:justify-start",
         "w-full",
         "sm:w-full",
-        "sm:min-w-fit",
+        "min-w-0",
         "sm:p-8",
         "sm:overflow-x-auto",
         isMenuOpen && cn("overflow-hidden", "h-screen")

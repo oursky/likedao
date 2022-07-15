@@ -206,7 +206,9 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           closeMobileMenu={onMenuClose}
         />
       </div>
-      <main className={cn("grow", "px-3", "sm:px-0")}>{children}</main>
+      <main className={cn("grow", "px-3", "min-w-0", "sm:px-0")}>
+        {children}
+      </main>
     </div>
   );
 };

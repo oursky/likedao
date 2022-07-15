@@ -69,7 +69,7 @@ const CoinsAmountField: React.FC<{
   amount: BigNumber;
 }> = ({ messageID, amount }) => {
   return (
-    <div className={cn("flex", "flex-col", "mr-6")}>
+    <div>
       <p
         className={cn(
           "text-likecoin-lightgreen",
@@ -124,13 +124,21 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
           />
         </h2>
       </div>
-      <div className={cn("mt-11", "mb-6", "sm:flex")}>
+      <div
+        className={cn(
+          "mt-11",
+          "mb-6",
+          "sm:flex",
+          "sm:min-w-0",
+          "overflow-x-auto"
+        )}
+      >
         <ProfilePicture
           profile={portfolio.profile}
           className={cn("mb-9", "sm:mb-0", "sm:mr-9")}
         />
 
-        <div className={cn("flex", "flex-col", "items-start")}>
+        <div className={cn("flex", "flex-col", "items-start", "w-full")}>
           <p className={cn("text-xl", "leading-6", "font-medium", "mb-3")}>
             {portfolio.profile?.dtag ?? truncateAddress(portfolio.address)}
           </p>
@@ -154,14 +162,11 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
 
           <div
             className={cn(
-              "flex",
-              "flex-row",
-              "flex-wrap",
-              "justify-between",
               "mt-3",
               "w-full",
-              "gap-4",
-              "sm:gap-0"
+              "grid",
+              "grid-cols-[repeat(auto-fill,minmax(100px,1fr))]",
+              "gap-y-3"
             )}
           >
             <CoinsAmountField

@@ -62,9 +62,9 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
         "flex",
         "flex-col",
         "gap-y-3",
-        "sm:gap-y-0",
         "sm:gap-x-3",
         "sm:flex-row",
+        "flex-wrap",
         className
       )}
     >
@@ -80,8 +80,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
                 "text-3xl",
                 "leading-9",
                 "font-semibold",
-                "text-gray-900",
-                "break-all"
+                "text-gray-900"
               )}
             >
               {convertBigNumberToMillifiedIntegerString(
