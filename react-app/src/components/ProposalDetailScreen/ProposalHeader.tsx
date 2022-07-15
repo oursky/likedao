@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
 import { isBefore, isWithinInterval } from "date-fns";
 import { Link } from "react-router-dom";
@@ -6,7 +6,7 @@ import Paper from "../common/Paper/Paper";
 import Badge from "../common/Badge/Badge";
 import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
-import { translateAddress, truncateAddress } from "../../utils/address";
+import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
 import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
 import Config from "../../config/Config";
@@ -16,7 +16,6 @@ import { DefaultReactionMap, ReactionType } from "../reactions/ReactionModel";
 import ProposalStatusBadge from "../proposals/ProposalStatusBadge";
 import { ProposalStatus } from "../../generated/graphql";
 import AppRoutes from "../../navigation/AppRoutes";
-import { useQueryClient } from "../../providers/QueryClientProvider";
 import { Proposal } from "./ProposalDetailScreenModel";
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -143,22 +142,6 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
 }) => {
   const { type, proposerAddress, submitTime } = proposal;
 
-  const [proposerName, setProposerName] = useState<string>();
-  const { desmosQuery } = useQueryClient();
-
-  useEffect(() => {
-    desmosQuery
-      .getProfile(translateAddress(proposerAddress, "desmos"))
-      .then((res) => {
-        if (res) {
-          setProposerName(res.dtag);
-        }
-      })
-      .catch((err) => {
-        console.error("failed to fetch desmos profile =", err);
-      });
-  }, [desmosQuery, proposerAddress]);
-
   return (
     <div
       className={cn(
@@ -181,23 +164,27 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
         <LocalizedText messageID="ProposalDetail.publishedBy" />
       </p>
       <div>
-        <Link
-          to={AppRoutes.OtherPortfolio.replace(":address", proposerAddress)}
-        >
-          <span className={cn("text-sm", "text-likecoin-green")}>
-            {proposerName ?? truncateAddress(proposerAddress)}
-          </span>
-          <span
-            className={cn(
-              "text-xs",
-              "text-likecoin-lightgreen",
-              "ml-2",
-              "text-xs"
-            )}
+        {proposerAddress ? (
+          <Link
+            to={AppRoutes.OtherPortfolio.replace(":address", proposerAddress)}
           >
-            {truncateAddress(proposerAddress)}
-          </span>
-        </Link>
+            <span className={cn("text-sm", "text-likecoin-green")}>
+              {truncateAddress(proposerAddress)}
+            </span>
+            <span
+              className={cn(
+                "text-xs",
+                "text-likecoin-lightgreen",
+                "ml-2",
+                "text-xs"
+              )}
+            >
+              {truncateAddress(proposerAddress)}
+            </span>
+          </Link>
+        ) : (
+          <span className={cn("text-sm", "text-likecoin-green")}>-</span>
+        )}
       </div>
       <UTCDatetime className={cn("text-xs")} date={submitTime} />
     </div>
