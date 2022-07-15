@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
-type AppButtonTheme = "primary" | "secondary" | "rounded" | "text";
+type AppButtonTheme = "primary" | "secondary" | "rounded" | "text" | "outlined";
 type AppButtonSize = "regular" | "small" | "extra-small";
 
 interface AppButtonCommonProps {
@@ -123,6 +123,21 @@ function getButtonClassNames(
         "after:absolute",
         "after:left-0",
         "after:-bottom-0.5",
+        getButtonFontStyle(size)
+      );
+    case "outlined":
+      return cn(
+        "bg-white",
+        "text-likecoin-green",
+        "border",
+        "hover:bg-likecoin-lightgreen",
+        "border-likecoin-green",
+        "disabled:bg-gray-300",
+        "hover:text-white",
+        "transition-colors",
+        "rounded-md",
+        "shadow-sm",
+        getButtonPaddings(size),
         getButtonFontStyle(size)
       );
     default:
