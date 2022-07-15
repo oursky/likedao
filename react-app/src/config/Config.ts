@@ -37,7 +37,6 @@ export interface IConfig {
     "dsn" | "environment" | "ignoreErrors"
   > | null;
   chainInfo: ChainInfo;
-  desmosRpc: string;
   graphql: {
     endpoint: string;
   };
@@ -66,7 +65,6 @@ const defaultConfig: IConfig = {
       coinDecimals: 9,
     },
   },
-  desmosRpc: "https://rpc.mainnet.desmos.network",
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },

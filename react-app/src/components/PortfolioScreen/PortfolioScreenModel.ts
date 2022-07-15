@@ -1,4 +1,3 @@
-import { Profile } from "@desmoslabs/desmjs-types/desmos/profiles/v1beta1/models_profile";
 import { Delegation } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { BigNumberCoin } from "../../models/coin";
 import { ProposalHistory } from "../ProposalHistory/ProposalHistoryModel";
@@ -13,7 +12,6 @@ export interface Stake {
 }
 
 export interface Portfolio {
-  profile: Profile | null;
   balance: BigNumberCoin;
   stakedBalance: BigNumberCoin;
   unstakingBalance: BigNumberCoin;

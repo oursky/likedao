@@ -20,46 +20,28 @@ interface PortfolioPanelProps {
 }
 
 const ProfilePicture: React.FC<{
-  profile: Portfolio["profile"];
   className?: string;
-}> = ({ profile, className }) => {
-  const profilePicture = profile?.pictures?.profile;
-
+}> = ({ className }) => {
   return (
     <div className={cn("flex", "justify-center", className)}>
-      {profilePicture ? (
-        <img
-          className={cn(
-            "rounded-full",
-            "w-[120px]",
-            "h-[120px]",
-            "sm:w-[180px]",
-            "sm:h-[180px]",
-            "object-cover"
-          )}
-          src={profilePicture}
-          alt="profile picture"
+      <div
+        className={cn(
+          "flex",
+          "justify-center",
+          "items-center",
+          "bg-likecoin-secondarygreen",
+          "rounded-full",
+          "w-[120px]",
+          "h-[120px]",
+          "sm:w-[180px]",
+          "sm:h-[180px]"
+        )}
+      >
+        <Icon
+          icon={IconType.Account}
+          className={cn("w-11", "h-11", "sm:w-16", "sm:h-16")}
         />
-      ) : (
-        <div
-          className={cn(
-            "flex",
-            "justify-center",
-            "items-center",
-            "bg-likecoin-secondarygreen",
-            "rounded-full",
-            "w-[120px]",
-            "h-[120px]",
-            "sm:w-[180px]",
-            "sm:h-[180px]"
-          )}
-        >
-          <Icon
-            icon={IconType.Account}
-            className={cn("w-11", "h-11", "sm:w-16", "sm:h-16")}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -133,14 +115,11 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
           "overflow-x-auto"
         )}
       >
-        <ProfilePicture
-          profile={portfolio.profile}
-          className={cn("mb-9", "sm:mb-0", "sm:mr-9")}
-        />
+        <ProfilePicture className={cn("mb-9", "sm:mb-0", "sm:mr-9")} />
 
         <div className={cn("flex", "flex-col", "items-start", "w-full")}>
           <p className={cn("text-xl", "leading-6", "font-medium", "mb-3")}>
-            {portfolio.profile?.dtag ?? truncateAddress(portfolio.address)}
+            {truncateAddress(portfolio.address)}
           </p>
 
           <CopyableText

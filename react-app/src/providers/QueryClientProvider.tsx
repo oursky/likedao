@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { DesmosClient } from "@desmoslabs/desmjs";
 import { StargateClient } from "@cosmjs/stargate";
 import Config from "../config/Config";
 import {
   ExtendedQueryClient,
   newQueryClient,
-  newDesmosQueryClient,
   newStargateClient,
 } from "../clients/queryClient";
 
@@ -15,7 +13,6 @@ interface QueryClientProviderProps {
 
 interface QueryClientProviderContextValue {
   query: ExtendedQueryClient;
-  desmosQuery: DesmosClient;
   stargateQuery: StargateClient;
 }
 
@@ -26,13 +23,10 @@ const QueryClientContext = React.createContext<QueryClientProviderContextValue>(
 const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   const { children } = props;
   const chainInfo = Config.chainInfo;
-  const desmosRpc = Config.desmosRpc;
 
   const [queryClient, setQueryClient] = useState<ExtendedQueryClient | null>(
     null
   );
-  const [desmosQueryClient, setDesmosQueryClient] =
-    useState<DesmosClient | null>(null);
   const [stargateClient, setStargateClient] = useState<StargateClient | null>(
     null
   );
@@ -40,10 +34,9 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   const value = useMemo(
     (): QueryClientProviderContextValue => ({
       query: queryClient!,
-      desmosQuery: desmosQueryClient!,
       stargateQuery: stargateClient!,
     }),
-    [queryClient, desmosQueryClient, stargateClient]
+    [queryClient, stargateClient]
   );
 
   useEffect(() => {
@@ -57,16 +50,6 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
   }, [chainInfo]);
 
   useEffect(() => {
-    newDesmosQueryClient(desmosRpc)
-      .then((client) => {
-        setDesmosQueryClient(client);
-      })
-      .catch((err) => {
-        console.log("Error creating desmos query client", err);
-      });
-  }, [desmosRpc]);
-
-  useEffect(() => {
     newStargateClient(chainInfo)
       .then((client) => {
         setStargateClient(client);
@@ -78,10 +61,7 @@ const QueryClientProvider: React.FC<QueryClientProviderProps> = (props) => {
 
   return (
     <QueryClientContext.Provider value={value}>
-      {queryClient != null &&
-        desmosQueryClient != null &&
-        stargateClient != null &&
-        children}
+      {queryClient != null && stargateClient != null && children}
     </QueryClientContext.Provider>
   );
 };
