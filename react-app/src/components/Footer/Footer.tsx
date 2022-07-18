@@ -28,7 +28,13 @@ const Footer: React.FC = () => {
             messageArgs={{ year: new Date().getFullYear() }}
           />
         </p>
-        <p className={cn("mt-6", "sm:mt-0")}>
+        <p
+          className={cn(
+            "mt-6",
+            "sm:mt-0",
+            Config.footerLinks.tokenLinks.length <= 0 && "hidden"
+          )}
+        >
           <LocalizedText messageID="footer.getToken" />
         </p>
         <div
@@ -40,75 +46,54 @@ const Footer: React.FC = () => {
             "sm:px-3"
           )}
         >
-          <AppButton
-            messageID="footer.osmosis"
-            theme="secondary"
-            size="small"
-            type="anchor"
-            href={Config.footerLinks.osmosis}
-            className={cn(
-              "text-sm",
-              "leading-4",
-              "font-medium",
-              "text-likecoin-darkgrey",
-              "m-0.5"
-            )}
-          />
-          <AppButton
-            messageID="footer.liquid"
-            theme="secondary"
-            size="small"
-            type="anchor"
-            href={Config.footerLinks.liquid}
-            className={cn(
-              "text-sm",
-              "leading-4",
-              "font-medium",
-              "text-likecoin-darkgrey",
-              "m-0.5"
-            )}
-          />
-          <AppButton
-            messageID="footer.emeris"
-            theme="secondary"
-            size="small"
-            type="anchor"
-            href={Config.footerLinks.emeris}
-            className={cn(
-              "text-sm",
-              "leading-4",
-              "font-medium",
-              "text-likecoin-darkgrey",
-              "m-0.5"
-            )}
-          />
+          {Config.footerLinks.tokenLinks.map((token) => (
+            <AppButton
+              key={token.name}
+              theme="secondary"
+              size="small"
+              type="anchor"
+              href={token.link}
+              className={cn(
+                "text-sm",
+                "capitalize",
+                "leading-4",
+                "font-medium",
+                "text-likecoin-darkgrey",
+                "m-0.5"
+              )}
+            >
+              {token.name}
+            </AppButton>
+          ))}
         </div>
-        <div
-          className={cn(
-            "flex",
-            "justify-center",
-            "items-center",
-            "my-3",
-            "sm:px-3"
-          )}
-        >
-          <p className={cn("pr-3")}>
-            <LocalizedText messageID="footer.needHelp" />
-          </p>
-          <AppButton
-            messageID="footer.contactSupport"
-            theme="secondary"
-            size="small"
-            type="anchor"
-            href={Config.footerLinks.contactSupport}
+        {Config.footerLinks.contactSupport != null && (
+          <div
             className={cn(
-              "text-sm",
-              "leading-4",
-              "font-medium",
-              "text-likecoin-darkgrey"
+              "flex",
+              "justify-center",
+              "items-center",
+              "my-3",
+              "sm:px-3"
             )}
-          />
-        </div>
+          >
+            <p className={cn("pr-3")}>
+              <LocalizedText messageID="footer.needHelp" />
+            </p>
+            <AppButton
+              messageID="footer.contactSupport"
+              theme="secondary"
+              size="small"
+              type="anchor"
+              href={Config.footerLinks.contactSupport}
+              className={cn(
+                "text-sm",
+                "leading-4",
+                "font-medium",
+                "text-likecoin-darkgrey"
+              )}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
