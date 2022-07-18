@@ -15,6 +15,9 @@ See [Architecture Docs](./docs/Architecture.md) for more details.
 ### Quick Start
 
 ```
+# Target genesis url for bdjuno to parse from
+export GENESIS_URL=https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.json
+
 make setup
 docker-compose up
 

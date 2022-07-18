@@ -1,15 +1,11 @@
-GENESIS_URL?=
-
-.PHONY: .checkenv
-.checkenv:
-	@test $${GENESIS_URL?Please set argument GENESIS_URL}
+GENESIS_URL?=https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.json
 
 .PHONY: init
 init: 
 	git submodule update --init --recursive
 
 .PHONY: setup
-setup: init .checkenv
+setup: init
 	mkdir -p ./.bdjuno
 	cp config.example.yaml ./.bdjuno/config.yaml
 	curl -o ./.bdjuno/genesis.json $(GENESIS_URL)

@@ -1,11 +1,11 @@
 window.keplrChainInfo = {
-  chainId: "likecoin-public-testnet-5",
-  chainName: "LikeCoin public test chain",
-  rpc: "https://likecoin-public-testnet-5.oursky.dev/rpc/",
-  rest: "https://likecoin-public-testnet-5.oursky.dev/",
+  chainId: "likecoin-mainnet-2",
+  chainName: "LikeCoin chain",
+  rpc: "https://mainnet-node.like.co/rpc/",
+  rest: "https://mainnet-node.like.co",
   stakeCurrency: {
-    coinDenom: "EKIL",
-    coinMinimalDenom: "nanoekil",
+    coinDenom: "LIKE",
+    coinMinimalDenom: "nanolike",
     coinDecimals: 9,
     coinGeckoId: "likecoin",
   },
@@ -23,24 +23,24 @@ window.keplrChainInfo = {
   },
   currencies: [
     {
-      coinDenom: "EKIL",
-      coinMinimalDenom: "nanoekil",
+      coinDenom: "LIKE",
+      coinMinimalDenom: "nanolike",
       coinDecimals: 9,
       coinGeckoId: "likecoin",
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: "EKIL",
-      coinMinimalDenom: "nanoekil",
+      coinDenom: "LIKE",
+      coinMinimalDenom: "nanolike",
       coinDecimals: 9,
       coinGeckoId: "likecoin",
     },
   ],
   coinType: 118,
   gasPriceStep: {
-    low: 0.01,
-    average: 1,
+    low: 1,
+    average: 10,
     high: 1000,
   },
   features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
