@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import cn from "classnames";
+import { Link } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
@@ -15,16 +16,20 @@ import Table, {
   TableHead,
   TableRow,
 } from "../common/Table/Table";
+import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
+import AppRoutes from "../../navigation/AppRoutes";
 import { Stake } from "./PortfolioScreenModel";
 
 interface StakesPanelProps {
-  stakes: Stake[];
+  isLoading: boolean;
+  stakes: Stake[] | null;
   isYourPortfolio: boolean;
   order: ColumnOrder;
   setOrder: (order: ColumnOrder) => void;
 }
 
 const StakesPanel: React.FC<StakesPanelProps> = ({
+  isLoading,
   stakes,
   isYourPortfolio,
   order,
@@ -34,6 +39,18 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
     () => ({ order, setOrder }),
     [order, setOrder]
   );
+
+  if (!stakes || isLoading) {
+    return (
+      <Paper className={cn("flex", "justify-center", "items-center")}>
+        <LoadingSpinner />
+      </Paper>
+    );
+  }
+
+  if (stakes.length === 0) {
+    return null;
+  }
 
   return (
     <Paper>
@@ -87,11 +104,13 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
               <SortableColumnHeader
                 id="expectedReturns"
                 titleId="StakesPanel.expectedReturns"
+                sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
               <SortableColumnHeader
                 id="votingPower"
                 titleId="StakesPanel.votingPower"
+                sortable={true}
                 className="uppercase bg-gray-50 border-b border-gray-200"
               />
             </ColumnSortContext.Provider>
@@ -102,7 +121,6 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
           {stakes.map((stake) => (
             <TableRow key={stake.delegation.validatorAddress}>
               <TableCell className="flex items-center py-4">
-                {/* TODO: Fetch from Graphql API */}
                 <div
                   className={cn(
                     "w-9",
@@ -114,7 +132,14 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                 />
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-likecoin-green">
-                    {stake.validator.moniker}
+                    <Link
+                      to={AppRoutes.ValidatorDetail.replace(
+                        ":address",
+                        stake.validator.operatorAddress
+                      )}
+                    >
+                      {stake.validator.description.moniker}
+                    </Link>
                   </h3>
                   <p
                     className={cn(
@@ -138,13 +163,9 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                     )
                   : convertBigNumberToFixedPointString(stake.reward.amount, 9)}
               </TableCell>
+              <TableCell>{(stake.expectedReturn * 100).toFixed(2)}%</TableCell>
               <TableCell>
-                {/* TODO: Fetch from Graphql API */}
-                15.76%
-              </TableCell>
-              <TableCell>
-                {/* TODO: Fetch from Graphql API */}
-                3.69%
+                {(stake.validator.votePower * 100).toFixed(2)}%
               </TableCell>
             </TableRow>
           ))}

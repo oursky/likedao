@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { translateAddress, truncateAddress } from "../../utils/address";
+import { translateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
   isRequestStateLoaded,
@@ -104,18 +104,21 @@ export const usePortfolioQuery = (): {
         (delegation) => delegation.delegation.validatorAddress
       );
 
-      const rewards = await distribution.getDelegationRewardsByValidators(
-        address,
-        validatorAddresses
-      );
+      const [rewards, validators, expectedReturns] = await Promise.all([
+        distribution.getDelegationRewardsByValidators(
+          address,
+          validatorAddresses
+        ),
+        stakingAPI.getValidators(validatorAddresses),
+        distribution.getBatchValidatorExpectedReturn(validatorAddresses),
+      ]);
 
       // merge stakes and delegation rewards into stake entries
       const stakeEntries: Stake[] = delegations.map((delegation, i) => ({
         ...delegation,
         reward: rewards[i],
-        validator: {
-          moniker: `validator ${i + 1}`,
-        },
+        validator: validators[i],
+        expectedReturn: expectedReturns[i],
       }));
 
       return stakeEntries;
@@ -159,16 +162,13 @@ export const usePortfolioQuery = (): {
     }
     return RequestStateLoaded({
       ...requestState.data,
+      // eslint-disable-next-line complexity
       stakes: requestState.data.stakes.sort((a, b) => {
         switch (stakesOrder.id) {
           case "name":
             return (
-              (
-                a.validator.moniker ??
-                truncateAddress(a.delegation.validatorAddress)
-              ).localeCompare(
-                b.validator.moniker ??
-                  truncateAddress(b.delegation.validatorAddress)
+              a.validator.description.moniker.localeCompare(
+                b.validator.description.moniker
               ) * (stakesOrder.direction === "asc" ? 1 : -1)
             );
           case "staked":
@@ -179,6 +179,16 @@ export const usePortfolioQuery = (): {
           case "rewards":
             return (
               a.reward.amount.minus(b.reward.amount).toNumber() *
+              (stakesOrder.direction === "asc" ? 1 : -1)
+            );
+          case "expectedReturns":
+            return (
+              (a.expectedReturn - b.expectedReturn) *
+              (stakesOrder.direction === "asc" ? 1 : -1)
+            );
+          case "votingPower":
+            return (
+              (a.validator.votePower - b.validator.votePower) *
               (stakesOrder.direction === "asc" ? 1 : -1)
             );
           default:

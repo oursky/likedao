@@ -2,18 +2,14 @@ import { Profile } from "@desmoslabs/desmjs-types/desmos/profiles/v1beta1/models
 import { Delegation } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { BigNumberCoin } from "../../models/coin";
 import { ProposalHistory } from "../ProposalHistory/ProposalHistoryModel";
-
-// use validator interface from graphql code gen
-interface Validator {
-  moniker?: string;
-  // and other attributes
-}
+import { ValidatorRPC } from "../../models/cosmos/staking";
 
 export interface Stake {
   reward: BigNumberCoin;
   delegation: Delegation;
   balance: BigNumberCoin;
-  validator: Validator;
+  validator: ValidatorRPC;
+  expectedReturn: number;
 }
 
 export interface Portfolio {
