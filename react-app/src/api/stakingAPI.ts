@@ -341,10 +341,18 @@ export const useStakingAPI = (): IStakingAPI => {
         ...validator,
         consensusPubAddr,
         commission,
-        tokens,
+        tokens: {
+          amount: convertMinimalTokenToToken(tokens.amount),
+          denom: Config.chainInfo.currency.coinDenom,
+        },
         unbondingTime,
         minSelfDelegation,
-        selfDelegation,
+        selfDelegation: selfDelegation
+          ? {
+              amount: convertMinimalTokenToToken(selfDelegation.amount),
+              denom: Config.chainInfo.currency.coinDenom,
+            }
+          : null,
         votePower,
       } as ValidatorRPC;
     },

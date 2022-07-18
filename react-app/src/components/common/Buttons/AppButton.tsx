@@ -4,13 +4,13 @@ import { Link as RouterLink } from "react-router-dom";
 import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
 
-type AppButtonTheme = "primary" | "secondary" | "rounded";
+type AppButtonTheme = "primary" | "secondary" | "rounded" | "text" | "outlined";
 type AppButtonSize = "regular" | "small" | "extra-small";
 
 interface AppButtonCommonProps {
   theme: AppButtonTheme;
   size: AppButtonSize;
-  messageID: MessageID;
+  messageID?: MessageID;
 }
 
 interface LinkProps
@@ -39,7 +39,37 @@ interface ButtonProps
 type AppButtonProps = (LinkProps | ButtonProps | AnchorProps) &
   AppButtonCommonProps;
 
-function getButtonThemeClassNames(theme: AppButtonTheme): string {
+function getButtonFontStyle(size: AppButtonSize): string {
+  switch (size) {
+    case "regular":
+      return cn("text-base", "leading-6", "font-medium");
+    case "small":
+      return cn("text-sm", "leading-4", "font-medium");
+    case "extra-small":
+      return cn("text-sm", "leading-4", "font-medium");
+    default:
+      throw new Error("Unknown button size");
+  }
+}
+
+function getButtonPaddings(size: AppButtonSize): string {
+  switch (size) {
+    case "regular":
+      return cn("py-3", "px-6");
+    case "small":
+      return cn("py-3", "px-4");
+    case "extra-small":
+      return cn("py-2", "px-3");
+    default:
+      throw new Error("Unknown button size");
+  }
+}
+
+// eslint-disable-next-line complexity
+function getButtonClassNames(
+  theme: AppButtonTheme,
+  size: AppButtonSize
+): string {
   switch (theme) {
     case "primary":
       return cn(
@@ -48,7 +78,11 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "disabled:bg-gray-300",
         "hover:bg-likecoin-lightgreen",
         "acitve:bg-likecoin-darkgreen",
-        "transition-colors"
+        "transition-colors",
+        "rounded-md",
+        "shadow-sm",
+        getButtonPaddings(size),
+        getButtonFontStyle(size)
       );
     case "secondary":
       return cn(
@@ -58,7 +92,11 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "hover:bg-likecoin-lightgreen",
         "hover:text-white",
         "acitve:bg-likecoin-darkgreen",
-        "transition-colors"
+        "transition-colors",
+        "rounded-md",
+        "shadow-sm",
+        getButtonPaddings(size),
+        getButtonFontStyle(size)
       );
     case "rounded":
       return cn(
@@ -66,53 +104,50 @@ function getButtonThemeClassNames(theme: AppButtonTheme): string {
         "bg-likecoin-secondarygreen",
         "hover:bg-likecoin-lightgreen",
         "hover:text-white",
-        "transition-colors"
+        "transition-colors",
+        "rounded-md",
+        "shadow-sm",
+        getButtonPaddings(size),
+        getButtonFontStyle(size)
+      );
+    case "text":
+      return cn(
+        "text-likecoin-green",
+        "after:bg-likecoin-green",
+        "relative",
+        "after:transition-[width]",
+        "after:duration-300",
+        "hover:after:w-full",
+        "after:w-0",
+        "after:h-0.5",
+        "after:absolute",
+        "after:left-0",
+        "after:-bottom-0.5",
+        getButtonFontStyle(size)
+      );
+    case "outlined":
+      return cn(
+        "bg-white",
+        "text-likecoin-green",
+        "border",
+        "hover:bg-likecoin-lightgreen",
+        "border-likecoin-green",
+        "disabled:bg-gray-300",
+        "hover:text-white",
+        "transition-colors",
+        "rounded-md",
+        "shadow-sm",
+        getButtonPaddings(size),
+        getButtonFontStyle(size)
       );
     default:
       throw new Error("Unknown button type");
   }
 }
 
-function getButtonSizeStyle(size: AppButtonSize): string {
-  switch (size) {
-    case "regular":
-      return cn(
-        "text-base",
-        "leading-6",
-        "font-medium",
-        "py-3",
-        "px-6",
-        "rounded-md",
-        "shadow-sm"
-      );
-    case "small":
-      return cn(
-        "text-sm",
-        "leading-4",
-        "font-medium",
-        "py-3",
-        "px-4",
-        "rounded-md",
-        "shadow-sm"
-      );
-    case "extra-small":
-      return cn(
-        "text-sm",
-        "leading-4",
-        "font-medium",
-        "py-2",
-        "px-3",
-        "rounded-md",
-        "shadow-sm"
-      );
-    default:
-      throw new Error("Unknown button size");
-  }
-}
-
 const Button = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "type">>(
   (props, ref) => {
-    const { messageID, onClick: onClick_, ...rest } = props;
+    const { messageID, onClick: onClick_, children, ...rest } = props;
 
     const onClick = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -125,7 +160,7 @@ const Button = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "type">>(
 
     return (
       <button ref={ref} type="button" onClick={onClick} {...rest}>
-        <LocalizedText messageID={messageID} />
+        {messageID ? <LocalizedText messageID={messageID} /> : children}
       </button>
     );
   }
@@ -133,11 +168,11 @@ const Button = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, "type">>(
 
 const Link = React.forwardRef<HTMLAnchorElement, Omit<LinkProps, "type">>(
   (props, ref) => {
-    const { messageID, ...rest } = props;
+    const { messageID, children, ...rest } = props;
 
     return (
       <RouterLink ref={ref} {...rest}>
-        <LocalizedText messageID={messageID} />
+        {messageID ? <LocalizedText messageID={messageID} /> : children}
       </RouterLink>
     );
   }
@@ -152,11 +187,11 @@ const AnchorLink = React.forwardRef<
   HTMLAnchorElement,
   Omit<AnchorProps, "type">
 >((props, ref) => {
-  const { messageID, ...rest } = props;
+  const { messageID, children, ...rest } = props;
 
   return (
     <a ref={ref} target="_blank" {...rest}>
-      <LocalizedText messageID={messageID} />
+      {messageID ? <LocalizedText messageID={messageID} /> : children}
     </a>
   );
 });
@@ -166,12 +201,7 @@ const AppButton = React.forwardRef<HTMLElement, AppButtonProps>(
     const { type = "button", theme, size, className, ...rest } = props;
 
     const computedClassName = useMemo(
-      () =>
-        cn(
-          getButtonThemeClassNames(theme),
-          getButtonSizeStyle(size),
-          className
-        ),
+      () => cn(getButtonClassNames(theme, size), className),
       [className, theme, size]
     );
 
