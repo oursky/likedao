@@ -45,9 +45,16 @@ data:
         {{- end}}
       ],
       footerLinks: {
-        osmosis: {{ .Values.reactApp.footerLinks.osmosis | quote}},
-        liquid: {{ .Values.reactApp.footerLinks.liquid | quote}},
-        emeris: {{ .Values.reactApp.footerLinks.emeris | quote}},
+        tokenLinks: [
+          {{- range .Values.reactApp.footerLinks.tokenLinks }}
+            {{- with .}}
+              {
+                "name": {{ .name | quote }},
+                "link": {{ .link | quote }}
+              },
+            {{- end}}
+          {{- end}}
+        ],
         contactSupport: {{ .Values.reactApp.footerLinks.contactSupport | quote}},
       },
     };
