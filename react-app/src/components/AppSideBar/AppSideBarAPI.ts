@@ -1,15 +1,20 @@
 import { useCallback, useState } from "react";
 import { differenceInSeconds } from "date-fns";
+import BigNumber from "bignumber.js";
 import {
   AppSideBarQueryAverageBlockTime,
   AppSideBarQueryAverageBlockTimeQuery,
   AppSideBarQueryAverageBlockTimeQueryVariables,
+  AppSideBarQueryCommunityStatus,
+  AppSideBarQueryCommunityStatusQuery,
+  AppSideBarQueryCommunityStatusQueryVariables,
 } from "../../generated/graphql";
 import { useGraphQLQuery } from "../../hooks/graphql";
 import { useInterval } from "../../hooks/useInterval";
 import {
   isRequestStateError,
   isRequestStateLoaded,
+  mapRequestData,
   RequestState,
   RequestStateError,
   RequestStateInitial,
@@ -17,9 +22,13 @@ import {
   RequestStateLoading,
 } from "../../models/RequestState";
 import { useQueryClient } from "../../providers/QueryClientProvider";
-import { AppSideBarModel, ChainStatus } from "./AppSideBarModel";
+import Config from "../../config/Config";
+import { convertMinimalTokenToToken } from "../../utils/coin";
+import { ChainHealth, ChainStatus, CommunityStatus } from "./AppSideBarModel";
 
-type AppSideBarRequestState = RequestState<AppSideBarModel>;
+type AppSideBarRequestState = RequestState<ChainHealth>;
+
+const coinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 
 export function useChainHealthQuery(): {
   requestState: AppSideBarRequestState;
@@ -107,4 +116,28 @@ export function useChainHealthQuery(): {
   return {
     requestState,
   };
+}
+
+export function useAppSideBarCommunityStatusQuery(): RequestState<CommunityStatus> {
+  const requestState = useGraphQLQuery<
+    AppSideBarQueryCommunityStatusQuery,
+    AppSideBarQueryCommunityStatusQueryVariables
+  >(AppSideBarQueryCommunityStatus);
+
+  return mapRequestData<AppSideBarQueryCommunityStatusQuery, CommunityStatus>(
+    requestState,
+    (r) => {
+      const communityPool = r.communityStatus.communityPool.find(
+        (c) => c.denom === coinMinimalDenom
+      );
+      return {
+        inflation: new BigNumber(r.communityStatus.inflation),
+        bondedRatio: new BigNumber(r.communityStatus.bondedRatio),
+        communityPool: {
+          denom: coinMinimalDenom,
+          amount: convertMinimalTokenToToken(communityPool?.amount ?? 0),
+        },
+      };
+    }
+  );
 }

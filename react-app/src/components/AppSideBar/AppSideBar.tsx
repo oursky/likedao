@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
-import { useLocation } from "react-router-dom";
+import { useLocation, useMatch } from "react-router-dom";
 import { toast } from "react-toastify";
 import IconButton from "../common/Buttons/IconButton";
 import { IconType } from "../common/Icons/Icons";
@@ -16,7 +16,12 @@ import { useTransaction } from "../../providers/TransactionProvider";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import Config from "../../config/Config";
-import { useChainHealthQuery } from "./AppSideBarAPI";
+import { CommunityStatusHeader } from "../CommunityStatus/CommunityStatusHeader";
+import AppRoutes from "../../navigation/AppRoutes";
+import {
+  useChainHealthQuery,
+  useAppSideBarCommunityStatusQuery,
+} from "./AppSideBarAPI";
 import { Header } from "./Header";
 import { LoginPanel } from "./LoginPanel";
 import { UserInfoPanel } from "./UserInfoPanel";
@@ -54,6 +59,7 @@ const MenuPanel: React.FC<{
   );
 };
 
+// eslint-disable-next-line complexity
 const AppSideBar: React.FC<AppSideBarProps> = ({
   children,
   isMenuOpen,
@@ -61,11 +67,14 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
   onMenuOpen,
 }) => {
   const { translate } = useLocale();
+  const hideCommunityStatusHeader = useMatch(AppRoutes.Overview);
 
   const wallet = useWallet();
   const transaction = useTransaction();
 
   const { requestState } = useChainHealthQuery();
+  const communityStatusRequestState = useAppSideBarCommunityStatusQuery();
+
   const chainId = Config.chainInfo.chainId;
 
   const toggleMobileMenuMenu = useCallback(() => {
@@ -204,9 +213,22 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           closeMobileMenu={onMenuClose}
         />
       </div>
-      <main className={cn("grow", "px-3", "min-w-0", "sm:px-0")}>
-        {children}
-      </main>
+      <div className={cn("grow", "px-3", "min-w-0", "sm:px-0")}>
+        {!hideCommunityStatusHeader && (
+          <div className="flex justify-end mb-6">
+            <CommunityStatusHeader
+              className="hidden sm:flex"
+              isLoading={!isRequestStateLoaded(communityStatusRequestState)}
+              communityStatus={
+                isRequestStateLoaded(communityStatusRequestState)
+                  ? communityStatusRequestState.data
+                  : null
+              }
+            />
+          </div>
+        )}
+        <main>{children}</main>
+      </div>
     </div>
   );
 };
