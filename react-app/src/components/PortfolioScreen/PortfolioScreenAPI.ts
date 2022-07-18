@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
-import { translateAddress } from "../../utils/address";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
   isRequestStateLoaded,
@@ -32,7 +31,7 @@ export const usePortfolioQuery = (): {
   const bankAPI = useBankAPI();
   const stakingAPI = useStakingAPI();
   const distribution = useDistributionAPI();
-  const { desmosQuery, query } = useQueryClient();
+  const { query } = useQueryClient();
 
   const [stakesOrder, setStakesOrder] = useState({
     id: "name",
@@ -61,14 +60,12 @@ export const usePortfolioQuery = (): {
         unstakingBalance,
         commission,
         reward,
-        profile,
       ] = await Promise.all([
         bankAPI.getAddressBalance(address),
         stakingAPI.getAddressStakedBalance(address),
         stakingAPI.getUnstakingAmount(address),
         distribution.getAddressTotalCommission(address),
         distribution.getAddressTotalDelegationRewards(address),
-        desmosQuery.getProfile(translateAddress(address, "desmos")),
       ]);
 
       const balance = {
@@ -81,7 +78,6 @@ export const usePortfolioQuery = (): {
       };
 
       return {
-        profile,
         balance,
         stakedBalance,
         unstakingBalance,
@@ -91,7 +87,7 @@ export const usePortfolioQuery = (): {
         address,
       };
     },
-    [bankAPI, stakingAPI, distribution, desmosQuery]
+    [bankAPI, stakingAPI, distribution]
   );
 
   const fetchStakes = useCallback(

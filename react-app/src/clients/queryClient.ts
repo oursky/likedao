@@ -21,7 +21,6 @@ import {
   setupSlashingExtension,
 } from "@cosmjs/stargate/build/modules";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
-import { DesmosClient } from "@desmoslabs/desmjs";
 import { ChainInfo } from "../config/Config";
 
 export type ExtendedQueryClient = QueryClient &
@@ -49,12 +48,6 @@ export const newQueryClient = async (
     setupMintExtension,
     setupTxExtension
   );
-};
-
-export const newDesmosQueryClient = async (
-  desmosRpc: string
-): Promise<DesmosClient> => {
-  return DesmosClient.connect(desmosRpc);
 };
 
 export const newStargateClient = async (

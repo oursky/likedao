@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import cn from "classnames";
 import * as Sentry from "@sentry/react";
 import { Link } from "react-router-dom";
-import { Profile } from "@desmoslabs/desmjs-types/desmos/profiles/v1beta1/models_profile";
 import { useQuery, useLazyQuery } from "@apollo/client";
 import AppRoutes from "../../navigation/AppRoutes";
 import LocalizedText from "../common/Localized/LocalizedText";
@@ -15,8 +14,6 @@ import {
   MeQueryQuery,
 } from "../../generated/graphql";
 import { useAuth } from "../../providers/AuthProvider";
-import { useQueryClient } from "../../providers/QueryClientProvider";
-import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import * as SectionedTable from "../SectionedTable/SectionedTable";
 import AppButton from "../common/Buttons/AppButton";
 
@@ -74,10 +71,7 @@ const dummyTableItems: SectionedTable.SectionItem<DummyTableItem>[] = [
 const DummyScreen: React.FC = () => {
   const { setLocale } = useLocale();
   const auth = useAuth();
-  const { desmosQuery } = useQueryClient();
-  const wallet = useWallet();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [dummyTableSort, setDummyTableSort] =
     useState<SectionedTable.ColumnOrder | null>(null);
 
@@ -124,18 +118,6 @@ const DummyScreen: React.FC = () => {
   const captureDummyError = useCallback(() => {
     Sentry.captureException(new Error("This is my fake error message"));
   }, []);
-
-  useEffect(() => {
-    // test desmos query client on Oursky portfolio
-    if (wallet.status === ConnectionStatus.Connected) {
-      desmosQuery
-        .getProfile("desmos1ze7n3xsfd7na2saj070v0cx0eu7twng9dxxrlt")
-        .then((res) => {
-          setProfile(res);
-        })
-        .catch((err) => console.error("Failed to query desmos profile =", err));
-    }
-  }, [setProfile, wallet, desmosQuery]);
 
   return (
     <div
@@ -245,13 +227,7 @@ const DummyScreen: React.FC = () => {
           Go to Overview Screen
         </Link>
       </div>
-      <pre>
-        {JSON.stringify(
-          { dtag: profile?.dtag, pictures: profile?.pictures },
-          null,
-          4
-        )}
-      </pre>
+
       <div className={cn("flex", "flex-row", "gap-x-2")}>
         <button
           type="button"

@@ -18,7 +18,6 @@ window.appConfig = {
       coinDecimals: 9,
     },
   },
-  desmosRpc: "https://rpc.mainnet.desmos.network",
   graphql: {
     endpoint: "http://localhost:8080/graphql",
   },

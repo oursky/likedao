@@ -15,7 +15,6 @@
     "@cosmjs/stream": "^0.28.4",
     "@cosmjs/tendermint-rpc": "^0.28.4",
     "@cosmjs/utils": "^0.28.4",
-    "@desmoslabs/desmjs": "2.0.0-beta.4",
     "@graphql-codegen/introspection": "^2.1.1",
     "@headlessui/react": "^1.6.1",
     "@oursky/react-messageformat": "^2.0.2",
