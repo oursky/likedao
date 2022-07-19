@@ -37,7 +37,7 @@ services:
       context: ./graphql-server
       dockerfile: ./Dockerfile.dev
     env_file:
-      - .env
+      - ./graphql-server/.env
     volumes:
       - ./graphql-server:/usr/src/app
     ports:

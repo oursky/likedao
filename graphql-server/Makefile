@@ -1,3 +1,13 @@
+SIGNATURE_SECRET := $(shell openssl rand -hex 64)
+.PHONY: secret
+secret:
+	cp -p .env .env.$$(date +%Y%m%d%H%M%S).bak || true
+	sed -e "s/__SIGNATURE_SECRET__/$(SIGNATURE_SECRET)/g" ".env.example" > .env
+
+.PHONY: setup
+setup: secret
+	make vendor
+
 .PHONY: vendor
 vendor:
 	go mod download
@@ -28,7 +38,7 @@ codegen:
 .PHONY: ci
 ci: vendor codegen lint test
 
-RUN_IN_DOCKER := docker-compose --env-file ../.env run --rm graphql-server
+RUN_IN_DOCKER := docker-compose --env-file .env run --rm graphql-server
 .PHONY: migration-new
 migration-new:
 	$(RUN_IN_DOCKER) go run ./cmd/migration/main.go db create_go "$(NAME)"
