@@ -51,3 +51,7 @@ Visit http://localhost:3000
 1. Translation key is in the format of `screenName.section.view.content`
 1. Use `<LocalizedText>` or `translate` from `useIntl()`
 1. Sort the translation by `make sort-translations`
+
+### Theming
+
+The LikeDAO frontend uses Tailwind UI alongside customized colour palette that can be customized in the `tailwind.config.js` file. Existing colours can be modified by changing the colour code, while additional colours added to the file would require changes to code of the related components for them to be functional.

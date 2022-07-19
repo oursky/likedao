@@ -24,6 +24,8 @@ docker-compose up
 # In another tab
 
 make -C react-app dev
+
+Note that it will take BDJuno some time to get data populated to the database
 ```
 
 Then visit http://localhost:3000
@@ -40,6 +42,12 @@ Then visit http://localhost:3000
 - Yarn 1.22.17
 
 Managed by [asdf](https://github.com/asdf-vm/asdf)
+
+## Customization
+
+The LikeDAO is a generic DAO platform that does not only work with the LikeCoin chain but also other Cosmos-based chain, the following states the customizable configurations that can be modified to make the app work with one's favourite chain.
+
+See [Customization Docs](./docs/Customization.md)
 
 ### React App
 
