@@ -23,7 +23,7 @@ module.exports = {
           secondarygreen: "#E0EFEB",
           "primary-bg": "#F8F7F4",
           black: "#222222",
-          gradient: {
+          "button-gradient": {
             from: "#D7EFE7",
             to: "#EFE7B8",
           },

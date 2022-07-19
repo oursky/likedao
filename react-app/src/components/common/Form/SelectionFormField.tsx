@@ -50,8 +50,8 @@ function SelectionOptionImpl<T>(
             checked
               ? cn(
                   "bg-gradient-to-r",
-                  "from-app-gradient-from",
-                  "to-app-gradient-to"
+                  "from-app-button-gradient-from",
+                  "to-app-button-gradient-to"
                 )
               : "bg-app-lightergrey",
             className,
