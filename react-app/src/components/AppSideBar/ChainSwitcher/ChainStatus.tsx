@@ -13,12 +13,12 @@ interface ChainStatusProps {
 function getStatusColour(status: IChainStatus) {
   switch (status) {
     case IChainStatus.Online:
-      return "bg-likecoin-vote-color-yes";
+      return "bg-app-vote-color-yes";
     case IChainStatus.Congested:
       // Pending design for congested colour
       return "bg-yellow-400";
     case IChainStatus.Halted:
-      return "bg-likecoin-vote-color-no";
+      return "bg-app-vote-color-no";
     default:
       throw new Error("Unknown chain status");
   }
@@ -61,7 +61,7 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
             "overflow-hidden",
             "break-all",
             "whitespace-nowrap",
-            "text-likecoin-green"
+            "text-app-green"
           )}
         >
           {chainId}
@@ -71,7 +71,7 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
             "text-xs",
             "leading-5",
             "font-normal",
-            "text-likecoin-green"
+            "text-app-green"
           )}
         >
           {displayedHeight ?? (

@@ -29,7 +29,7 @@ const ConfirmationPanel: React.FC = () => {
         "items-center",
         "justify-center",
         "p-12",
-        "bg-likecoin-lightgrey",
+        "bg-app-lightgrey",
         "rounded-xl"
       )}
     >

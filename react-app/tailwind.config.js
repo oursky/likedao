@@ -9,7 +9,7 @@ module.exports = {
         "2lg": "32.5rem",
       },
       colors: {
-        likecoin: {
+        app: {
           green: "#28646E",
           black: "#222222",
           darkgrey: "#666666",

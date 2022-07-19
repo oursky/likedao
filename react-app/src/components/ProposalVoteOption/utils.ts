@@ -24,13 +24,13 @@ export function getVoteOptionMessage(option: ProposalVoteOption): MessageID {
 export function getVoteOptionBgCn(option: ProposalVoteOption): string {
   switch (option) {
     case ProposalVoteOption.Yes:
-      return "bg-likecoin-vote-color-yes";
+      return "bg-app-vote-color-yes";
     case ProposalVoteOption.Abstain:
-      return "bg-likecoin-vote-color-abstain";
+      return "bg-app-vote-color-abstain";
     case ProposalVoteOption.No:
-      return "bg-likecoin-vote-color-no";
+      return "bg-app-vote-color-no";
     case ProposalVoteOption.NoWithVeto:
-      return "bg-likecoin-vote-color-veto";
+      return "bg-app-vote-color-veto";
     default:
       throw new Error("Unknown vote option");
   }
@@ -44,13 +44,13 @@ export function getVoteOptionBgCn(option: ProposalVoteOption): string {
 export function getVoteOptionTextColorCn(option: ProposalVoteOption): string {
   switch (option) {
     case ProposalVoteOption.Yes:
-      return "text-likecoin-vote-color-yes";
+      return "text-app-vote-color-yes";
     case ProposalVoteOption.Abstain:
-      return "text-likecoin-vote-color-abstain";
+      return "text-app-vote-color-abstain";
     case ProposalVoteOption.No:
-      return "text-likecoin-vote-color-no";
+      return "text-app-vote-color-no";
     case ProposalVoteOption.NoWithVeto:
-      return "text-likecoin-vote-color-veto";
+      return "text-app-vote-color-veto";
     default:
       throw new Error("Unknown vote option");
   }

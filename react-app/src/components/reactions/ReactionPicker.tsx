@@ -68,7 +68,7 @@ export const ReactionPicker: React.FC<ReactionPickerProps> = (props) => {
         theme="rounded"
         size="extra-small"
         className={cn(
-          "text-likecoin-green",
+          "text-app-green",
           "text-sm",
           "leading-5",
           "font-semibold",

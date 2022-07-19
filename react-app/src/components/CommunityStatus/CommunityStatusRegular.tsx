@@ -96,7 +96,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
                 "text-xs",
                 "leading-3",
                 "font-semibold",
-                "text-likecoin-darkgrey"
+                "text-app-darkgrey"
               )}
             >
               {convertBigNumberToLocalizedIntegerString(

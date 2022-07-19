@@ -64,7 +64,7 @@ const ProposalHistoryTable: React.FC<ProposalHistoryTableProps> = ({
                   ":id",
                   proposal.proposalId.toString()
                 )}
-                className="mb-3 text-sm font-medium leading-5 text-likecoin-green"
+                className="mb-3 text-sm font-medium leading-5 text-app-green"
               >
                 #{proposal.proposalId} {proposal.title}
               </Link>

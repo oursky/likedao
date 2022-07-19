@@ -43,12 +43,7 @@ const UserInfoPanel: React.FC<UserInfoPanelProps> = (props) => {
       <CoinBalanceCard balance={balance} denom={coinDenom} />
 
       <CopyableText
-        className={cn(
-          "text-2xs",
-          "leading-6",
-          "font-medium",
-          "text-likecoin-green"
-        )}
+        className={cn("text-2xs", "leading-6", "font-medium", "text-app-green")}
         text={userInfo?.address ?? ""}
         onCopied={onAddressCopied}
       />

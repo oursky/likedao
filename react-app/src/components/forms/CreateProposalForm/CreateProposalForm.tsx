@@ -45,14 +45,7 @@ const CreateProposalForm: React.FC<CreateProposalFormProps> = (props) => {
 
   return (
     <Paper className={cn("flex", "flex-col")}>
-      <h1
-        className={cn(
-          "text-lg",
-          "leading-6",
-          "font-bold",
-          "text-likecoin-black"
-        )}
-      >
+      <h1 className={cn("text-lg", "leading-6", "font-bold", "text-app-black")}>
         <LocalizedText messageID="CreateNewProposalForm.title" />
       </h1>
       <span
@@ -61,7 +54,7 @@ const CreateProposalForm: React.FC<CreateProposalFormProps> = (props) => {
           "text-sm",
           "leading-5",
           "font-normal",
-          "text-likecoin-darkgrey"
+          "text-app-darkgrey"
         )}
       >
         <LocalizedText messageID="CreateNewProposalForm.description" />

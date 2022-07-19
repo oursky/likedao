@@ -101,7 +101,7 @@ const UserAddressModal: React.FC<UserAddressModalProps> = (props) => {
                       "text-sm",
                       "leading-5",
                       "font-medium",
-                      "text-likecoin-black"
+                      "text-app-black"
                     )}
                   >
                     <LocalizedText messageID="UserAddressModal.myAddress" />
@@ -110,14 +110,14 @@ const UserAddressModal: React.FC<UserAddressModalProps> = (props) => {
                     containerClassName={cn(
                       "w-full",
                       "border",
-                      "border-likecoin-grey",
+                      "border-app-grey",
                       "drop-shadow-sm"
                     )}
                     className={cn(
                       "text-2xs",
                       "leading-6",
                       "font-medium",
-                      "text-likecoin-green"
+                      "text-app-green"
                     )}
                     text={address}
                     onCopied={onAddressCopied}

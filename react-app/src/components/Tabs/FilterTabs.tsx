@@ -34,7 +34,7 @@ const FilterTabItem: <T>(props: FilterTabItemProps<T>) => React.ReactElement = (
         "py-4",
         "px-1",
         isSelected
-          ? cn("border-likecoin-green", "text-likecoin-green")
+          ? cn("border-app-green", "text-app-green")
           : cn(
               "border-transparent",
               "text-gray-500",

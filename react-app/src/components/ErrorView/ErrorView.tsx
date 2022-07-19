@@ -48,9 +48,9 @@ const ErrorView: React.FC<ErrorViewProps> = (props) => {
           "text-sm",
           "leading-5",
           "font-medium",
-          "text-likecoin-green",
-          "hover:text-likecoin-lightgreen",
-          "active:text-likecoin-darkgreen"
+          "text-app-green",
+          "hover:text-app-lightgreen",
+          "active:text-app-darkgreen"
         )}
         href="/"
       >

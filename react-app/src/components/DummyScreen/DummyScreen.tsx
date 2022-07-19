@@ -28,7 +28,7 @@ interface DummyTableItem {
 const dummyTableItems: SectionedTable.SectionItem<DummyTableItem>[] = [
   {
     titleId: "AppSideBar.navigation.overview",
-    className: cn("bg-likecoin-secondarygreen", "text-likecoin-green"),
+    className: cn("bg-app-secondarygreen", "text-app-green"),
     items: [
       {
         identity: {
@@ -150,9 +150,9 @@ const DummyScreen: React.FC = () => {
         <button
           type="button"
           className={cn(
-            "bg-likecoin-green",
+            "bg-app-green",
             "text-white",
-            "hover:bg-likecoin-lightgreen",
+            "hover:bg-app-lightgreen",
             "text-base",
             "leading-6",
             "font-medium",
@@ -171,9 +171,9 @@ const DummyScreen: React.FC = () => {
           <button
             type="button"
             className={cn(
-              "bg-likecoin-green",
+              "bg-app-green",
               "text-white",
-              "hover:bg-likecoin-lightgreen",
+              "hover:bg-app-lightgreen",
               "text-base",
               "leading-6",
               "font-medium",
@@ -190,9 +190,9 @@ const DummyScreen: React.FC = () => {
           <button
             type="button"
             className={cn(
-              "bg-likecoin-green",
+              "bg-app-green",
               "text-white",
-              "hover:bg-likecoin-lightgreen",
+              "hover:bg-app-lightgreen",
               "text-base",
               "leading-6",
               "font-medium",
@@ -211,9 +211,9 @@ const DummyScreen: React.FC = () => {
         <Link
           to={AppRoutes.Overview}
           className={cn(
-            "bg-likecoin-green",
+            "bg-app-green",
             "text-white",
-            "hover:bg-likecoin-lightgreen",
+            "hover:bg-app-lightgreen",
             "text-base",
             "leading-6",
             "font-medium",
@@ -232,9 +232,9 @@ const DummyScreen: React.FC = () => {
         <button
           type="button"
           className={cn(
-            "bg-likecoin-green",
+            "bg-app-green",
             "text-white",
-            "hover:bg-likecoin-lightgreen",
+            "hover:bg-app-lightgreen",
             "text-base",
             "leading-6",
             "font-medium",
@@ -252,9 +252,9 @@ const DummyScreen: React.FC = () => {
         <button
           type="button"
           className={cn(
-            "bg-likecoin-green",
+            "bg-app-green",
             "text-white",
-            "hover:bg-likecoin-lightgreen",
+            "hover:bg-app-lightgreen",
             "text-base",
             "leading-6",
             "font-medium",
@@ -298,9 +298,7 @@ const DummyScreen: React.FC = () => {
           titleId="App.title"
           sortable={true}
         >
-          {(item) => (
-            <span className={cn("text-likecoin-green")}>{item.value}</span>
-          )}
+          {(item) => <span className={cn("text-app-green")}>{item.value}</span>}
         </SectionedTable.Column>
         <SectionedTable.Column<DummyTableItem>
           id="action"

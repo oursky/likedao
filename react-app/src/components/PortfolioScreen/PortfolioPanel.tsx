@@ -29,7 +29,7 @@ const ProfilePicture: React.FC<{
           "flex",
           "justify-center",
           "items-center",
-          "bg-likecoin-secondarygreen",
+          "bg-app-secondarygreen",
           "rounded-full",
           "w-[120px]",
           "h-[120px]",
@@ -54,7 +54,7 @@ const CoinsAmountField: React.FC<{
     <div>
       <p
         className={cn(
-          "text-likecoin-lightgreen",
+          "text-app-lightgreen",
           "text-sm",
           "leading-5",
           "font-medium"
@@ -84,18 +84,13 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
     <Paper className={cn("py-6", "px-5")}>
       <div className={cn("flex")}>
         <Icon
-          className={cn("fill-likecoin-black", "mr-3")}
+          className={cn("fill-app-black", "mr-3")}
           icon={isYourPortfolio ? IconType.PieChart : IconType.Account}
           height={20}
           width={20}
         />
         <h2
-          className={cn(
-            "text-lg",
-            "font-bold",
-            "leading-5",
-            "text-likecoin-black"
-          )}
+          className={cn("text-lg", "font-bold", "leading-5", "text-app-black")}
         >
           <LocalizedText
             messageID={
@@ -127,7 +122,7 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
               "text-2xs",
               "leading-6",
               "font-medium",
-              "text-likecoin-green"
+              "text-app-green"
             )}
             containerClassName={cn("shadow-sm", "mb-6")}
             text={portfolio.address}

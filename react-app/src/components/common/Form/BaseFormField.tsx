@@ -76,7 +76,7 @@ const BaseFormField: React.FC<BaseFormFieldProps> = (props) => {
             "text-sm",
             "font-medium",
             "leading-5",
-            "text-likecoin-black"
+            "text-app-black"
           )}
         >
           <LocalizedText messageID={label} />

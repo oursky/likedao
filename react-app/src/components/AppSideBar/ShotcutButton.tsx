@@ -33,15 +33,10 @@ const ShortcutButton: React.FC<ShortcutButtonProps> = (props) => {
         icon={icon}
         height={24}
         width={24}
-        className={cn("text-likecoin-green")}
+        className={cn("text-app-green")}
       />
       <p
-        className={cn(
-          "text-xs",
-          "leading-6",
-          "font-medium",
-          "text-likecoin-green"
-        )}
+        className={cn("text-xs", "leading-6", "font-medium", "text-app-green")}
       >
         <LocalizedText messageID={labelId} />
       </p>

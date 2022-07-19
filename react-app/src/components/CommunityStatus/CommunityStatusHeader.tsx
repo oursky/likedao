@@ -25,7 +25,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-lightgreen"
+            "text-app-lightgreen"
           )}
         >
           <LocalizedText messageID="CommunityStatus.communityPool" />
@@ -56,7 +56,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-lightgreen"
+            "text-app-lightgreen"
           )}
         >
           <LocalizedText messageID="CommunityStatus.bondedRatio" />
@@ -88,7 +88,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-lightgreen"
+            "text-app-lightgreen"
           )}
         >
           <LocalizedText messageID="CommunityStatus.inflation" />

@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
                 "capitalize",
                 "leading-4",
                 "font-medium",
-                "text-likecoin-darkgrey",
+                "text-app-darkgrey",
                 "m-0.5"
               )}
             >
@@ -89,7 +89,7 @@ const Footer: React.FC = () => {
                 "text-sm",
                 "leading-4",
                 "font-medium",
-                "text-likecoin-darkgrey"
+                "text-app-darkgrey"
               )}
             />
           </div>

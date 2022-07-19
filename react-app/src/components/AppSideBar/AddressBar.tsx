@@ -22,7 +22,7 @@ const AddressBar: React.FC<AddressBarProps> = (props) => {
           "text-2xs",
           "leading-5",
           "font-normal",
-          "text-likecoin-lightgreen",
+          "text-app-lightgreen",
           "whitespace-nowrap"
         )}
       >

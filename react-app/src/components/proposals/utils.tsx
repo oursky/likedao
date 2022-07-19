@@ -66,13 +66,13 @@ export function getVoteOptionIndicatorClassname(
 ): string | null {
   switch (option) {
     case ProposalVoteOption.Yes:
-      return "bg-likecoin-vote-color-yes";
+      return "bg-app-vote-color-yes";
     case ProposalVoteOption.Abstain:
-      return "bg-likecoin-vote-color-abstain";
+      return "bg-app-vote-color-abstain";
     case ProposalVoteOption.No:
-      return "bg-likecoin-vote-color-no";
+      return "bg-app-vote-color-no";
     case ProposalVoteOption.NoWithVeto:
-      return "bg-likecoin-vote-color-veto";
+      return "bg-app-vote-color-veto";
     default:
       return null;
   }

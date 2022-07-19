@@ -26,7 +26,7 @@ const InformationField = ({
 }) => {
   return (
     <div className="text-sm font-medium">
-      <h3 className="mb-1 text-likecoin-lightgreen">
+      <h3 className="mb-1 text-app-lightgreen">
         <LocalizedText messageID={messageID} />
       </h3>
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">
@@ -61,7 +61,7 @@ const ValidatorDetailScreenInformationPanel: React.FC<
   return (
     <Paper>
       <div className="flex items-center mb-5">
-        <Icon icon={IconType.Info} className="mr-3 fill-likecoin-black" />
+        <Icon icon={IconType.Info} className="mr-3 fill-app-black" />
         <h1 className="text-lg font-bold leading-5">
           <LocalizedText messageID="ValidatorDetailScreen.information" />
         </h1>

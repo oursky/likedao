@@ -33,12 +33,7 @@ const ProposalVoter: React.FC<{ voter: ProposalVoteVoter }> = ({ voter }) => {
     return (
       <Link
         to={AppRoutes.OtherPortfolio.replace(":address", voter.value)}
-        className={cn(
-          "text-sm",
-          "leading-5",
-          "font-normal",
-          "text-likecoin-green"
-        )}
+        className={cn("text-sm", "leading-5", "font-normal", "text-app-green")}
       >
         {voter.value}
       </Link>
@@ -54,7 +49,7 @@ const ProposalVoter: React.FC<{ voter: ProposalVoteVoter }> = ({ voter }) => {
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-green"
+            "text-app-green"
           )}
         >
           {/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */}
@@ -65,7 +60,7 @@ const ProposalVoter: React.FC<{ voter: ProposalVoteVoter }> = ({ voter }) => {
             "text-xs",
             "leading-tight",
             "font-medium",
-            "text-likecoin-yellow"
+            "text-app-yellow"
           )}
         >
           <LocalizedText messageID="ProposalDetail.votes.voter.validator" />
@@ -89,7 +84,7 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
             "text-sm",
             "leading-5",
             "font-normal",
-            "text-likecoin-vote-color-yes"
+            "text-app-vote-color-yes"
           )}
         >
           <LocalizedText messageID="proposal.voteOption.yes" />
@@ -102,7 +97,7 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
             "text-sm",
             "leading-5",
             "font-normal",
-            "text-likecoin-vote-color-no"
+            "text-app-vote-color-no"
           )}
         >
           <LocalizedText messageID="proposal.voteOption.no" />
@@ -115,7 +110,7 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
             "text-sm",
             "leading-5",
             "font-normal",
-            "text-likecoin-vote-color-veto"
+            "text-app-vote-color-veto"
           )}
         >
           <LocalizedText messageID="proposal.voteOption.noWithVeto" />
@@ -128,7 +123,7 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
             "text-sm",
             "leading-5",
             "font-normal",
-            "text-likecoin-vote-color-abstain"
+            "text-app-vote-color-abstain"
           )}
         >
           <LocalizedText messageID="proposal.voteOption.abstain" />
@@ -141,7 +136,7 @@ const ProposalVoteOption: React.FC<{ option: VoteOption | null }> = ({
             "text-sm",
             "leading-5",
             "font-normal",
-            "text-likecoin-darkgrey"
+            "text-app-darkgrey"
           )}
         >
           <LocalizedText messageID="ProposalDetail.votes.option.notVoted" />
@@ -173,7 +168,7 @@ const RemindToVoteButton: React.FC<{
       type="anchor"
       theme="secondary"
       size="regular"
-      className={cn("border", "border-likecoin-grey")}
+      className={cn("border", "border-app-grey")}
       messageID="ProposalDetail.votes.remindToVote"
       href={`mailto:${email}`}
     />
@@ -247,20 +242,12 @@ const ProposalVotesPanel: React.FC = () => {
       return [
         {
           titleId: "ProposalDetail.votes.delegatedValidators",
-          className: cn(
-            "uppercase",
-            "bg-likecoin-secondarygreen",
-            "text-likecoin-green"
-          ),
+          className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
           items: requestState.data.pinnedVotes,
         },
         {
           titleId: "ProposalDetail.votes.others",
-          className: cn(
-            "uppercase",
-            "bg-likecoin-gold",
-            "text-likecoin-darkgrey"
-          ),
+          className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
           items: requestState.data.votes,
         },
       ];

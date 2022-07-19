@@ -26,19 +26,19 @@ export const makeColorBarData = (
 ): ColorBarData[] => [
   {
     value: new BigNumber(data?.yes ?? 0),
-    colorClassName: "bg-likecoin-vote-color-yes",
+    colorClassName: "bg-app-vote-color-yes",
   },
   {
     value: new BigNumber(data?.no ?? 0),
-    colorClassName: "bg-likecoin-vote-color-no",
+    colorClassName: "bg-app-vote-color-no",
   },
   {
     value: new BigNumber(data?.noWithVeto ?? 0),
-    colorClassName: "bg-likecoin-vote-color-veto",
+    colorClassName: "bg-app-vote-color-veto",
   },
   {
     value: new BigNumber(data?.abstain ?? 0),
-    colorClassName: "bg-likecoin-vote-color-abstain",
+    colorClassName: "bg-app-vote-color-abstain",
   },
 ];
 
@@ -182,7 +182,7 @@ const ColorBar: React.FC<ColorBarProps> = (props) => {
           "block",
           "h-full",
           "w-full",
-          "bg-likecoin-grey"
+          "bg-app-grey"
         )}
       />
       <div className={cn("row-start-1", "col-start-1", "flex")}>
