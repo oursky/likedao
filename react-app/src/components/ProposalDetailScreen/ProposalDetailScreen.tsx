@@ -185,13 +185,17 @@ const ProposalDetailScreen: React.FC = () => {
     () => {
       switch (requestState.type) {
         case RequestStateType.Error:
-          toast.error("Failed to fetch proposal.", {
+          toast.error(translate("ProposalDetail.proposal.requestState.error"), {
             toastId: "proposal-detail-request-error",
           });
           break;
         case RequestStateType.Loaded:
           if (requestState.data === null) {
-            toast.error(`Proposal ${id} does not exist`);
+            toast.error(
+              translate("ProposalDetail.proposal.requestState.empty", {
+                id: id?.toString() ?? "",
+              })
+            );
             navigate(AppRoutes.Proposals);
           }
           break;

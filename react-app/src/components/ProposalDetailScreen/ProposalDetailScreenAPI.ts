@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDistance } from "date-fns";
 import {
   ProposalDetailScreenQuery,
@@ -15,13 +15,22 @@ import {
   Sort,
 } from "../../generated/graphql";
 import { useGraphQLQuery, useLazyGraphQLQuery } from "../../hooks/graphql";
-import { mapRequestData, RequestState } from "../../models/RequestState";
+import {
+  mapRequestData,
+  RequestState,
+  RequestStateError,
+  RequestStateInitial,
+  RequestStateLoaded,
+  RequestStateLoading,
+} from "../../models/RequestState";
 import { convertMinimalTokenToToken } from "../../utils/coin";
 import { getReactionType } from "../reactions/ReactionModel";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import Config from "../../config/Config";
 import { useLocale } from "../../providers/AppLocaleProvider";
+import { GovParams } from "../../models/cosmos/gov";
+import { useGovAPI } from "../../api/govAPI";
 import {
   PaginatedProposalVotes,
   PaginatedProposalDeposits,
@@ -431,5 +440,37 @@ export function useProposalQuery(id: number | null): {
 
   return {
     requestState: data,
+  };
+}
+
+export function useGovParamsQuery(): {
+  requestState: RequestState<GovParams | null>;
+} {
+  const govAPI = useGovAPI();
+  const [requestState, setRequestState] =
+    useState<RequestState<GovParams>>(RequestStateInitial);
+
+  const fetch = useCallback(async () => {
+    setRequestState(RequestStateLoading);
+    try {
+      const params = await govAPI.getAllParams();
+      setRequestState(RequestStateLoaded(params));
+    } catch (err: unknown) {
+      console.error("Failed to get gov params = ", err);
+      if (err instanceof Error) {
+        setRequestState(RequestStateError(err));
+      } else {
+        setRequestState(RequestStateError(new Error("Unknown error")));
+      }
+    }
+  }, [govAPI]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetch();
+  }, [fetch]);
+
+  return {
+    requestState,
   };
 }

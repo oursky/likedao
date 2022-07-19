@@ -14,6 +14,7 @@ import PageContoller from "../common/PageController/PageController";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
   Proposal,
   ProposalVote,
@@ -21,6 +22,7 @@ import {
 } from "./ProposalDetailScreenModel";
 import {
   ProposalVoteSortableColumn,
+  useGovParamsQuery,
   useProposalVotesQuery,
 } from "./ProposalDetailScreenAPI";
 
@@ -206,6 +208,7 @@ const ProposalVotesPanel: React.FC = () => {
     0,
     PROPOSAL_VOTE_PAGE_SIZE
   );
+  const { requestState: govParamRequestState } = useGovParamsQuery();
 
   const setPage = useCallback(
     (after: number) => {
@@ -225,6 +228,16 @@ const ProposalVotesPanel: React.FC = () => {
     },
     [setSearchParams]
   );
+
+  const quorumParam = useMemo(() => {
+    if (isRequestStateLoaded(govParamRequestState)) {
+      return (
+        govParamRequestState.data?.tally.quorum.toFloatApproximation() ?? null
+      );
+    }
+
+    return null;
+  }, [govParamRequestState]);
 
   const tableSections =
     useMemo((): SectionedTable.SectionItem<ProposalVote>[] => {
@@ -273,9 +286,22 @@ const ProposalVotesPanel: React.FC = () => {
     }
   }, [requestState, translate]);
 
+  useEffectOnce(
+    () => {
+      if (isRequestStateError(govParamRequestState)) {
+        toast.error(translate("ProposalDetail.govParams.requestState.error"), {
+          toastId: "gov-params-request-error",
+        });
+      }
+    },
+    () =>
+      isRequestStateError(govParamRequestState) ||
+      isRequestStateLoaded(govParamRequestState)
+  );
+
   return (
     <div className={cn("flex", "flex-col", "gap-y-4")}>
-      <TallyResultIndicator proposal={proposal} />
+      <TallyResultIndicator proposal={proposal} quorum={quorumParam} />
       <SectionedTable.Table
         sections={tableSections}
         isLoading={!isRequestStateLoaded(requestState)}

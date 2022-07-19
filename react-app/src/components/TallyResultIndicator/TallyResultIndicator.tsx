@@ -51,12 +51,18 @@ const VoteDetail: React.FC<VoteDetailProps> = (props) => {
 
 interface TallyResultIndicatorProps {
   proposal: Proposal;
+  quorum: number | null;
 }
 
 const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
-  const { proposal } = props;
+  const { proposal, quorum } = props;
   const coinDenom = Config.chainInfo.currency.coinDenom;
 
+  const quorumPercentage = useMemo(() => {
+    if (!quorum) return null;
+
+    return new BigNumber(quorum).shiftedBy(2);
+  }, [quorum]);
   const [voteData, total] = useMemo((): [
     {
       yes: ColorBarData;
@@ -152,8 +158,9 @@ const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
                 "text-black"
               )}
             >
-              {/* TODO: Handle this param */}
-              {` 40%`}
+              {quorumPercentage != null
+                ? ` ${quorumPercentage.toFixed(2)}%`
+                : " -"}
             </span>
           </span>
         </div>
