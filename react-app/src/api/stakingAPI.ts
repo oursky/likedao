@@ -19,6 +19,7 @@ import {
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
 import { pubKeyToBech32, translateAddress } from "../utils/address";
+import { convertTimestampToDate } from "../utils/datetime";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 import { useBankAPI } from "./bankAPI";
 
@@ -294,13 +295,9 @@ export const useStakingAPI = (): IStakingAPI => {
 
       const commissionRaw = validator.commission;
 
-      let commissionUpdateTime: Date | null = null;
-      if (commissionRaw?.updateTime) {
-        commissionUpdateTime = new Date(0);
-        commissionUpdateTime.setUTCSeconds(
-          commissionRaw.updateTime.seconds.toNumber()
-        );
-      }
+      const commissionUpdateTime = commissionRaw?.updateTime
+        ? convertTimestampToDate(commissionRaw.updateTime)
+        : null;
 
       const commission = {
         commissionRates: {
