@@ -11,6 +11,7 @@ import ProposalHistory, {
 } from "../ProposalHistory/ProposalHistory";
 import { useProposalHistory } from "../ProposalHistory/ProposalHistoryAPI";
 import ValidatorDetailDescriptionPanel from "./ValidatorDetailDescriptionPanel";
+import ValidatorDetailYourStakes from "./ValidatorDetailYourStakesPanel";
 import { useValidatorQuery } from "./ValidatorDetailScreenAPI";
 import ValidatorDetailScreenInformationPanel from "./ValidatorDetailScreenInformationPanel";
 
@@ -18,8 +19,6 @@ const Bech32PrefixAccAddr = Config.chainInfo.bech32Config.bech32PrefixAccAddr;
 
 const ValidatorDetailScreen: React.FC = () => {
   const { address: operatorAddress } = useParams();
-  const { requestState: validatorRequestState, fetch: fetchValidator } =
-    useValidatorQuery();
 
   const selfDelegateAddress = useMemo(
     // eslint-disable-next-line no-confusing-arrow
@@ -38,6 +37,8 @@ const ValidatorDetailScreen: React.FC = () => {
     requestState: proposalHistoryRequestState,
     fetch: fetchProposalHistory,
   } = useProposalHistory();
+  const { requestState: validatorRequestState, fetch: fetchValidator } =
+    useValidatorQuery();
 
   useEffect(() => {
     if (selfDelegateAddress) {
@@ -65,6 +66,14 @@ const ValidatorDetailScreen: React.FC = () => {
         data={
           isRequestStateLoaded(validatorRequestState)
             ? validatorRequestState.data
+            : null
+        }
+      />
+      <ValidatorDetailYourStakes
+        isLoading={!isRequestStateLoaded(validatorRequestState)}
+        data={
+          isRequestStateLoaded(validatorRequestState)
+            ? validatorRequestState.data.stake
             : null
         }
       />
