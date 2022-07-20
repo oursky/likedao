@@ -19,6 +19,10 @@ interface ReactionListProps {
 export const ReactionList: React.FC<ReactionListProps> = (props) => {
   const { items, itemTheme, onItemClick } = props;
 
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
     <div className={cn("flex", "flex-row", "gap-x-3")}>
       {items.map((item, index) => (

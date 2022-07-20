@@ -24,23 +24,22 @@ const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const { proposalId, title, status } = proposal;
 
   return (
-    <div>
-      <div className={cn("flex", "flex-col", "gap-x-2.5", "items-center")}>
-        <div className={cn("text-xs", "mb-4")}>#{proposalId}</div>
-        <h1
-          className={cn(
-            "text-3xl",
-            "leading-none",
-            "text-center",
-            "text-app-green",
-            "leading-9",
-            "font-medium"
-          )}
-        >
-          {title}
-        </h1>
-      </div>
-      <div className={cn("flex", "flex-col", "my-4", "items-center")}>
+    <div className={cn("flex", "flex-col", "gap-y-4", "items-center")}>
+      <div className={cn("text-xs", "mb-4")}>#{proposalId}</div>
+      <h1
+        className={cn(
+          "text-3xl",
+          "leading-none",
+          "text-center",
+          "text-app-green",
+          "leading-9",
+          "font-medium",
+          "break-all"
+        )}
+      >
+        {title}
+      </h1>
+      <div className={cn("flex", "flex-col", "items-center")}>
         <ProposalStatusBadge status={status} />
       </div>
     </div>
@@ -66,28 +65,20 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   return (
     <div
       className={cn(
-        "flex",
-        "flex-col",
-        "items-center",
-        "justify-around",
-        "my-4",
-        "p-2",
-        "sm:flex-row",
-        "sm:items-end"
+        "p-2.5",
+        "grid",
+        "grid-rows-2",
+        "grid-cols-2",
+        "sm:grid-rows-1",
+        "sm:grid-cols-4",
+        "text-sm",
+        "leading-5",
+        "font-medium",
+        "text-center",
+        "gap-y-5"
       )}
     >
-      <div
-        className={cn(
-          "flex",
-          "flex-col",
-          "items-center",
-          "justify-end",
-          "grow",
-          "text-sm",
-          "leading-5",
-          "font-medium"
-        )}
-      >
+      <div className={cn("col-span-2", "flex", "flex-col", "items-center")}>
         <LocalizedText messageID="ProposalDetail.votingPeriod" />
 
         {votingStartTime && votingEndTime ? (
@@ -112,28 +103,13 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
           <p className={cn("mb-1", "text-sm", "text-center")}>-</p>
         )}
       </div>
-      <div
-        className={cn(
-          "flex",
-          "justify-center",
-          "items-stretch",
-          "grow",
-          "w-full",
-          "sm:w-1/2",
-          "mt-5",
-          "text-sm",
-          "leading-5",
-          "font-medium"
-        )}
-      >
-        <div className={cn("flex", "flex-col", "items-center", "grow")}>
-          <LocalizedText messageID="ProposalDetail.deposit" />
-          <p>{`${totalDepositString} ${CoinDenom}`}</p>
-        </div>
-        <div className={cn("flex", "flex-col", "items-center", "grow")}>
-          <LocalizedText messageID="ProposalDetail.turnOut" />
-          <p>{turnout != null ? `${(turnout * 100).toFixed(2)}%` : "-"}</p>
-        </div>
+      <div className={cn("flex", "flex-col", "items-center", "grow")}>
+        <LocalizedText messageID="ProposalDetail.deposit" />
+        <p>{`${totalDepositString} ${CoinDenom}`}</p>
+      </div>
+      <div className={cn("flex", "flex-col", "items-center", "grow")}>
+        <LocalizedText messageID="ProposalDetail.turnOut" />
+        <p>{turnout != null ? `${(turnout * 100).toFixed(2)}%` : "-"}</p>
       </div>
     </div>
   );
@@ -147,7 +123,6 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   return (
     <div
       className={cn(
-        "my-4",
         "p-6",
         "bg-app-lightergrey",
         "rounded-xl",
@@ -252,17 +227,14 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
         "flex-col",
         "sm:flex-row",
         "sm:justify-between",
-        "sm:justify-center",
-        "mt-4"
+        "sm:justify-center"
       )}
     >
       <div
         className={cn(
           "flex",
           "flex-row",
-          "gap-x-3",
-          "sm:mb-0",
-          "mb-3",
+          "space-x-3",
           "items-center",
           "flex-wrap",
           "gap-y-4"
@@ -324,7 +296,7 @@ const ProposalHeader: React.FC<ProposalHeaderProps> = (props) => {
   );
 
   return (
-    <Paper>
+    <Paper className={cn("flex", "flex-col", "gap-y-4")}>
       <ProposalTitle proposal={proposal} />
       <ProposalStatistics proposal={proposal} />
       <ProposalTypeAndProposer proposal={proposal} />

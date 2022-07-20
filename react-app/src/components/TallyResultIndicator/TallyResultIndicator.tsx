@@ -30,7 +30,13 @@ const VoteDetail: React.FC<VoteDetailProps> = (props) => {
       <div className={cn("w-1", "h-8", "rounded-2xl", colorClassName)} />
       <div className={cn("flex", "flex-col", "gap-y-1")}>
         <span
-          className={cn("text-base", "leading-5", "font-bold", "text-black")}
+          className={cn(
+            "text-base",
+            "leading-5",
+            "font-bold",
+            "text-black",
+            "break-all"
+          )}
         >
           <LocalizedText messageID={labelId} />
         </span>
