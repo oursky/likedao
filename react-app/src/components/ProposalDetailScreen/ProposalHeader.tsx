@@ -89,26 +89,28 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         )}
       >
         <LocalizedText messageID="ProposalDetail.votingPeriod" />
-        <p className={cn("mb-1", "text-sm", "text-center")}>
-          {votingStartTime && votingEndTime ? (
-            <LocalizedText
-              messageID="ProposalDetail.votingDateRange"
-              messageArgs={{
-                from: <UTCDatetime date={votingStartTime} />,
-                to: <UTCDatetime date={votingEndTime} />,
-              }}
-            />
-          ) : (
-            "-"
-          )}
-        </p>
 
-        <Badge color="likecoin-yellow">
-          <LocalizedText
-            messageID="ProposalDetail.votingDurationRemaining"
-            messageArgs={{ duration: remainingVotingDuration }}
-          />
-        </Badge>
+        {votingStartTime && votingEndTime ? (
+          <>
+            <p className={cn("mb-1", "text-sm", "text-center")}>
+              <LocalizedText
+                messageID="ProposalDetail.votingDateRange"
+                messageArgs={{
+                  from: <UTCDatetime date={votingStartTime} />,
+                  to: <UTCDatetime date={votingEndTime} />,
+                }}
+              />
+            </p>
+            <Badge color="likecoin-yellow">
+              <LocalizedText
+                messageID="ProposalDetail.votingDurationRemaining"
+                messageArgs={{ duration: remainingVotingDuration }}
+              />
+            </Badge>
+          </>
+        ) : (
+          <p className={cn("mb-1", "text-sm", "text-center")}>-</p>
+        )}
       </div>
       <div
         className={cn(
