@@ -29,6 +29,10 @@ spec:
     metadata:
       labels:
         app: react-app-{{ .Values.deploymentTag }}
+      annotations:
+        checksum/nginx-config: {{ include (print $.Template.BasePath "/react-app.nginx.yaml") . | sha256sum }}
+        checksum/keplr-config: {{ include (print $.Template.BasePath "/react-app.keplr.yaml") . | sha256sum }}
+        checksum/server-config: {{ include (print $.Template.BasePath "/react-app.config.yaml") . | sha256sum }}
     spec:
       restartPolicy: Always
       containers:
@@ -74,27 +78,3 @@ spec:
         - name: react-app-keplr-{{ .Values.deploymentTag }}
           configMap:
             name: react-app-keplr-{{ .Values.deploymentTag }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: react-app-nginx-conf-{{ .Values.deploymentTag }}
-data:
-  nginx.conf: |-
-{{ .Files.Get "static/react-app.nginx.conf" | indent 4 }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: react-app-config-{{ .Values.deploymentTag }}
-data:
-  config.js: |-
-{{ .Files.Get "static/react-app.config.js" | indent 4 }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: react-app-keplr-{{ .Values.deploymentTag }}
-data:
-  keplr.js: |-
-{{ .Files.Get "static/react-app.keplr.js" | indent 4 }} 

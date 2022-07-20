@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-keplr-{{ .Values.deploymentTag }}
+data:
+  keplr.js: |
+    window.keplrChainInfo = {
+      chainId: {{ .Values.reactApp.chainId | quote }},
+      chainName: {{ .Values.reactApp.keplr.chainName | quote }},
+      rpc: {{ .Values.reactApp.chainRpc | quote }},
+      rest: {{ .Values.reactApp.chainRest | quote }},
+      stakeCurrency: {
+        coinDenom: {{ .Values.reactApp.currency.coinDenom | quote }},
+        coinMinimalDenom: {{ .Values.reactApp.currency.coinMinimalDenom | quote }},
+        coinDecimals: {{ .Values.reactApp.currency.coinDecimals }},
+        coinGeckoId: {{ .Values.reactApp.currency.geckoId | quote }}
+      },
+      walletUrlForStaking: {{ .Values.reactApp.keplr.walletUrlForStaking | quote }},
+      bip44: {
+        coinType: {{ .Values.reactApp.keplr.coinType }},
+      },
+      bech32Config: {
+        bech32PrefixAccAddr: {{ .Values.reactApp.bech32Config.bech32PrefixAccAddr | quote }},
+        bech32PrefixAccPub: {{ .Values.reactApp.bech32Config.bech32PrefixAccPub | quote }},
+        bech32PrefixValAddr: {{ .Values.reactApp.bech32Config.bech32PrefixValAddr | quote }},
+        bech32PrefixValPub: {{ .Values.reactApp.bech32Config.bech32PrefixValPub | quote }},
+        bech32PrefixConsAddr: {{ .Values.reactApp.bech32Config.bech32PrefixConsAddr | quote }},
+        bech32PrefixConsPub: {{ .Values.reactApp.bech32Config.bech32PrefixConsPub | quote }},
+      },
+      currencies: [
+        {
+          coinDenom: {{ .Values.reactApp.currency.coinDenom | quote }},
+          coinMinimalDenom: {{ .Values.reactApp.currency.coinMinimalDenom | quote }},
+          coinDecimals: {{ .Values.reactApp.currency.coinDecimals }},
+          coinGeckoId: {{ .Values.reactApp.currency.geckoId | quote }}
+        },
+      ],
+      feeCurrencies: [
+        {
+          coinDenom: {{ .Values.reactApp.currency.coinDenom | quote }},
+          coinMinimalDenom: {{ .Values.reactApp.currency.coinMinimalDenom | quote }},
+          coinDecimals: {{ .Values.reactApp.currency.coinDecimals }},
+          coinGeckoId: {{ .Values.reactApp.currency.geckoId | quote }}
+        },
+      ],
+      coinType: {{ .Values.reactApp.keplr.coinType }},
+      gasPriceStep: {
+        low: {{ .Values.reactApp.keplr.gasPriceStep.low }},
+        average: {{ .Values.reactApp.keplr.gasPriceStep.average }},
+        high: {{ .Values.reactApp.keplr.gasPriceStep.high }},
+      },
+      features: ["stargate", "ibc-transfer", "no-legacy-stdTx", "ibc-go"],
+    };

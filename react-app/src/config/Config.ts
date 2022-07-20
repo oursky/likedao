@@ -5,6 +5,11 @@ export interface ChainLink {
   link: string;
 }
 
+export interface TokenLink {
+  name: string;
+  link: string;
+}
+
 export interface ChainInfo {
   bech32Config: {
     bech32PrefixAccAddr: string;
@@ -25,10 +30,8 @@ export interface ChainInfo {
 }
 
 interface FooterLinks {
-  osmosis: string;
-  liquid: string;
-  emeris: string;
-  contactSupport: string;
+  tokenLinks: TokenLink[];
+  contactSupport?: string;
 }
 
 export interface IConfig {
@@ -71,9 +74,20 @@ const defaultConfig: IConfig = {
   authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
   footerLinks: {
-    osmosis: "https://app.osmosis.zone/?from=ATOM&to=LIKE",
-    liquid: "https://app.liquid.com/exchange/LIKEUSDT",
-    emeris: "https://app.emeris.com/welcome",
+    tokenLinks: [
+      {
+        name: "osmosis",
+        link: "https://app.osmosis.zone/?from=ATOM&to=LIKE",
+      },
+      {
+        name: "liquid",
+        link: "https://app.liquid.com/exchange/LIKEUSDT",
+      },
+      {
+        name: "emeris",
+        link: "https://app.emeris.com/welcome",
+      },
+    ],
     contactSupport:
       "https://go.crisp.chat/chat/embed/?website_id=5c009125-5863-4059-ba65-43f177ca33f7",
   },
