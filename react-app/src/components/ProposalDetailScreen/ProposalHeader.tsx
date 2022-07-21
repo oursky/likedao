@@ -225,6 +225,7 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
       className={cn(
         "flex",
         "flex-col",
+        "gap-y-4",
         "sm:flex-row",
         "sm:justify-between",
         "sm:justify-center"
@@ -249,9 +250,9 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
       </div>
       {proposalPeriod !== null && (
         <AppButton
-          size="regular"
+          size="extra-small"
           theme="primary"
-          className={cn("text-base", "leading-6", "font-medium")}
+          className={cn("text-base", "leading-6", "font-medium", "px-6")}
           messageID={
             proposalPeriod === ProposalPeriod.Voting
               ? "ProposalDetail.voteNow"
