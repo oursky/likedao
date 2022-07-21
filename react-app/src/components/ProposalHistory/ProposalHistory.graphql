@@ -6,6 +6,7 @@ fragment ProposalHistoryProposalConnection on ProposalConnection {
   totalCount
   edges {
     node {
+      id
       proposalId
       title
       type
