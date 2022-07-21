@@ -2,10 +2,11 @@ package logging
 
 import (
 	"context"
+	"time"
 
-	"github.com/sirupsen/logrus"
-
+	"github.com/evalphobia/logrus_sentry"
 	"github.com/oursky/likedao/pkg/config"
+	"github.com/sirupsen/logrus"
 )
 
 type Fields logrus.Fields
@@ -37,5 +38,27 @@ func ConfigureLogger(logConfig config.LogConfig) {
 		logrus.WithError(err).Warnf(`unrecognized log level "%s"`, logConfig.Level)
 	} else {
 		logrus.SetLevel(logLevel)
+	}
+
+	if logConfig.Sentry != nil {
+		hook, err := logrus_sentry.NewSentryHook(logConfig.Sentry.DSN, []logrus.Level{
+			logrus.PanicLevel,
+			logrus.FatalLevel,
+			logrus.ErrorLevel,
+		})
+
+		if err != nil {
+			logrus.WithError(err).Warnf("failed to initialize sentry hook")
+			return
+		}
+
+		if logConfig.Sentry.Environment != "" {
+			hook.SetEnvironment(logConfig.Sentry.Environment)
+		}
+
+		hook.Timeout = time.Duration(1) * time.Second
+		hook.StacktraceConfiguration.Enable = true
+
+		logrus.AddHook(hook)
 	}
 }
