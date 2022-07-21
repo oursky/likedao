@@ -42,22 +42,22 @@ const VoteProposalForm: React.FC<VoteProposalFormProps> = (props) => {
       {
         label: translate("proposal.voteOption.yes"),
         value: VoteOption.Yes,
-        className: "text-likecoin-green",
+        className: "text-app-green",
       },
       {
         label: translate("proposal.voteOption.no"),
         value: VoteOption.No,
-        className: "text-likecoin-vote-color-no",
+        className: "text-app-vote-color-no",
       },
       {
         label: translate("proposal.voteOption.noWithVeto"),
         value: VoteOption.NoWithVeto,
-        className: "text-likecoin-vote-color-veto",
+        className: "text-app-vote-color-veto",
       },
       {
         label: translate("proposal.voteOption.abstain"),
         value: VoteOption.Abstain,
-        className: "text-likecoin-vote-color-abstain",
+        className: "text-app-vote-color-abstain",
       },
     ];
   }, [translate]);

@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = (props) => {
           "leading-5",
           "font-normal",
           "whitespace-nowrap",
-          "text-likecoin-green"
+          "text-app-green"
         )}
       >
         <LocalizedText messageID="AppSideBar.title" />

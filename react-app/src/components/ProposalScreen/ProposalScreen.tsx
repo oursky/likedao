@@ -136,14 +136,14 @@ const ProposalScreen: React.FC = () => {
           fill="currentColor"
           height={24}
           width={24}
-          className={cn("text-likecoin-black")}
+          className={cn("text-app-black")}
         />
         <h1
           className={cn(
             "text-lg",
             "leading-none",
             "font-bold",
-            "text-likecoin-black"
+            "text-app-black"
           )}
         >
           <LocalizedText messageID="ProposalScreen.title" />

@@ -32,7 +32,7 @@ const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
             "text-3xl",
             "leading-none",
             "text-center",
-            "text-likecoin-green",
+            "text-app-green",
             "leading-9",
             "font-medium"
           )}
@@ -147,20 +147,20 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
       className={cn(
         "my-4",
         "p-6",
-        "bg-likecoin-lightergrey",
+        "bg-app-lightergrey",
         "rounded-xl",
         "text-sm",
         "leading-5",
         "font-medium"
       )}
     >
-      <p className={cn("text-sm", "text-likecoin-lightgreen", "mb-1")}>
+      <p className={cn("text-sm", "text-app-lightgreen", "mb-1")}>
         <LocalizedText messageID="ProposalDetail.proposalType" />
       </p>
       <p className={cn("text-sm", "mb-4")}>
         <LocalizedText messageID={getProposalTypeMessage(type)} />
       </p>
-      <p className={cn("text-sm", "text-likecoin-lightgreen", "mb-1")}>
+      <p className={cn("text-sm", "text-app-lightgreen", "mb-1")}>
         <LocalizedText messageID="ProposalDetail.publishedBy" />
       </p>
       <div>
@@ -168,13 +168,13 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
           <Link
             to={AppRoutes.OtherPortfolio.replace(":address", proposerAddress)}
           >
-            <span className={cn("text-sm", "text-likecoin-green")}>
+            <span className={cn("text-sm", "text-app-green")}>
               {truncateAddress(proposerAddress)}
             </span>
             <span
               className={cn(
                 "text-xs",
-                "text-likecoin-lightgreen",
+                "text-app-lightgreen",
                 "ml-2",
                 "text-xs"
               )}
@@ -183,7 +183,7 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
             </span>
           </Link>
         ) : (
-          <span className={cn("text-sm", "text-likecoin-green")}>-</span>
+          <span className={cn("text-sm", "text-app-green")}>-</span>
         )}
       </div>
       <UTCDatetime className={cn("text-xs")} date={submitTime} />

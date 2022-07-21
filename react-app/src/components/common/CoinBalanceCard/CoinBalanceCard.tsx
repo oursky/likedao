@@ -35,7 +35,7 @@ const CoinBalanceCard: React.FC<CoinBalanceCardProps> = ({
           "text-sm",
           "leading-5",
           "font-medium",
-          "text-likecoin-lightgreen"
+          "text-app-lightgreen"
         )}
       >
         {convertBigNumberToFixedPointString(balance, 9)}

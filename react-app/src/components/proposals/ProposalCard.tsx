@@ -23,19 +23,19 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
     (): ColorBarData[] => [
       {
         value: new BigNumber(proposal.tallyResult?.yes ?? 0),
-        colorClassName: "bg-likecoin-vote-color-yes",
+        colorClassName: "bg-app-vote-color-yes",
       },
       {
         value: new BigNumber(proposal.tallyResult?.no ?? 0),
-        colorClassName: "bg-likecoin-vote-color-no",
+        colorClassName: "bg-app-vote-color-no",
       },
       {
         value: new BigNumber(proposal.tallyResult?.noWithVeto ?? 0),
-        colorClassName: "bg-likecoin-vote-color-veto",
+        colorClassName: "bg-app-vote-color-veto",
       },
       {
         value: new BigNumber(proposal.tallyResult?.abstain ?? 0),
-        colorClassName: "bg-likecoin-vote-color-abstain",
+        colorClassName: "bg-app-vote-color-abstain",
       },
     ],
     [proposal]
@@ -55,7 +55,7 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
       className={cn(
         "flex",
         "flex-col",
-        "bg-likecoin-lightergrey",
+        "bg-app-lightergrey",
         "rounded-xl",
         "p-2.5",
         "gap-y-2.5"
@@ -83,7 +83,7 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
             "text-xs",
             "leading-5",
             "font-medium",
-            "text-likecoin-darkgrey"
+            "text-app-darkgrey"
           )}
         >
           <LocalizedText messageID={getProposalTypeMessage(proposal.type)} />
@@ -93,7 +93,7 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-green"
+            "text-app-green"
           )}
         >
           {proposal.title}

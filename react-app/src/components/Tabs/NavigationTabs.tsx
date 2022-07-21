@@ -28,7 +28,7 @@ const NavigationTabItem: React.FC<NavigationTabItemProps> = (props) => {
         "py-4",
         "px-1",
         isSelected
-          ? cn("border-likecoin-green", "text-likecoin-green")
+          ? cn("border-app-green", "text-app-green")
           : cn(
               "border-transparent",
               "text-gray-500",

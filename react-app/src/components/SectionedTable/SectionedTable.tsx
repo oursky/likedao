@@ -89,7 +89,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = (props) => {
               "leading-4",
               "font-medium",
               "uppercase",
-              order?.id === id ? "text-likecoin-green" : "text-gray-500"
+              order?.id === id ? "text-app-green" : "text-gray-500"
             )}
           >
             <LocalizedText messageID={titleId} />

@@ -42,7 +42,7 @@ function SelectionOptionImpl<T>(
             "items-center",
             "justify-start",
             "border-2",
-            "border-likecoin-lightgreen",
+            "border-app-lightgreen",
             "shadow-sm",
             "py-4",
             "px-6",
@@ -50,10 +50,10 @@ function SelectionOptionImpl<T>(
             checked
               ? cn(
                   "bg-gradient-to-r",
-                  "from-likecoin-gradient-from",
-                  "to-likecoin-gradient-to"
+                  "from-app-button-gradient-from",
+                  "to-app-button-gradient-to"
                 )
-              : "bg-likecoin-lightergrey",
+              : "bg-app-lightergrey",
             className,
             item.className
           )}

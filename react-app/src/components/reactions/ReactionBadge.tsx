@@ -31,7 +31,7 @@ export const ReactionBadge: React.FC<ReactionBadgeProps> = (props) => {
       case "white":
         return "bg-white";
       case "grey":
-        return "bg-likecoin-lightergrey";
+        return "bg-app-lightergrey";
       default:
         throw new Error("Unknown theme");
     }
@@ -61,7 +61,7 @@ export const ReactionBadge: React.FC<ReactionBadgeProps> = (props) => {
         "items-center",
         "pr-4",
         "h-9",
-        isActive ? "bg-likecoin-secondarygreen" : backgroundColorClass,
+        isActive ? "bg-app-secondarygreen" : backgroundColorClass,
         !onClick && "pointer-events-none",
         className
       )}
@@ -74,7 +74,7 @@ export const ReactionBadge: React.FC<ReactionBadgeProps> = (props) => {
           "h-9",
           "w-9",
           "rounded-full",
-          "bg-likecoin-lightgrey"
+          "bg-app-lightgrey"
         )}
       >
         <div

@@ -40,12 +40,7 @@ const ProposalDepositor: React.FC<{
     return (
       <Link
         to={AppRoutes.OtherPortfolio.replace(":address", depositor.value)}
-        className={cn(
-          "text-sm",
-          "leading-5",
-          "font-normal",
-          "text-likecoin-green"
-        )}
+        className={cn("text-sm", "leading-5", "font-normal", "text-app-green")}
       >
         {depositor.value}
       </Link>
@@ -60,7 +55,7 @@ const ProposalDepositor: React.FC<{
             "text-sm",
             "leading-5",
             "font-medium",
-            "text-likecoin-green"
+            "text-app-green"
           )}
         >
           {/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */}
@@ -71,7 +66,7 @@ const ProposalDepositor: React.FC<{
             "text-xs",
             "leading-tight",
             "font-medium",
-            "text-likecoin-yellow"
+            "text-app-yellow"
           )}
         >
           <LocalizedText messageID="ProposalDetail.deposits.depositor.validator" />
@@ -101,7 +96,7 @@ const ProposalDepositInfo: React.FC<{
 }> = ({ totalDepositAmount, requiredDepositAmount }) => {
   const colorBarData = {
     value: BigNumber.min(totalDepositAmount, requiredDepositAmount),
-    colorClassName: "bg-likecoin-vote-color-yes",
+    colorClassName: "bg-app-vote-color-yes",
   };
 
   return (
@@ -196,20 +191,12 @@ const ProposalDepositsPanel: React.FC = () => {
       return [
         {
           titleId: "ProposalDetail.deposits.delegatedValidators",
-          className: cn(
-            "uppercase",
-            "bg-likecoin-secondarygreen",
-            "text-likecoin-green"
-          ),
+          className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
           items: requestState.data.pinnedDeposits,
         },
         {
           titleId: "ProposalDetail.deposits.others",
-          className: cn(
-            "uppercase",
-            "bg-likecoin-gold",
-            "text-likecoin-darkgrey"
-          ),
+          className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
           items: requestState.data.deposits,
         },
       ];

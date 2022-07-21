@@ -9,7 +9,7 @@ module.exports = {
         "2lg": "32.5rem",
       },
       colors: {
-        likecoin: {
+        app: {
           green: "#28646E",
           black: "#222222",
           darkgrey: "#666666",
@@ -23,7 +23,7 @@ module.exports = {
           secondarygreen: "#E0EFEB",
           "primary-bg": "#F8F7F4",
           black: "#222222",
-          gradient: {
+          "button-gradient": {
             from: "#D7EFE7",
             to: "#EFE7B8",
           },

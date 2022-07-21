@@ -29,8 +29,8 @@ const NavigationMenuItem: React.FC<NavigationMenuItemProps> = (props) => {
           "flex",
           "flex-row",
           "items-center",
-          "from-likecoin-gradient-from",
-          "to-likecoin-gradient-to",
+          "from-app-button-gradient-from",
+          "to-app-button-gradient-to",
           "rounded-md",
           "group",
           "select-none",
@@ -47,8 +47,8 @@ const NavigationMenuItem: React.FC<NavigationMenuItemProps> = (props) => {
           className={cn(
             "flex-0",
             isActive
-              ? "text-likecoin-green"
-              : "text-likecoin-lightgreen group-hover:text-gray-900"
+              ? "text-app-green"
+              : "text-app-lightgreen group-hover:text-gray-900"
           )}
         />
         <h2
@@ -60,8 +60,8 @@ const NavigationMenuItem: React.FC<NavigationMenuItemProps> = (props) => {
             "font-medium",
             "leading-5",
             isActive
-              ? "text-likecoin-green"
-              : "text-likecoin-lightgreen group-hover:text-gray-900"
+              ? "text-app-green"
+              : "text-app-lightgreen group-hover:text-gray-900"
           )}
         >
           <LocalizedText messageID={labelId} />

@@ -68,7 +68,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         "py-3",
         "px-6",
         "text-left",
-        "text-likecoin-green",
+        "text-app-green",
         className
       )}
     >
@@ -153,7 +153,7 @@ export const SortableColumnHeader: React.FC<SortableColumnHeaderProps> = (
               "leading-4",
               "font-medium",
               "uppercase",
-              order?.id === id ? "text-likecoin-green" : "text-gray-500"
+              order?.id === id ? "text-app-green" : "text-gray-500"
             )}
           >
             <LocalizedText messageID={titleId} />

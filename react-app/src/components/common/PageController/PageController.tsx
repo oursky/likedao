@@ -145,9 +145,9 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
           "leading-[0]"
         )}
         activeLinkClassName={cn(
-          "hover:border-likecoin-green",
-          "border-likecoin-green",
-          "!text-likecoin-green",
+          "hover:border-app-green",
+          "border-app-green",
+          "!text-app-green",
           "border-t-2"
         )}
         pageCount={totalPage}

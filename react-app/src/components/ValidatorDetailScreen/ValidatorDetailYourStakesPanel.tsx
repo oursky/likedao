@@ -36,14 +36,14 @@ const ValidatorDetailYourStakes: React.FC<ValidatorDetailYourStakesProps> = ({
   return (
     <Paper>
       <div className="flex items-center">
-        <Icon icon={IconType.Safe} className="mr-3 fill-likecoin-black" />
+        <Icon icon={IconType.Safe} className="mr-3 fill-app-black" />
         <h1 className="text-lg font-bold leading-5">
           <LocalizedText messageID="ValidatorDetailScreen.yourStakes.title" />
         </h1>
       </div>
       <div className="flex mt-4">
         <div className="flex flex-col mr-6">
-          <p className="mb-2 text-sm font-medium text-likecoin-lightgreen">
+          <p className="mb-2 text-sm font-medium text-app-lightgreen">
             <LocalizedText messageID="ValidatorDetailScreen.yourStakes.staked" />
           </p>
           <p className={cn("text-base", "leading-5", "font-medium")}>
@@ -51,7 +51,7 @@ const ValidatorDetailYourStakes: React.FC<ValidatorDetailYourStakesProps> = ({
           </p>
         </div>
         <div className="flex flex-col mr-6">
-          <p className="mb-2 text-sm font-medium text-likecoin-lightgreen">
+          <p className="mb-2 text-sm font-medium text-app-lightgreen">
             <LocalizedText messageID="ValidatorDetailScreen.yourStakes.rewards" />
           </p>
           <p
@@ -59,7 +59,7 @@ const ValidatorDetailYourStakes: React.FC<ValidatorDetailYourStakesProps> = ({
               "text-base",
               "leading-5",
               "font-medium",
-              "text-likecoin-vote-color-yes"
+              "text-app-vote-color-yes"
             )}
           >
             +{convertBigNumberToFixedPointString(reward.amount, 9)}

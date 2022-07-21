@@ -73,11 +73,11 @@ function getButtonClassNames(
   switch (theme) {
     case "primary":
       return cn(
-        "bg-likecoin-green",
+        "bg-app-green",
         "text-white",
         "disabled:bg-gray-300",
-        "hover:bg-likecoin-lightgreen",
-        "acitve:bg-likecoin-darkgreen",
+        "hover:bg-app-lightgreen",
+        "acitve:bg-app-darkgreen",
         "transition-colors",
         "rounded-md",
         "shadow-sm",
@@ -87,11 +87,11 @@ function getButtonClassNames(
     case "secondary":
       return cn(
         "bg-white",
-        "text-likecoin-green",
+        "text-app-green",
         "disabled:bg-gray-300",
-        "hover:bg-likecoin-lightgreen",
+        "hover:bg-app-lightgreen",
         "hover:text-white",
-        "acitve:bg-likecoin-darkgreen",
+        "acitve:bg-app-darkgreen",
         "transition-colors",
         "rounded-md",
         "shadow-sm",
@@ -101,8 +101,8 @@ function getButtonClassNames(
     case "rounded":
       return cn(
         "rounded-full",
-        "bg-likecoin-secondarygreen",
-        "hover:bg-likecoin-lightgreen",
+        "bg-app-secondarygreen",
+        "hover:bg-app-lightgreen",
         "hover:text-white",
         "transition-colors",
         "rounded-md",
@@ -112,8 +112,8 @@ function getButtonClassNames(
       );
     case "text":
       return cn(
-        "text-likecoin-green",
-        "after:bg-likecoin-green",
+        "text-app-green",
+        "after:bg-app-green",
         "relative",
         "after:transition-[width]",
         "after:duration-300",
@@ -128,10 +128,10 @@ function getButtonClassNames(
     case "outlined":
       return cn(
         "bg-white",
-        "text-likecoin-green",
+        "text-app-green",
         "border",
-        "hover:bg-likecoin-lightgreen",
-        "border-likecoin-green",
+        "hover:bg-app-lightgreen",
+        "border-app-green",
         "disabled:bg-gray-300",
         "hover:text-white",
         "transition-colors",

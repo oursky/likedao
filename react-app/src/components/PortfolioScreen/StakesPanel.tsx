@@ -56,18 +56,13 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
     <Paper>
       <div className={cn("flex", "mb-9")}>
         <Icon
-          className={cn("fill-likecoin-black", "mr-3")}
+          className={cn("fill-app-black", "mr-3")}
           icon={isYourPortfolio ? IconType.Safe : IconType.CommentsQA}
           height={20}
           width={20}
         />
         <h2
-          className={cn(
-            "text-lg",
-            "font-bold",
-            "leading-5",
-            "text-likecoin-black"
-          )}
+          className={cn("text-lg", "font-bold", "leading-5", "text-app-black")}
         >
           <LocalizedText
             messageID={
@@ -131,7 +126,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                   )}
                 />
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-likecoin-green">
+                  <h3 className="text-sm font-medium text-app-green">
                     <Link
                       to={AppRoutes.ValidatorDetail.replace(
                         ":address",
@@ -146,7 +141,7 @@ const StakesPanel: React.FC<StakesPanelProps> = ({
                       "text-xs",
                       "font-medium",
                       "leading-[14px]",
-                      "text-likecoin-vote-color-yes"
+                      "text-app-vote-color-yes"
                     )}
                   >
                     <LocalizedText messageID="StakesPanel.active" />

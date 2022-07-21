@@ -37,7 +37,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = (props) => {
               "border-t-4",
               "items-start",
               currentStep === step.value
-                ? "border-likecoin-green"
+                ? "border-app-green"
                 : "border-gray-200"
             )}
           >
@@ -48,8 +48,8 @@ const StepIndicator: React.FC<StepIndicatorProps> = (props) => {
                 "leading-4",
                 "uppercase",
                 currentStep === step.value
-                  ? "text-likecoin-green"
-                  : "text-likecoin-darkgrey"
+                  ? "text-app-green"
+                  : "text-app-darkgrey"
               )}
             >
               <LocalizedText
@@ -64,7 +64,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = (props) => {
                 "text-sm",
                 "font-medium",
                 "leading-5",
-                "text-likecoin-black"
+                "text-app-black"
               )}
             >
               <LocalizedText messageID={step.label} />

@@ -8,12 +8,7 @@ interface DividerProps {
 const Divider: React.FC<DividerProps> = ({ className }) => {
   return (
     <div
-      className={cn(
-        "border-b",
-        "border-solid",
-        "border-likecoin-grey",
-        className
-      )}
+      className={cn("border-b", "border-solid", "border-app-grey", className)}
     />
   );
 };

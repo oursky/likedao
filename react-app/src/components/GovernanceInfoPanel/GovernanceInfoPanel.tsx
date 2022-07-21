@@ -20,14 +20,7 @@ const InfoField: React.FC<{
   value: React.ReactNode;
 }> = ({ labelMessageID, value }) => (
   <div className="flex flex-col justify-between">
-    <h3
-      className={cn(
-        "text-likecoin-lightgreen",
-        "text-sm",
-        "font-medium",
-        "mb-2"
-      )}
-    >
+    <h3 className={cn("text-app-lightgreen", "text-sm", "font-medium", "mb-2")}>
       <LocalizedText messageID={labelMessageID} />
     </h3>
     <div className={cn("text-base", "leading-5", "font-medium")}>{value}</div>

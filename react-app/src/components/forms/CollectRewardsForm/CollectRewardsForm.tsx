@@ -49,7 +49,7 @@ const CollectRewardsForm: React.FC<CollectRewardsFormProps> = (props) => {
           disabled: true,
           readOnly: true,
         }}
-        inputClassName={cn("text-likecoin-grey")}
+        inputClassName={cn("text-app-grey")}
         registerReturn={register("amount", registerOptions.amount)}
         errorMessage={errors.amount?.message}
       />

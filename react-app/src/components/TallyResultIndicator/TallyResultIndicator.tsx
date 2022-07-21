@@ -82,19 +82,19 @@ const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
     const voteData = {
       yes: {
         value: yesAmount,
-        colorClassName: "bg-likecoin-vote-color-yes",
+        colorClassName: "bg-app-vote-color-yes",
       },
       no: {
         value: noAmount,
-        colorClassName: "bg-likecoin-vote-color-no",
+        colorClassName: "bg-app-vote-color-no",
       },
       noWithVeto: {
         value: vetoAmount,
-        colorClassName: "bg-likecoin-vote-color-veto",
+        colorClassName: "bg-app-vote-color-veto",
       },
       abstain: {
         value: abstainAmount,
-        colorClassName: "bg-likecoin-vote-color-abstain",
+        colorClassName: "bg-app-vote-color-abstain",
       },
     };
 
