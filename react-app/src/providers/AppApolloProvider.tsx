@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import BigNumber from "bignumber.js";
 import {
   buildClientSchema,
@@ -83,7 +83,8 @@ interface AppApolloProviderProps {
 const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
   const { children } = props;
   const isLoggingIn = useRef<boolean>(false);
-  const authRef = useRef(useAuth());
+  const auth = useAuth();
+  const authRef = useRef(auth);
   const { translate } = useLocale();
 
   const authErrorLink = useMemo(() => {
@@ -139,6 +140,10 @@ const AppApolloProvider: React.FC<AppApolloProviderProps> = (props) => {
       }),
     });
   }, [link]);
+
+  useEffect(() => {
+    authRef.current = auth;
+  }, [auth]);
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 };
