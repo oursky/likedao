@@ -60,8 +60,8 @@ const getMinDepositFromAllMinDeposit = (
 
 export const useGovAPI = (): IGovAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmosAPI();
-  const bank = useBankAPI();
+  const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
   const { query } = useQueryClient();
 
   const signSubmitProposalTx = useCallback(
@@ -76,7 +76,7 @@ export const useGovAPI = (): IGovAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await bank.getBalance();
+      const balance = await bankAPI.getBalance();
 
       if (balance.amount.isLessThan(initialDeposit)) {
         throw new Error("Insufficient funds");
@@ -97,9 +97,9 @@ export const useGovAPI = (): IGovAPI => {
         initialDeposit: deposit,
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [bank, cosmos, wallet]
+    [bankAPI, cosmosAPI, wallet]
   );
 
   const signVoteProposalTx = useCallback(
@@ -116,9 +116,9 @@ export const useGovAPI = (): IGovAPI => {
         option,
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [cosmos, wallet]
+    [cosmosAPI, wallet]
   );
 
   const signDepositProposalTx = useCallback(
@@ -129,7 +129,7 @@ export const useGovAPI = (): IGovAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await bank.getBalance();
+      const balance = await bankAPI.getBalance();
 
       if (balance.amount.isLessThan(amount)) {
         throw new Error("Insufficient funds");
@@ -146,9 +146,9 @@ export const useGovAPI = (): IGovAPI => {
         amount: [deposit],
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [cosmos, bank, wallet]
+    [cosmosAPI, bankAPI, wallet]
   );
 
   const getMinDepositParams = useCallback(async () => {

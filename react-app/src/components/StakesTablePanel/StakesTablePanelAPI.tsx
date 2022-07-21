@@ -25,7 +25,7 @@ export const useStakesQuery = (): {
 
   const wallet = useWallet();
   const stakingAPI = useStakingAPI();
-  const distribution = useDistributionAPI();
+  const distributionAPI = useDistributionAPI();
   const { query } = useQueryClient();
 
   const [order, setOrder] = useState({
@@ -56,12 +56,12 @@ export const useStakesQuery = (): {
       );
 
       const [rewards, validators, expectedReturns] = await Promise.all([
-        distribution.getDelegationRewardsByValidators(
+        distributionAPI.getDelegationRewardsByValidators(
           address,
           validatorAddresses
         ),
         stakingAPI.getValidators(validatorAddresses),
-        distribution.getBatchValidatorExpectedReturn(validatorAddresses),
+        distributionAPI.getBatchValidatorExpectedReturn(validatorAddresses),
       ]);
 
       // merge stakes and delegation rewards into stake entries
@@ -74,7 +74,7 @@ export const useStakesQuery = (): {
 
       return stakeEntries;
     },
-    [distribution, stakingAPI]
+    [distributionAPI, stakingAPI]
   );
 
   const fetch = useCallback(

@@ -54,8 +54,8 @@ const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 
 export const useStakingAPI = (): IStakingAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmosAPI();
-  const bank = useBankAPI();
+  const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
   const { query } = useQueryClient();
 
   const signDelegateTokenTx = useCallback(
@@ -66,7 +66,7 @@ export const useStakingAPI = (): IStakingAPI => {
 
       const { address } = wallet.account;
 
-      const balance = await bank.getBalance();
+      const balance = await bankAPI.getBalance();
 
       if (balance.amount.isLessThan(amount)) {
         throw new Error("Insufficient funds");
@@ -81,9 +81,9 @@ export const useStakingAPI = (): IStakingAPI => {
         },
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [cosmos, bank, wallet]
+    [cosmosAPI, bankAPI, wallet]
   );
 
   const signUndelegateTokenTx = useCallback(
@@ -119,9 +119,9 @@ export const useStakingAPI = (): IStakingAPI => {
         },
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [query, cosmos, wallet]
+    [query, cosmosAPI, wallet]
   );
 
   const getStakedBalance = useCallback(async () => {
