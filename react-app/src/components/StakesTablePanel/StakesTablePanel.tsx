@@ -122,7 +122,8 @@ const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
                     "h-9",
                     "leading-none",
                     "rounded-full",
-                    "bg-blue-700"
+                    "bg-blue-700",
+                    "flex-shrink-0"
                   )}
                 />
                 <div className="ml-3">
