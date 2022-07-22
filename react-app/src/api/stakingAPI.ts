@@ -354,7 +354,7 @@ export const useStakingAPI = (): IStakingAPI => {
         minSelfDelegation,
         selfDelegation: selfDelegation
           ? {
-              amount: convertMinimalTokenToToken(selfDelegation.amount),
+              amount: selfDelegation.amount,
               denom: Config.chainInfo.currency.coinDenom,
             }
           : null,
