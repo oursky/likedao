@@ -33,8 +33,8 @@ const AppNavigationMenu: React.FC<AppNavigationMenuProps> = (props) => {
       <NavigationMenuItem
         labelId="AppSideBar.navigation.validators"
         icon={IconType.Validator}
-        isActive={activeRoute.startsWith(AppRoutes.Validator)}
-        navigateTo={AppRoutes.Validator}
+        isActive={activeRoute.startsWith(AppRoutes.Validators)}
+        navigateTo={AppRoutes.Validators}
         onNavigationItemSelect={onMenuItemSelect}
       />
       <NavigationMenuItem
