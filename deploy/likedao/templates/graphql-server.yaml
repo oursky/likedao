@@ -48,10 +48,7 @@ spec:
                   name: graphql-server-config-{{ .Values.deploymentTag }}
                   key: GRAPHQL_SENTRY_DSN
             - name: GRAPHQL_SENTRY_ENVIRONMENT
-              valueFrom:
-                secretKeyRef:
-                  name: graphql-server-config-{{ .Values.deploymentTag }}
-                  key: GRAPHQL_SENTRY_ENVIRONMENT
+              value: {{ .Values.deploymentTag }}
             - name: SERVER_DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -138,6 +135,5 @@ data:
   BDJUNO_DATABASE_URL: {{ .Values.graphqlServer.bdjunoDatabase.url | b64enc }}
   BDJUNO_DATABASE_SCHEMA: {{ .Values.graphqlServer.bdjunoDatabase.schema | b64enc }}
   GRAPHQL_SENTRY_DSN: {{ .Values.graphqlServer.sentry.dsn | b64enc }}
-  GRAPHQL_SENTRY_ENVIRONMENT: {{ .Values.graphqlServer.sentry.environment | b64enc }}
   SIGNATURE_SECRET: {{ .Values.graphqlServer.session.signatureSecret | b64enc }}
   COOKIE_DOMAIN: {{ .Values.graphqlServer.session.cookieDomain | b64enc }}

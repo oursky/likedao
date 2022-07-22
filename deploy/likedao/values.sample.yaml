@@ -8,7 +8,6 @@ graphqlServer:
     sessionExpiry: 86400
   sentry:
     dsn: dsn
-    environment: graphql-server
   corsAllowOrigins: "*"
   serverDatabase:
     url: postgres://likedao:likedao@server-db/likedao?sslmode=disable

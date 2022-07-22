@@ -33,7 +33,11 @@ func DefaultErrorPresenter(ctx context.Context, e error) *gqlerror.Error {
 	// If there is no `code` in the Extensions field, we treat this as an
 	// internal error.
 	if _, ok := err.Extensions["code"]; !ok {
+		operationCtx := graphql.GetOperationContext(ctx)
 		logging.GetLogger(ctx).
+			WithField("query", operationCtx.RawQuery).
+			WithField("variables", operationCtx.Variables).
+			WithField("operationName", operationCtx.Operation.Name).
 			WithField("path", graphql.GetPath(ctx)).
 			WithError(innerErr).
 			Errorf("Unhandled internal error: %s", innerErr)

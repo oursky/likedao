@@ -50,6 +50,8 @@ func GraphqlHandler(serverDB *bun.DB, chainDB *bun.DB) gin.HandlerFunc {
 	h.Use(GraphQLOperationLogger{})
 
 	h.SetErrorPresenter(errors.DefaultErrorPresenter)
+	h.SetRecoverFunc(errors.DefaultSentryErrorTracker)
+
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
