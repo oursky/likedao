@@ -11,6 +11,7 @@ import { useWallet, ConnectionStatus } from "../providers/WalletProvider";
 import AppScaffold from "../components/AppScaffold/AppScaffold";
 import ProposalDetailRouter from "../components/ProposalDetailScreen/ProposalDetailRouter";
 import ValidatorDetailScreen from "../components/ValidatorDetailScreen/ValidatorDetailScreen";
+import ValidatorScreen from "../components/ValidatorScreen/ValidatorScreen";
 import AppRoutes from "./AppRoutes";
 
 const AppRouter: React.FC = () => {
@@ -22,6 +23,7 @@ const AppRouter: React.FC = () => {
           <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
           <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
           <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
+          <Route path={AppRoutes.Validators} element={<ValidatorScreen />} />
           <Route
             path={AppRoutes.NewProposal}
             element={<CreateProposalScreen />}
