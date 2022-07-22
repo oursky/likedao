@@ -201,6 +201,7 @@
   "ValidatorDetailScreen.yourStakes.rewards": "Rewards",
   "ValidatorDetailScreen.yourStakes.staked": "Staked",
   "ValidatorDetailScreen.yourStakes.title": "Your Stakes",
+  "ValidatorScreen.title": "Validators",
   "VoteProposalModal.step1.title": "Choose option",
   "VoteProposalModal.title": "Vote",
   "auth.loginFailure": "Failed to login, please try again",
