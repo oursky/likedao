@@ -96,10 +96,10 @@ const ValidatorDetailScreenInformationPanel: React.FC<
           <p>{`${commissionRates.rate.times(100).toString(10)}%`}</p>
         </InformationField>
         <InformationField messageID="ValidatorDetailScreen.information.maxCommissionRate">
-          <p>{`${commissionRates.rate.times(100).toString(10)}%`}</p>
+          <p>{`${commissionRates.maxRate.times(100).toString(10)}%`}</p>
         </InformationField>
         <InformationField messageID="ValidatorDetailScreen.information.maxCommissionChangeRate">
-          <p>{`${commissionRates.rate.times(100).toString(10)}%`}</p>
+          <p>{`${commissionRates.maxChangeRate.times(100).toString(10)}%`}</p>
         </InformationField>
         <InformationField messageID="ValidatorDetailScreen.information.commissionUpdateTime">
           {commissionUpdateTime ? (
