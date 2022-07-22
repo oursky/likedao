@@ -7,7 +7,10 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
 import * as Table from "../common/Table";
 import AppRoutes from "../../navigation/AppRoutes";
+import PageContoller from "../common/PageController/PageController";
 import { FilterKey } from "./ValidatorScreenAPI";
+
+const VALIDATOR_LIST_PAGE_SIZE = 20;
 
 type ValidatorTabItem = IFilterTabItem<FilterKey>;
 
@@ -31,15 +34,30 @@ const defaultTabItem = defaultTabItems[0];
 const ValidatorScreen: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams({
     tab: defaultTabItem.value,
+    page: "1",
   });
 
-  const [selectedTab] = useMemo(() => {
+  const [after, selectedTab] = useMemo(() => {
+    const after =
+      (parseInt(searchParams.get("page") ?? "1", 10) - 1) *
+      VALIDATOR_LIST_PAGE_SIZE;
+
     const tab = (
       defaultTabItems.find((i) => i.value === searchParams.get("tab")) ??
       defaultTabItem
     ).value;
-    return [tab];
+    return [after, tab];
   }, [searchParams]);
+
+  const setPage = useCallback(
+    (after: number) => {
+      setSearchParams({
+        tab: selectedTab,
+        page: (after / VALIDATOR_LIST_PAGE_SIZE + 1).toString(),
+      });
+    },
+    [selectedTab, setSearchParams]
+  );
 
   const handleSelectTab = useCallback(
     (tab: FilterKey) => {
@@ -245,6 +263,14 @@ const ValidatorScreen: React.FC = () => {
             )}
           </Table.Column>
         </Table.Table>
+
+        <PageContoller
+          offsetBased={true}
+          pageSize={VALIDATOR_LIST_PAGE_SIZE}
+          totalItems={1000}
+          currentOffset={after}
+          onPageChange={setPage}
+        />
       </div>
     </Paper>
   );
