@@ -249,7 +249,6 @@ const ProposalDetailScreen: React.FC = () => {
         />
         <ProposalDescription proposal={requestState.data} />
         <ProposalData proposal={requestState.data} />
-        <Paper>Comments Placeholder</Paper>
       </div>
       {activeModal === ProposalDetailModal.Vote && (
         <VoteProposalModal
