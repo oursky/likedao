@@ -1,38 +1,13 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import cn from "classnames";
-import { Icon, IconType } from "../Icons/Icons";
 import { MessageID } from "../../../i18n/LocaleModel";
 import LocalizedText from "../Localized/LocalizedText";
+import { Icon, IconType } from "../Icons/Icons";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 export interface ColumnOrder {
   id: string;
   direction: "asc" | "desc";
-}
-
-interface TableHeadProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-interface TableHeaderProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-interface TableRowProps {
-  className?: string;
-  children: React.ReactNode;
-  isHeader?: boolean;
-}
-
-interface TableCellProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-interface TableProps {
-  className?: string;
-  children: React.ReactNode;
 }
 
 const SortIndicator: React.FC<Pick<ColumnOrder, "direction">> = (props) => {
@@ -44,63 +19,6 @@ const SortIndicator: React.FC<Pick<ColumnOrder, "direction">> = (props) => {
 
   return <Icon icon={IconType.ChevronDown} width={24} height={24} />;
 };
-
-export const TableHead: React.FC<TableHeadProps> = ({
-  children,
-  className,
-}) => {
-  return <thead className={cn("bg-white", className)}>{children}</thead>;
-};
-
-export const TableHeader: React.FC<TableHeaderProps> = ({
-  children,
-  className,
-}) => {
-  return (
-    <th
-      scope="col"
-      className={cn(
-        "font-medium",
-        "tracking-wider",
-        "leading-4",
-        "uppercase",
-        "text-xs",
-        "py-3",
-        "px-6",
-        "text-left",
-        "text-app-green",
-        className
-      )}
-    >
-      {children}
-    </th>
-  );
-};
-
-export const TableRow: React.FC<TableRowProps> = ({
-  children,
-  className,
-  isHeader,
-}) => {
-  return (
-    <tr
-      className={cn(
-        !isHeader && "text-sm font-normal leading-5 text-gray-500",
-        className
-      )}
-    >
-      {children}
-    </tr>
-  );
-};
-
-interface SortableColumnHeaderProps {
-  id: string;
-  titleId?: MessageID;
-  className?: string;
-  sortable?: boolean;
-}
-
 interface ColumnSortContextValue {
   order?: ColumnOrder;
   setOrder?: (order: ColumnOrder) => void;
@@ -109,10 +27,28 @@ interface ColumnSortContextValue {
 export const ColumnSortContext = React.createContext<ColumnSortContextValue>(
   {} as any
 );
+const ItemContext = React.createContext<any>({});
+interface ColumnProps<T> {
+  id: string;
+  titleId?: MessageID;
+  className?: string;
+  sortable?: boolean;
+  children(item: T): React.ReactElement;
+}
 
-export const SortableColumnHeader: React.FC<SortableColumnHeaderProps> = (
-  props
-) => {
+const Column: <T>(props: ColumnProps<T>) => React.ReactElement = (props) => {
+  const { className } = props;
+  const item = React.useContext(ItemContext);
+
+  return (
+    <td className={cn("whitespace-nowrap", "px-6", "py-4", className)}>
+      {props.children(item)}
+    </td>
+  );
+};
+
+type ColumnHeaderProps = Omit<ColumnProps<any>, "children">;
+export const ColumnHeader: React.FC<ColumnHeaderProps> = (props) => {
   const { id, titleId, sortable, className } = props;
   const { order, setOrder } = React.useContext(ColumnSortContext);
 
@@ -136,6 +72,7 @@ export const SortableColumnHeader: React.FC<SortableColumnHeaderProps> = (
         "px-6",
         "py-3.5",
         "text-left",
+        "bg-gray-50",
         className
       )}
     >
@@ -167,24 +104,126 @@ export const SortableColumnHeader: React.FC<SortableColumnHeaderProps> = (
   );
 };
 
-export const TableCell: React.FC<TableCellProps> = ({
-  children,
-  className,
-}) => {
-  return <td className={cn("px-6", className)}>{children}</td>;
+export interface RowProps<T> {
+  item: T;
+  columns: React.ReactNode | React.ReactNode[];
+}
+
+const Row: <T>(props: RowProps<T>) => React.ReactElement = (props) => {
+  const { item, columns } = props;
+  return (
+    <tr>
+      <ItemContext.Provider value={item}>{columns}</ItemContext.Provider>
+    </tr>
+  );
 };
 
-const Table: React.FC<TableProps> = ({ children, className }) => {
+export interface TableProps<T> {
+  items: T[];
+  isLoading?: boolean;
+  emptyMessageID?: MessageID;
+  sortOrder?: ColumnOrder;
+  RowComponent?: React.ComponentType<RowProps<T>>;
+  onSort?: (order: ColumnOrder) => void;
+  children:
+    | React.ReactElement<ColumnProps<T>>
+    | React.ReactElement<ColumnProps<T>>[];
+}
+
+const Table: <T>(props: TableProps<T>) => React.ReactElement = (props) => {
+  const {
+    items,
+    children,
+    emptyMessageID,
+    isLoading,
+    sortOrder,
+    onSort,
+    RowComponent = Row,
+  } = props;
+
+  const columnSortContextValue = useMemo(
+    () => ({
+      order: sortOrder,
+      setOrder: onSort,
+    }),
+    [sortOrder, onSort]
+  );
+
   return (
-    <div
-      className={cn(
-        "inline-block overflow-x-auto rounded-lg w-full min-w-full shadow-md",
-        className
-      )}
-    >
-      <table className={cn("table-auto rounded-lg w-full")}>{children}</table>
+    <div className={cn("inline-block", "min-w-full", "py-2", "align-middle")}>
+      <div
+        className={cn(
+          "overflow-x-auto",
+          "shadow",
+          "ring-1",
+          "ring-black",
+          "ring-opacity-5",
+          "rounded-lg"
+        )}
+      >
+        <table className="min-w-full">
+          <thead className={cn("bg-white", "border-b")}>
+            <tr>
+              <ColumnSortContext.Provider value={columnSortContextValue}>
+                {React.Children.map(children, (column, index) => (
+                  <ColumnHeader {...column.props} key={index} />
+                ))}
+              </ColumnSortContext.Provider>
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            {isLoading ? (
+              <tr>
+                <td colSpan={React.Children.count(children)}>
+                  <div
+                    className={cn(
+                      "w-full",
+                      "h-96",
+                      "flex",
+                      "items-center",
+                      "justify-center"
+                    )}
+                  >
+                    <LoadingSpinner className={cn("h-16", "w-full")} />
+                  </div>
+                </td>
+              </tr>
+            ) : items.length === 0 ? (
+              <tr>
+                <td colSpan={React.Children.count(children)}>
+                  <div
+                    className={cn(
+                      "h-96",
+                      "flex",
+                      "items-center",
+                      "justify-center"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "font-bold",
+                        "text-xl",
+                        "leading-5",
+                        "text-black"
+                      )}
+                    >
+                      <LocalizedText
+                        messageID={emptyMessageID ?? "SectionedTable.noItems"}
+                      />
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              items.map((item, itemIdx) => (
+                <RowComponent key={itemIdx} item={item} columns={children} />
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default Table;
+export { Table, Column, Row };

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLazyGraphQLQuery } from "../../hooks/graphql";
-import { RequestState } from "../../models/RequestState";
+import { mapRequestData, RequestState } from "../../models/RequestState";
 import {
   ProposalHistoryQuery as ProposalHistoryGraphqlQuery,
   ProposalHistoryQueryQuery,
@@ -134,8 +134,19 @@ const useProposalHistoryQuery = (): ProposalHistoryQuery => {
     [fetch]
   );
 
-  return {
+  const data = mapRequestData<ProposalHistoryQueryQuery, ProposalHistory>(
     requestState,
+    (d) => {
+      return {
+        proposalVotesDistribution: d.proposalVotesDistribution,
+        proposals: d.proposals.edges.map((p) => p.node),
+        totalProposalCount: d.proposals.totalCount,
+      };
+    }
+  );
+
+  return {
+    requestState: data,
     fetch: callFetch,
   };
 };

@@ -3,7 +3,7 @@ import cn from "classnames";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import TallyResultIndicator from "../TallyResultIndicator/TallyResultIndicator";
-import * as SectionedTable from "../SectionedTable/SectionedTable";
+import * as Table from "../common/Table";
 import { ProposalStatus, VoteOption } from "../../models/cosmos/gov";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
@@ -219,7 +219,7 @@ const ProposalVotesPanel: React.FC = () => {
       sortBy && sortDirection
         ? {
             id: sortBy as ProposalVoteSortableColumn,
-            direction: sortDirection as SectionedTable.ColumnOrder["direction"],
+            direction: sortDirection as Table.ColumnOrder["direction"],
           }
         : undefined;
 
@@ -245,7 +245,7 @@ const ProposalVotesPanel: React.FC = () => {
   );
 
   const setSortOrder = useCallback(
-    (order: SectionedTable.ColumnOrder) => {
+    (order: Table.ColumnOrder) => {
       setSearchParams({
         sortBy: order.id,
         sortDirection: order.direction,
@@ -264,24 +264,23 @@ const ProposalVotesPanel: React.FC = () => {
     return null;
   }, [govParamRequestState]);
 
-  const tableSections =
-    useMemo((): SectionedTable.SectionItem<ProposalVote>[] => {
-      if (!isRequestStateLoaded(requestState)) {
-        return [];
-      }
-      return [
-        {
-          titleId: "ProposalDetail.votes.delegatedValidators",
-          className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
-          items: requestState.data.pinnedVotes,
-        },
-        {
-          titleId: "ProposalDetail.votes.others",
-          className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
-          items: requestState.data.votes,
-        },
-      ];
-    }, [requestState]);
+  const tableSections = useMemo((): Table.SectionItem<ProposalVote>[] => {
+    if (!isRequestStateLoaded(requestState)) {
+      return [];
+    }
+    return [
+      {
+        titleId: "ProposalDetail.votes.delegatedValidators",
+        className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
+        items: requestState.data.pinnedVotes,
+      },
+      {
+        titleId: "ProposalDetail.votes.others",
+        className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
+        items: requestState.data.votes,
+      },
+    ];
+  }, [requestState]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -319,34 +318,31 @@ const ProposalVotesPanel: React.FC = () => {
   return (
     <div className={cn("flex", "flex-col", "gap-y-4")}>
       <TallyResultIndicator proposal={proposal} quorum={quorumParam} />
-      <SectionedTable.Table
+      <Table.SectionedTable
         sections={tableSections}
         isLoading={!isRequestStateLoaded(requestState)}
         emptyMessageID="ProposalDetail.votes.empty"
         sortOrder={sortOrder}
         onSort={setSortOrder}
       >
-        <SectionedTable.Column<ProposalVote>
+        <Table.Column<ProposalVote>
           id={ProposalVoteSortableColumn.Voter}
           titleId="ProposalDetail.votes.voter"
           sortable={true}
         >
           {(item) => <ProposalVoter voter={item.voter} />}
-        </SectionedTable.Column>
-        <SectionedTable.Column<ProposalVote>
+        </Table.Column>
+        <Table.Column<ProposalVote>
           id={ProposalVoteSortableColumn.Option}
           titleId="ProposalDetail.votes.option"
           sortable={true}
         >
           {(item) => <ProposalVoteOption option={item.option ?? null} />}
-        </SectionedTable.Column>
-        <SectionedTable.Column<ProposalVote>
-          id="action"
-          className={cn("text-right")}
-        >
+        </Table.Column>
+        <Table.Column<ProposalVote> id="action" className={cn("text-right")}>
           {(item) => <RemindToVoteButton proposal={proposal} vote={item} />}
-        </SectionedTable.Column>
-      </SectionedTable.Table>
+        </Table.Column>
+      </Table.SectionedTable>
       <PageContoller
         offsetBased={true}
         pageSize={PROPOSAL_VOTE_PAGE_SIZE}

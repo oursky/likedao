@@ -14,8 +14,8 @@ import {
   MeQueryQuery,
 } from "../../generated/graphql";
 import { useAuth } from "../../providers/AuthProvider";
-import * as SectionedTable from "../SectionedTable/SectionedTable";
 import AppButton from "../common/Buttons/AppButton";
+import * as Table from "../common/Table";
 
 interface DummyTableItem {
   identity: {
@@ -25,7 +25,7 @@ interface DummyTableItem {
   value: string;
 }
 
-const dummyTableItems: SectionedTable.SectionItem<DummyTableItem>[] = [
+const dummyTableItems: Table.SectionItem<DummyTableItem>[] = [
   {
     titleId: "AppSideBar.navigation.overview",
     className: cn("bg-app-secondarygreen", "text-app-green"),
@@ -73,7 +73,7 @@ const DummyScreen: React.FC = () => {
   const auth = useAuth();
 
   const [dummyTableSort, setDummyTableSort] =
-    useState<SectionedTable.ColumnOrder | null>(null);
+    useState<Table.ColumnOrder | null>(null);
 
   // Fetch block height every 6 seconds (i.e average block time)
   const { data } = useQuery<TestQueryQuery>(TestQuery, {
@@ -276,12 +276,12 @@ const DummyScreen: React.FC = () => {
 
       {meError && <div>Failed to sign in: {meError.message}</div>}
 
-      <SectionedTable.Table
+      <Table.SectionedTable
         sections={dummyTableItems}
         sortOrder={dummyTableSort ?? undefined}
         onSort={setDummyTableSort}
       >
-        <SectionedTable.Column<DummyTableItem>
+        <Table.Column<DummyTableItem>
           id="title"
           titleId="App.title"
           sortable={true}
@@ -292,18 +292,15 @@ const DummyScreen: React.FC = () => {
               <span>{item.identity.role}</span>
             </div>
           )}
-        </SectionedTable.Column>
-        <SectionedTable.Column<DummyTableItem>
+        </Table.Column>
+        <Table.Column<DummyTableItem>
           id="name"
           titleId="App.title"
           sortable={true}
         >
           {(item) => <span className={cn("text-app-green")}>{item.value}</span>}
-        </SectionedTable.Column>
-        <SectionedTable.Column<DummyTableItem>
-          id="action"
-          className={cn("text-right")}
-        >
+        </Table.Column>
+        <Table.Column<DummyTableItem> id="action" className={cn("text-right")}>
           {(item) => (
             <AppButton
               theme="primary"
@@ -312,8 +309,8 @@ const DummyScreen: React.FC = () => {
               onClick={onDummyItemClick(item)}
             />
           )}
-        </SectionedTable.Column>
-      </SectionedTable.Table>
+        </Table.Column>
+      </Table.SectionedTable>
     </div>
   );
 };
