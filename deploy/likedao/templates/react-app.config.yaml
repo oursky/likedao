@@ -8,7 +8,7 @@ data:
       {{ if (.Values.reactApp.sentry).dsn }}
       sentry: {
         dsn: {{ .Values.reactApp.sentry.dsn | quote }}
-        environment: {{ .Values.deploymentTag }}
+        environment: {{ .Values.deploymentTag | quote }}
       },
       {{ else }}
       sentry: null,
