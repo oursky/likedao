@@ -7,7 +7,7 @@ data:
     window.appConfig = {
       {{ if (.Values.reactApp.sentry).dsn }}
       sentry: {
-        dsn: {{ .Values.reactApp.sentry.dsn | quote }}
+        dsn: {{ .Values.reactApp.sentry.dsn | quote }},
         environment: {{ .Values.deploymentTag | quote }}
       },
       {{ else }}
