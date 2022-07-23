@@ -19,7 +19,7 @@ function getInputClassNameBySize(size: FormFieldSize): string {
 }
 interface TextFormFieldProps extends BaseFormFieldProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  registerReturn: UseFormRegisterReturn;
+  registerReturn?: UseFormRegisterReturn;
 }
 const TextFormField: React.FC<TextFormFieldProps> = (props) => {
   const {
