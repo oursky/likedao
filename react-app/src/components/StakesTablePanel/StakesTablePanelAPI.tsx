@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import BigNumber from "bignumber.js";
 import { useDistributionAPI } from "../../api/distributionAPI";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
@@ -9,19 +10,23 @@ import {
   RequestStateLoaded,
   RequestStateLoading,
 } from "../../models/RequestState";
+import {
+  calculateValidatorExpectedReturn,
+  calculateValidatorVotingPower,
+} from "../../models/staking";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { useWallet, ConnectionStatus } from "../../providers/WalletProvider";
 import * as Table from "../common/Table";
-import { Stake } from "./StakesTablePanelModel";
+import { StakedValidatorInfo } from "./StakesTablePanelModel";
 
 export const useStakesQuery = (): {
-  requestState: RequestState<Stake[]>;
+  requestState: RequestState<StakedValidatorInfo[]>;
   fetch: (address?: string) => Promise<void>;
   order: Table.ColumnOrder;
   setOrder: (order: Table.ColumnOrder) => void;
 } => {
   const [requestState, setRequestState] =
-    useState<RequestState<Stake[]>>(RequestStateInitial);
+    useState<RequestState<StakedValidatorInfo[]>>(RequestStateInitial);
 
   const wallet = useWallet();
   const stakingAPI = useStakingAPI();
@@ -55,26 +60,45 @@ export const useStakesQuery = (): {
         (delegation) => delegation.delegation.validatorAddress
       );
 
-      const [rewards, validators, expectedReturns] = await Promise.all([
-        distributionAPI.getDelegationRewardsByValidators(
-          address,
-          validatorAddresses
-        ),
-        stakingAPI.getValidators(validatorAddresses),
-        distributionAPI.getBatchValidatorExpectedReturn(validatorAddresses),
-      ]);
+      const [annualProvisions, stakingPool, rewards, validators] =
+        await Promise.all([
+          query.mint.annualProvisions(),
+          stakingAPI.getPool(),
+          distributionAPI.getDelegationRewardsByValidators(
+            address,
+            validatorAddresses
+          ),
+          stakingAPI.getValidators(validatorAddresses),
+        ]);
+
+      const calculatedValidatorInfo = validators.map((validator) => {
+        return {
+          expectedReturn: calculateValidatorExpectedReturn(
+            annualProvisions,
+            stakingPool,
+            validator
+          ),
+          votingPower: calculateValidatorVotingPower(
+            stakingPool,
+            new BigNumber(validator.tokens)
+          ),
+        };
+      });
 
       // merge stakes and delegation rewards into stake entries
-      const stakeEntries: Stake[] = delegations.map((delegation, i) => ({
-        ...delegation,
-        reward: rewards[i],
-        validator: validators[i],
-        expectedReturn: expectedReturns[i],
-      }));
+      const stakeEntries: StakedValidatorInfo[] = delegations.map(
+        (delegation, i) => ({
+          ...delegation,
+          reward: rewards[i],
+          validator: validators[i],
+          expectedReturn: calculatedValidatorInfo[i].expectedReturn,
+          votingPower: calculatedValidatorInfo[i].votingPower,
+        })
+      );
 
       return stakeEntries;
     },
-    [distributionAPI, stakingAPI]
+    [distributionAPI, query.mint, stakingAPI]
   );
 
   const fetch = useCallback(
@@ -112,8 +136,8 @@ export const useStakesQuery = (): {
         switch (order.id) {
           case "name":
             return (
-              a.validator.description.moniker.localeCompare(
-                b.validator.description.moniker
+              a.validator.description!.moniker.localeCompare(
+                b.validator.description!.moniker
               ) * direction
             );
           case "staked":
@@ -127,7 +151,7 @@ export const useStakesQuery = (): {
           case "expectedReturns":
             return (a.expectedReturn - b.expectedReturn) * direction;
           case "votingPower":
-            return (a.validator.votePower - b.validator.votePower) * direction;
+            return (a.votingPower - b.votingPower) * direction;
           default:
             return 1;
         }

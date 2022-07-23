@@ -57,7 +57,8 @@ const CoinsAmountField: React.FC<{
           "text-app-lightgreen",
           "text-sm",
           "leading-5",
-          "font-medium"
+          "font-medium",
+          "break-all"
         )}
       >
         <LocalizedText messageID={messageID} />
@@ -140,7 +141,7 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
               "w-full",
               "grid",
               "grid-cols-[repeat(auto-fill,minmax(100px,1fr))]",
-              "gap-y-3"
+              "gap-3"
             )}
           >
             <CoinsAmountField

@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
-import { QueryDelegationRewardsResponse } from "cosmjs-types/cosmos/distribution/v1beta1/query";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import {
@@ -32,8 +31,6 @@ interface IDistributionAPI {
   ): Promise<BigNumberCoin[]>;
   getParams(): Promise<DistributionParam>;
   getAPR(): Promise<number>;
-  getValidatorExpectedReturn(address: string): Promise<number>;
-  getBatchValidatorExpectedReturn(addresses: string[]): Promise<number[]>;
 }
 
 const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
@@ -133,19 +130,15 @@ export const useDistributionAPI = (): IDistributionAPI => {
 
   const getDelegationRewardsByValidators = useCallback(
     async (delegatorAddress: string, validatorAddresses: string[]) => {
-      const rewardPromises: Promise<QueryDelegationRewardsResponse>[] = [];
-
-      validatorAddresses.forEach((validatorAddress) =>
-        rewardPromises.push(
-          query.distribution.delegationRewards(
-            delegatorAddress,
-            validatorAddress
-          )
-        )
+      const totalRewards = await query.distribution.delegationTotalRewards(
+        delegatorAddress
       );
-      const rewards = await Promise.all(rewardPromises);
+
+      const rewards = totalRewards.rewards.filter((r) =>
+        validatorAddresses.includes(r.validatorAddress)
+      );
       return rewards.map((rewardRespond) => {
-        const reward = rewardRespond.rewards.find(
+        const reward = rewardRespond.reward.find(
           (r) => r.denom === CoinMinimalDenom
         );
         // Default cosmos decimal places is 18
@@ -281,53 +274,6 @@ export const useDistributionAPI = (): IDistributionAPI => {
     return apr;
   }, [bankAPI, getParams, query.mint, stakingAPI]);
 
-  /**
-   * Expected return for delegators if they stake this validator
-   * takes validator operator address as input argument
-   * ref https://github.com/likecoin/lunie-ng/blob/60dbf7e18ceba41f4ebce304c23fa628a579c387/apis/cosmos-reducers.js#L689-L692
-   */
-  const getValidatorExpectedReturn = useCallback(
-    async (address: string) => {
-      const [annualProvisions, pool, validator] = await Promise.all([
-        query.mint.annualProvisions(),
-        stakingAPI.getPool(),
-        stakingAPI.getValidator(address),
-      ]);
-
-      const pctCommission = new BigNumber(1).minus(
-        validator.commission.commissionRates.rate
-      );
-
-      const provision = new BigNumber(annualProvisions.toString());
-      const bonded = new BigNumber(pool.bondedTokens);
-      const expectedRewards = pctCommission.times(provision.div(bonded));
-
-      return expectedRewards.toNumber();
-    },
-    [query.mint, stakingAPI]
-  );
-
-  const getBatchValidatorExpectedReturn = useCallback(
-    async (addresses: string[]) => {
-      const [annualProvisions, pool, validators] = await Promise.all([
-        query.mint.annualProvisions(),
-        stakingAPI.getPool(),
-        stakingAPI.getValidators(addresses),
-      ]);
-      return validators.map((validator) => {
-        const pctCommission = new BigNumber(1).minus(
-          validator.commission.commissionRates.rate
-        );
-        const provision = new BigNumber(annualProvisions.toString());
-        const bonded = new BigNumber(pool.bondedTokens);
-        const expectedRewards = pctCommission.times(provision.div(bonded));
-
-        return expectedRewards.toNumber();
-      });
-    },
-    [query.mint, stakingAPI]
-  );
-
   return useMemo(
     () => ({
       signWithdrawDelegationRewardsTx,
@@ -339,8 +285,6 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
-      getValidatorExpectedReturn,
-      getBatchValidatorExpectedReturn,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -352,8 +296,6 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
-      getValidatorExpectedReturn,
-      getBatchValidatorExpectedReturn,
     ]
   );
 };

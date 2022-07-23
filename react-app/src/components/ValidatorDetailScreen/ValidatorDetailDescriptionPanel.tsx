@@ -94,41 +94,53 @@ const DataField = ({
 
 const Info = ({ className, data }: ValidatorDetailPureComponentProps) => {
   const {
-    description: { moniker, details, securityContact, website },
+    description,
     tokens,
-    votePower,
+    votingPower,
     selfDelegation,
+    expectedReturn,
     commission: { commissionRates },
   } = data.validator;
 
   return (
     <div className={cn(className)}>
       {/* Title and descriptions */}
-      <h2 className="text-xl font-medium leading-6">{moniker}</h2>
+      <h2 className="text-xl font-medium leading-6">{description.moniker}</h2>
       <ValidatorStatus className="mb-3" data={data} />
-      <p className="mb-3 text-xs font-medium leading-4">{details}</p>
+      <p className="mb-3 text-xs font-medium leading-4">
+        {description.details}
+      </p>
 
       {/* contacts and links */}
-      <p className="mb-3">
-        <AppButton
-          href={`mailto:${securityContact}`}
-          type="anchor"
-          theme="text"
-          size="extra-small"
-        >
-          {securityContact}
-        </AppButton>
-      </p>
-      <p className="mb-6">
-        <AppButton
-          href={website.includes("://") ? website : `https://${website}`}
-          type="anchor"
-          theme="text"
-          size="extra-small"
-        >
-          {website}
-        </AppButton>
-      </p>
+      {description.securityContact && (
+        <p className="mb-3">
+          <AppButton
+            href={`mailto:${description.securityContact}`}
+            type="anchor"
+            theme="text"
+            size="extra-small"
+          >
+            {description.securityContact}
+          </AppButton>
+        </p>
+      )}
+
+      {description.website && (
+        <p className="mb-6">
+          <AppButton
+            href={
+              description.website.includes("://")
+                ? description.website
+                : `https://${description.website}`
+            }
+            type="anchor"
+            theme="text"
+            size="extra-small"
+          >
+            {description.website}
+          </AppButton>
+        </p>
+      )}
 
       {/* balances and stats */}
       <h3 className="text-sm font-medium leading-5 text-app-lightgreen">
@@ -141,10 +153,10 @@ const Info = ({ className, data }: ValidatorDetailPureComponentProps) => {
 
       <div className="flex gap-y-3 justify-between mt-3 sm:justify-start">
         <DataField messageID="ValidatorDetailScreen.descriptionPanel.votingPower">
-          {(votePower * 100).toFixed(2)}%
+          {(votingPower * 100).toFixed(2)}%
         </DataField>
         <DataField messageID="ValidatorDetailScreen.descriptionPanel.apy">
-          {(data.expectedReturn * 100).toFixed(2)}%
+          {(expectedReturn * 100).toFixed(2)}%
         </DataField>
         <DataField messageID="ValidatorDetailScreen.descriptionPanel.selfStake">
           {selfDelegation
