@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import cn from "classnames";
 import BigNumber from "bignumber.js";
+import { toast } from "react-toastify";
 import Config from "../../config/Config";
 import { isRequestStateLoaded } from "../../models/RequestState";
 import { translateAddress } from "../../utils/address";
@@ -16,6 +17,9 @@ import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { StakeTokenFormValues } from "../forms/StakeTokenForm/StakeTokenFormModel";
 import { UnstakeTokenFormValues } from "../forms/UnstakeTokenForm/UnstakeTokenFormModel";
 import UnstakeTokenModal from "../TransactionModals/UnstakeTokenModal";
+import { useStakingAPI } from "../../api/stakingAPI";
+import { useLocale } from "../../providers/AppLocaleProvider";
+import { useCosmosAPI } from "../../api/cosmosAPI";
 import ValidatorDetailDescriptionPanel from "./ValidatorDetailDescriptionPanel";
 import ValidatorDetailYourStakes from "./ValidatorDetailYourStakesPanel";
 import { useValidatorQuery } from "./ValidatorDetailScreenAPI";
@@ -31,6 +35,10 @@ enum ValidatorDetailModal {
 const ValidatorDetailScreen: React.FC = () => {
   const { address: operatorAddress } = useParams();
   const wallet = useWallet();
+  const stakingAPI = useStakingAPI();
+  const cosmosAPI = useCosmosAPI();
+
+  const { translate } = useLocale();
 
   const selfDelegateAddress = useMemo(
     // eslint-disable-next-line no-confusing-arrow
@@ -64,17 +72,6 @@ const ValidatorDetailScreen: React.FC = () => {
   const { requestState: validatorRequestState, fetch: fetchValidator } =
     useValidatorQuery();
 
-  const handleStakeToken = useCallback(async (data: StakeTokenFormValues) => {
-    console.log(data);
-  }, []);
-
-  const handleUnstakeToken = useCallback(
-    async (data: UnstakeTokenFormValues) => {
-      console.log(data);
-    },
-    []
-  );
-
   const openStakeTokenModal = useCallback(() => {
     if (wallet.status !== ConnectionStatus.Connected) {
       wallet.openConnectWalletModal?.();
@@ -95,6 +92,61 @@ const ValidatorDetailScreen: React.FC = () => {
     setActiveModal(null);
   }, []);
 
+  const handleStakeToken = useCallback(
+    async (values: StakeTokenFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await stakingAPI.signDelegateTokenTx(
+          values.validator,
+          values.amount,
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccount();
+      } catch (err: unknown) {
+        console.error("Error signing delegate token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, stakingAPI, translate, wallet]
+  );
+
+  const handleUnstakeToken = useCallback(
+    async (values: UnstakeTokenFormValues) => {
+      if (wallet.status !== ConnectionStatus.Connected) return;
+
+      try {
+        const tx = await stakingAPI.signUndelegateTokenTx(
+          values.validator,
+          values.amount,
+          values.memo ?? undefined
+        );
+
+        setActiveModal(null);
+
+        await toast.promise(cosmosAPI.broadcastTx(tx), {
+          pending: translate("transaction.broadcasting"),
+          success: translate("transaction.success"),
+        });
+
+        await wallet.refreshAccount();
+      } catch (err: unknown) {
+        console.error("Error signing delegate token tx", err);
+        toast.error(translate("transaction.failure"));
+        closeModals();
+      }
+    },
+    [closeModals, cosmosAPI, stakingAPI, translate, wallet]
+  );
   useEffect(() => {
     if (selfDelegateAddress) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
