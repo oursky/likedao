@@ -26,7 +26,7 @@ const CollectRewardsForm: React.FC<CollectRewardsFormProps> = (props) => {
     handleSubmit,
     formState: { errors },
   } = useForm<CollectRewardsFormValues>({
-    mode: "onTouched",
+    mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues: {
       amount: availableRewards.toFixed(6),

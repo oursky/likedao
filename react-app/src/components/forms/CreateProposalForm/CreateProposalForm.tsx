@@ -27,7 +27,7 @@ const CreateProposalForm: React.FC<CreateProposalFormProps> = (props) => {
     control,
     formState: { errors, isValid },
   } = useForm<CreateProposalFormValues>({
-    mode: "onTouched",
+    mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues: undefined,
   });

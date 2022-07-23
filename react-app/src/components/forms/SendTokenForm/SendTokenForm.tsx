@@ -29,7 +29,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     clearErrors,
     formState: { errors },
   } = useForm<SendTokenFormValues>({
-    mode: "onTouched",
+    mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues: undefined,
   });

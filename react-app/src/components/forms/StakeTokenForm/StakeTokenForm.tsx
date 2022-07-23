@@ -39,7 +39,7 @@ const StakeTokenForm: React.FC<StakeTokenFormProps> = (props) => {
     clearErrors,
     formState: { errors },
   } = useForm<StakeTokenFormValues>({
-    mode: "onTouched",
+    mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues: {
       validator: validatorAddress,
