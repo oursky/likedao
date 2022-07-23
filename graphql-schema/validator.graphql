@@ -1,3 +1,8 @@
+enum ValidatorStatusFilter {
+  Active
+  Inactive
+}
+
 type Validator implements Node {
   id: ID!
   consensusAddress: String!
@@ -9,4 +14,34 @@ type Validator implements Node {
   website: String
   securityContact: String
   details: String
+}
+
+type ValidatorEdge {
+  cursor: String!
+  node: Validator!
+}
+
+type ValidatorConnection {
+  pageInfo: PageInfo!
+  edges: [ValidatorEdge!]!
+  totalCount: Int!
+}
+
+input ValidatorSort {
+  name: Sort
+  votingPower: Sort
+  expectedReturns: Sort
+  uptime: Sort
+}
+
+input QueryValidatorsInput {
+  first: Int!
+  after: Int!
+  status: ValidatorStatusFilter
+  searchTerm: String
+  order: ValidatorSort
+}
+
+extend type Query {
+  validators(input: QueryValidatorsInput!): ValidatorConnection!
 }
