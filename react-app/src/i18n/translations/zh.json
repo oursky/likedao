@@ -100,6 +100,7 @@
   "ProposalDetail.votes.remindToVote": "Remind to vote",
   "ProposalDetail.votes.requestState.error": "Failed to fetch proposal votes, please try again later.",
   "ProposalDetail.votes.voter": "Voter",
+  "ProposalDetail.votes.voter.noSecurityContact": "Contact information for this validator is not available",
   "ProposalDetail.votes.voter.validator": "Validator",
   "ProposalDetail.votingDateRange": "{from} 至 {to}",
   "ProposalDetail.votingDurationRemaining": "剩餘{duration}",
