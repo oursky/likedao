@@ -1,6 +1,8 @@
 package models
 
-import "github.com/uptrace/bun"
+import (
+	"github.com/uptrace/bun"
+)
 
 type Validator struct {
 	bun.BaseModel `bun:"table:validator"`
@@ -10,6 +12,7 @@ type Validator struct {
 
 	Description *ValidatorDescription `bun:"rel:has-one,join:consensus_address=validator_address"`
 	Info        *ValidatorInfo        `bun:"rel:has-one,join:consensus_address=consensus_address"`
+	Status      *ValidatorStatus      `bun:"rel:has-one,join:consensus_address=validator_address"`
 }
 
 func (p Validator) IsNode()              {}
@@ -18,6 +21,9 @@ func (p Validator) IsProposalDepositor() {}
 func (p Validator) NodeID() NodeID {
 	return GetNodeID(p)
 }
+
+type ValidatorConnection = Connection[Validator]
+type ValidatorEdge = Edge[Validator]
 
 type ValidatorDescription struct {
 	bun.BaseModel `bun:"table:validator_description"`
@@ -47,4 +53,14 @@ type ValidatorInfo struct {
 	Validator        *Validator         `bun:"rel:belongs-to,join:consensus_address=consensus_address"`
 	ProposalVotes    []*ProposalVote    `bun:"rel:has-many,join:self_delegate_address=voter_address"`
 	ProposalDeposits []*ProposalDeposit `bun:"rel:has-many,join:self_delegate_address=depositor_address"`
+}
+
+type ValidatorStatus struct {
+	bun.BaseModel `bun:"table:validator_status"`
+
+	ConsensusAddress string `bun:"column:validator_address,pk"`
+	Status           int    `bun:"column:status,notnull"`
+	Jailed           bool   `bun:"column:jailed,notnull"`
+	Tombstoned       bool   `bun:"column:tombstoned,notnull"`
+	Height           int64  `bun:"column:height,notnull"`
 }
