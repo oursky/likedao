@@ -5,11 +5,38 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
 	pkgContext "github.com/oursky/likedao/pkg/context"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 )
+
+func (r *queryResolver) Validators(ctx context.Context, input models.QueryValidatorsInput) (*models.Connection[models.Validator], error) {
+	validatorQuery := pkgContext.GetQueriesFromCtx(ctx).Validator
+
+	res, err := validatorQuery.QueryPaginatedValidators(input.First, input.After, []string{})
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query validators: %v", err))
+	}
+
+	validatorCursorMap := make(map[string]string)
+	for _, validator := range res.Items {
+		cursorString := validator.ConsensusAddress
+		validatorCursorMap[validator.NodeID().String()] = cursorString
+	}
+
+	conn := models.NewConnection(res.Items, func(model models.Validator) string {
+		return validatorCursorMap[model.NodeID().String()]
+	})
+
+	conn.TotalCount = res.PaginationInfo.TotalCount
+	conn.PageInfo.HasNextPage = res.PaginationInfo.HasNext
+	conn.PageInfo.HasPreviousPage = res.PaginationInfo.HasPrevious
+
+	return &conn, nil
+}
 
 func (r *validatorResolver) OperatorAddress(ctx context.Context, obj *models.Validator) (*string, error) {
 	// Using dataloader here as we cannot assume the incoming validator has the info and description loaded
