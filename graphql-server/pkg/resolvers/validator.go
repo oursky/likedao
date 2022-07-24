@@ -197,6 +197,19 @@ func (r *validatorResolver) ExpectedReturns(ctx context.Context, obj *models.Val
 	return validator.Commission.ExpectedReturns, nil
 }
 
+func (r *validatorResolver) Uptime(ctx context.Context, obj *models.Validator) (float64, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.SigningInfo == nil {
+		return 0, nil
+	}
+
+	return validator.SigningInfo.Uptime, nil
+}
+
 // Validator returns graphql1.ValidatorResolver implementation.
 func (r *Resolver) Validator() graphql1.ValidatorResolver { return &validatorResolver{r} }
 

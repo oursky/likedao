@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/extra/bunbig"
 )
@@ -16,6 +18,7 @@ type Validator struct {
 	Status      *ValidatorStatus      `bun:"rel:has-one,join:consensus_address=validator_address"`
 	VotingPower *ValidatorVotingPower `bun:"rel:has-one,join:consensus_address=validator_address"`
 	Commission  *ValidatorCommission  `bun:"rel:has-one,join:consensus_address=validator_address"`
+	SigningInfo *ValidatorSigningInfo `bun:"rel:has-one,join:consensus_address=validator_address"`
 }
 
 func (p Validator) IsNode()              {}
@@ -87,4 +90,18 @@ type ValidatorCommission struct {
 	Height            int64         `bun:"column:height,notnull"`
 
 	ExpectedReturns float64 `json:"expected_returns"`
+}
+
+type ValidatorSigningInfo struct {
+	bun.BaseModel `bun:"table:validator_signing_info"`
+
+	ConsensusAddress    string    `bun:"column:validator_address,pk"`
+	StartHeight         int64     `bun:"column:start_height,notnull"`
+	IndexOffset         int64     `bun:"column:index_offset,notnull"`
+	JailedUntil         time.Time `bun:"column:jailed_until,notnull"`
+	Tombstoned          bool      `bun:"column:tombstoned,notnull"`
+	MissedBlocksCounter int64     `bun:"column:missed_blocks_counter,notnull"`
+	Height              int64     `bun:"column:height,notnull"`
+
+	Uptime float64 `json:"uptime"`
 }

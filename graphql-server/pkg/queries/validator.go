@@ -70,6 +70,13 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 				Column("validator_address", "commission", "min_self_delegation", "height").
 				ColumnExpr("(((1 - commission::decimal) * ((?) * (?))) / (?)::numeric) as commission__expected_returns", inflationQuery, nativeSupplyQuery, bondedPoolQuery)
 		}).
+		Relation("SigningInfo", func(signingInfoQuery *bun.SelectQuery) *bun.SelectQuery {
+			// Calculate uptime = (1 - signing_info.missed_blocks / (latest_block.height - signing_info.start_height))
+			latestBlockQuery := q.session.NewSelect().Model((*models.Block)(nil)).Order("timestamp DESC").Column("height").Limit(1)
+			return signingInfoQuery.
+				Column("validator_address", "start_height", "index_offset", "jailed_until", "tombstoned", "missed_blocks_counter", "height").
+				ColumnExpr("(1 - (missed_blocks_counter::decimal / ((?) - start_height::decimal))) as signing_info__uptime", latestBlockQuery)
+		}).
 		// To handle gql resolving when info is provided but validator isn't
 		Relation("Info.Validator")
 

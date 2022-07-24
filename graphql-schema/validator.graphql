@@ -17,6 +17,7 @@ type Validator implements Node {
 
   votingPower: Float!
   expectedReturns: Float!
+  uptime: Float!
 }
 
 type ValidatorEdge {
