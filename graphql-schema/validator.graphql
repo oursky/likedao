@@ -16,6 +16,7 @@ type Validator implements Node {
   details: String
 
   votingPower: Float!
+  expectedReturns: Float!
 }
 
 type ValidatorEdge {

@@ -184,6 +184,19 @@ func (r *validatorResolver) VotingPower(ctx context.Context, obj *models.Validat
 	return validator.VotingPower.RelativeVotingPower, nil
 }
 
+func (r *validatorResolver) ExpectedReturns(ctx context.Context, obj *models.Validator) (float64, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.Commission == nil {
+		return 0, nil
+	}
+
+	return validator.Commission.ExpectedReturns, nil
+}
+
 // Validator returns graphql1.ValidatorResolver implementation.
 func (r *Resolver) Validator() graphql1.ValidatorResolver { return &validatorResolver{r} }
 

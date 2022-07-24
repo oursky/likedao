@@ -3,6 +3,7 @@ package queries
 import (
 	"context"
 
+	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
@@ -19,13 +20,14 @@ type IValidatorQuery interface {
 type ValidatorQuery struct {
 	ctx     context.Context
 	session *bun.DB
+	config  config.Config
 
 	withProposalVotesByProposalID    int
 	withProposalDepositsByProposalID int
 }
 
-func NewValidatorQuery(ctx context.Context, session *bun.DB) IValidatorQuery {
-	return &ValidatorQuery{ctx: ctx, session: session}
+func NewValidatorQuery(ctx context.Context, config config.Config, session *bun.DB) IValidatorQuery {
+	return &ValidatorQuery{ctx: ctx, config: config, session: session}
 }
 
 func (q *ValidatorQuery) WithProposalVotes(proposalID int) IValidatorQuery {
@@ -52,6 +54,21 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 			return votingPowerQuery.
 				Column("validator_address", "voting_power", "height").
 				ColumnExpr("(voting_power::decimal / (?)) as voting_power__relative_voting_power", totalVotingPowerQuery)
+		}).
+		Relation("Commission", func(commissionQuery *bun.SelectQuery) *bun.SelectQuery {
+			// Calculate expected returns = (1 - commission_rate) * (inflation * supply) / bonded_tokens
+			inflationQuery := q.session.NewSelect().Model((*models.Inflation)(nil)).Column("value").Limit(1)
+			supplyQuery := q.session.NewSelect().Model((*models.Supply)(nil)).ColumnExpr("unnest(coins) AS coin")
+			nativeSupplyQuery := q.session.NewSelect().
+				ColumnExpr("((supply.coin).amount::numeric) as native_supply").
+				TableExpr("(?) as supply", supplyQuery).
+				Where("(supply.coin).denom = ?", q.config.Chain.CoinDenom).
+				Limit(1)
+			bondedPoolQuery := q.session.NewSelect().Model((*models.StakingPool)(nil)).Column("bonded_tokens").Limit(1)
+
+			return commissionQuery.
+				Column("validator_address", "commission", "min_self_delegation", "height").
+				ColumnExpr("(((1 - commission::decimal) * ((?) * (?))) / (?)::numeric) as commission__expected_returns", inflationQuery, nativeSupplyQuery, bondedPoolQuery)
 		}).
 		// To handle gql resolving when info is provided but validator isn't
 		Relation("Info.Validator")

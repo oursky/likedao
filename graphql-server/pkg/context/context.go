@@ -67,7 +67,7 @@ func NewRequestContext(
 		Supply:        queries.NewSupplyQuery(ctx, chainDB),
 		Proposal:      queries.NewProposalQuery(ctx, config, chainDB),
 		Reaction:      queries.NewReactionQuery(ctx, serverDB),
-		Validator:     queries.NewValidatorQuery(ctx, chainDB),
+		Validator:     queries.NewValidatorQuery(ctx, config, chainDB),
 	}
 	mutators := MutatorContext{
 		Test:     mutators.NewTestMutator(ctx, serverDB),

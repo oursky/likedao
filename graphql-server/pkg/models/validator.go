@@ -15,6 +15,7 @@ type Validator struct {
 	Info        *ValidatorInfo        `bun:"rel:has-one,join:consensus_address=consensus_address"`
 	Status      *ValidatorStatus      `bun:"rel:has-one,join:consensus_address=validator_address"`
 	VotingPower *ValidatorVotingPower `bun:"rel:has-one,join:consensus_address=validator_address"`
+	Commission  *ValidatorCommission  `bun:"rel:has-one,join:consensus_address=validator_address"`
 }
 
 func (p Validator) IsNode()              {}
@@ -75,4 +76,15 @@ type ValidatorVotingPower struct {
 	Height           int64       `bun:"column:height,notnull"`
 
 	RelativeVotingPower float64 `json:"relative_voting_power"`
+}
+
+type ValidatorCommission struct {
+	bun.BaseModel `bun:"table:validator_commission"`
+
+	ConsensusAddress  string        `bun:"column:validator_address,pk"`
+	Commission        *bunbig.Float `bun:"column:commission,notnull"`
+	MinSelfDelegation *bunbig.Int   `bun:"column:min_self_delegation,notnull"`
+	Height            int64         `bun:"column:height,notnull"`
+
+	ExpectedReturns float64 `json:"expected_returns"`
 }
