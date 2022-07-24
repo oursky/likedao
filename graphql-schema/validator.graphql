@@ -14,6 +14,8 @@ type Validator implements Node {
   website: String
   securityContact: String
   details: String
+
+  votingPower: Float!
 }
 
 type ValidatorEdge {

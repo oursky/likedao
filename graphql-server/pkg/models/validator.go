@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/extra/bunbig"
 )
 
 type Validator struct {
@@ -13,6 +14,7 @@ type Validator struct {
 	Description *ValidatorDescription `bun:"rel:has-one,join:consensus_address=validator_address"`
 	Info        *ValidatorInfo        `bun:"rel:has-one,join:consensus_address=consensus_address"`
 	Status      *ValidatorStatus      `bun:"rel:has-one,join:consensus_address=validator_address"`
+	VotingPower *ValidatorVotingPower `bun:"rel:has-one,join:consensus_address=validator_address"`
 }
 
 func (p Validator) IsNode()              {}
@@ -63,4 +65,14 @@ type ValidatorStatus struct {
 	Jailed           bool   `bun:"column:jailed,notnull"`
 	Tombstoned       bool   `bun:"column:tombstoned,notnull"`
 	Height           int64  `bun:"column:height,notnull"`
+}
+
+type ValidatorVotingPower struct {
+	bun.BaseModel `bun:"table:validator_voting_power"`
+
+	ConsensusAddress string      `bun:"column:validator_address,pk"`
+	VotingPower      *bunbig.Int `bun:"column:voting_power,notnull"`
+	Height           int64       `bun:"column:height,notnull"`
+
+	RelativeVotingPower float64 `json:"relative_voting_power"`
 }

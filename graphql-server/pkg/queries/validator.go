@@ -46,6 +46,13 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 		// Using model interface to avoid a bug where has-many fields are scanned as nil when using a nil model
 		Model(model).
 		Relation("Description").
+		Relation("VotingPower", func(votingPowerQuery *bun.SelectQuery) *bun.SelectQuery {
+			// Calculate the relative voting power = voting_power / sum(voting_power)
+			totalVotingPowerQuery := q.session.NewSelect().Model((*models.ValidatorVotingPower)(nil)).ColumnExpr("SUM(voting_power)::BIGINT as total_voting_power")
+			return votingPowerQuery.
+				Column("validator_address", "voting_power", "height").
+				ColumnExpr("(voting_power::decimal / (?)) as voting_power__relative_voting_power", totalVotingPowerQuery)
+		}).
 		// To handle gql resolving when info is provided but validator isn't
 		Relation("Info.Validator")
 
