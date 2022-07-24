@@ -18,6 +18,7 @@ import {
 } from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
+import { BigNumberDelegation } from "../models/staking";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 import { useBankAPI } from "./bankAPI";
 
@@ -35,14 +36,12 @@ interface IStakingAPI {
   getStakedBalance(): Promise<BigNumberCoin>;
   getAddressStakedBalance(address: string): Promise<BigNumberCoin>;
   getUnstakingAmount(account: string): Promise<BigNumberCoin>;
-  getDelegatorStakes(
-    account: string
-  ): Promise<{ delegation: Delegation; balance: BigNumberCoin }[]>;
+  getDelegatorStakes(account: string): Promise<BigNumberDelegation[]>;
   getPool(): Promise<Pool>;
   getDelegation(
     delegatorAddress: string,
     validatorAddress: string
-  ): Promise<{ delegation: Delegation; balance: BigNumberCoin } | null>;
+  ): Promise<BigNumberDelegation | null>;
   getValidator(address: string): Promise<RPCValidator>;
   getValidators(addresses: string[]): Promise<RPCValidator[]>;
 }
