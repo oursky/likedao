@@ -21,6 +21,10 @@ func (r *queryResolver) Validators(ctx context.Context, input models.QueryValida
 		validatorQuery = validatorQuery.ScopeValidatorStatus(*input.Status)
 	}
 
+	if input.Order != nil {
+		validatorQuery = validatorQuery.ValidatorOrderBy(*input.Order)
+	}
+
 	res, err := validatorQuery.QueryPaginatedValidators(input.First, input.After, []string{})
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query validators: %v", err))

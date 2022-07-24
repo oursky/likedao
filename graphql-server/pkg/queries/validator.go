@@ -2,6 +2,7 @@ package queries
 
 import (
 	"context"
+	"fmt"
 
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/oursky/likedao/pkg/config"
@@ -14,6 +15,7 @@ type IValidatorQuery interface {
 	ScopeValidatorStatus(filter models.ValidatorStatusFilter) IValidatorQuery
 	WithProposalDeposits() IValidatorQuery
 	WithProposalVotes() IValidatorQuery
+	ValidatorOrderBy(order models.ValidatorSort) IValidatorQuery
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
 	QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error)
 	QueryValidatorsBySelfDelegationAddresses(addresses []string) ([]*models.Validator, error)
@@ -29,6 +31,8 @@ type ValidatorQuery struct {
 	withProposalDeposits bool
 
 	scopeValidatorStatus *models.ValidatorStatusFilter
+
+	validatorOrderBy *models.ValidatorSort
 }
 
 func NewValidatorQuery(ctx context.Context, config config.Config, session *bun.DB) IValidatorQuery {
@@ -50,6 +54,12 @@ func (q *ValidatorQuery) WithProposalDeposits() IValidatorQuery {
 func (q *ValidatorQuery) ScopeValidatorStatus(status models.ValidatorStatusFilter) IValidatorQuery {
 	var newQuery = *q
 	newQuery.scopeValidatorStatus = &status
+	return &newQuery
+}
+
+func (q *ValidatorQuery) ValidatorOrderBy(order models.ValidatorSort) IValidatorQuery {
+	var newQuery = *q
+	newQuery.validatorOrderBy = &order
 	return &newQuery
 }
 
@@ -123,6 +133,23 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 		})
 	}
 
+	if q.validatorOrderBy != nil {
+		if q.validatorOrderBy.Name != nil {
+			query = query.Order(fmt.Sprintf("moniker %s", q.validatorOrderBy.Name)).Order(fmt.Sprintf("operator_address %s", q.validatorOrderBy.Name))
+		}
+		if q.validatorOrderBy.VotingPower != nil {
+			query = query.Order(fmt.Sprintf("voting_power__relative_voting_power %s", q.validatorOrderBy.VotingPower))
+		}
+		if q.validatorOrderBy.ExpectedReturns != nil {
+			query = query.Order(fmt.Sprintf("commission__expected_returns %s", q.validatorOrderBy.ExpectedReturns))
+		}
+		if q.validatorOrderBy.Uptime != nil {
+			query = query.Order(fmt.Sprintf("signing_info__uptime %s", q.validatorOrderBy.Uptime))
+		}
+	} else {
+		query = query.Order("moniker ASC").Order("operator_address ASC")
+	}
+
 	return query
 }
 
@@ -135,7 +162,7 @@ func (q *ValidatorQuery) QueryPaginatedValidators(first int, after int, includeA
 		return nil, err
 	}
 
-	query.Order("moniker ASC").Order("operator_address ASC").Limit(first + 1).Offset(after)
+	query.Limit(first + 1).Offset(after)
 
 	if err := query.Scan(q.ctx); err != nil {
 		return nil, errors.WithStack(err)
