@@ -10,8 +10,8 @@ import (
 )
 
 type IValidatorQuery interface {
-	WithProposalDeposits(proposalID int) IValidatorQuery
-	WithProposalVotes(proposalID int) IValidatorQuery
+	WithProposalDeposits() IValidatorQuery
+	WithProposalVotes() IValidatorQuery
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
 	QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error)
 	QueryValidatorsBySelfDelegationAddresses(addresses []string) ([]*models.Validator, error)
@@ -22,23 +22,23 @@ type ValidatorQuery struct {
 	session *bun.DB
 	config  config.Config
 
-	withProposalVotesByProposalID    int
-	withProposalDepositsByProposalID int
+	withProposalVotes    bool
+	withProposalDeposits bool
 }
 
 func NewValidatorQuery(ctx context.Context, config config.Config, session *bun.DB) IValidatorQuery {
 	return &ValidatorQuery{ctx: ctx, config: config, session: session}
 }
 
-func (q *ValidatorQuery) WithProposalVotes(proposalID int) IValidatorQuery {
+func (q *ValidatorQuery) WithProposalVotes() IValidatorQuery {
 	var newQuery = *q
-	newQuery.withProposalVotesByProposalID = proposalID
+	newQuery.withProposalVotes = true
 	return &newQuery
 }
 
-func (q *ValidatorQuery) WithProposalDeposits(proposalID int) IValidatorQuery {
+func (q *ValidatorQuery) WithProposalDeposits() IValidatorQuery {
 	var newQuery = *q
-	newQuery.withProposalDepositsByProposalID = proposalID
+	newQuery.withProposalDeposits = true
 	return &newQuery
 }
 
@@ -84,16 +84,13 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 		query = query.Where("info.operator_address IN (?)", bun.In(includeAddresses))
 	}
 
-	if q.withProposalVotesByProposalID > 0 {
-		query = query.Relation("Info.ProposalVotes", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			// Get the latest vote of a proposal
-			return sq.Where("proposal_id = ?", q.withProposalVotesByProposalID).Limit(1)
-		})
+	if q.withProposalVotes {
+		query = query.Relation("Info.ProposalVotes")
 	}
 
-	if q.withProposalDepositsByProposalID > 0 {
+	if q.withProposalDeposits {
 		query = query.Relation("Info.ProposalDeposits", func(sq *bun.SelectQuery) *bun.SelectQuery {
-			return sq.Where("proposal_id IN (?)", q.withProposalDepositsByProposalID).Order("proposal_deposit.height DESC")
+			return sq.Order("proposal_deposit.height DESC")
 		})
 	}
 

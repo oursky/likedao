@@ -127,7 +127,7 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 		validatorOffset = 0
 	}
 
-	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalVotes(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalVotes().QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
 	}
@@ -138,7 +138,15 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 		validator := validators.Items[i]
 		// There should only be at most one vote when scoped
 		if validator.Info != nil && len(validator.Info.ProposalVotes) != 0 {
-			result = append(result, *validator.Info.ProposalVotes[0])
+			for _, vote := range validator.Info.ProposalVotes {
+				if vote == nil {
+					continue
+				}
+				if vote.ProposalID == obj.ID {
+					result = append(result, *vote)
+					break
+				}
+			}
 		} else {
 			result = append(result, models.ProposalVote{
 				ProposalID:   obj.ID,
@@ -222,7 +230,7 @@ func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, i
 		validatorOffset = 0
 	}
 
-	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits().QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
 	}
@@ -231,7 +239,15 @@ func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, i
 	for i := range validators.Items {
 		validator := validators.Items[i]
 		if validator.Info != nil && len(validator.Info.ProposalDeposits) != 0 {
-			result = append(result, *validator.Info.ProposalDeposits[0])
+			for _, deposit := range validator.Info.ProposalDeposits {
+				if deposit == nil {
+					continue
+				}
+				if deposit.ProposalID == obj.ID {
+					result = append(result, *deposit)
+					break
+				}
+			}
 		} else {
 			result = append(result, models.ProposalDeposit{
 				ProposalID:       obj.ID,
