@@ -210,6 +210,32 @@ func (r *validatorResolver) Uptime(ctx context.Context, obj *models.Validator) (
 	return validator.SigningInfo.Uptime, nil
 }
 
+func (r *validatorResolver) ParticipatedProposalCount(ctx context.Context, obj *models.Validator) (int, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.Info == nil {
+		return 0, nil
+	}
+
+	return len(validator.Info.ProposalVotes), nil
+}
+
+func (r *validatorResolver) RelativeTotalProposalCount(ctx context.Context, obj *models.Validator) (int, error) {
+	count, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadRelativeTotalProposalCountByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if count == nil {
+		return 0, err
+	}
+
+	return *count, nil
+}
+
 // Validator returns graphql1.ValidatorResolver implementation.
 func (r *Resolver) Validator() graphql1.ValidatorResolver { return &validatorResolver{r} }
 

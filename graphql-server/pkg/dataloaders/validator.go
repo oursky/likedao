@@ -30,7 +30,7 @@ func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDat
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(addresses []string) ([]*models.Validator, []error) {
-			validators, err := validatorQuery.QueryValidatorsByConsensusAddresses(addresses)
+			validators, err := validatorQuery.WithProposalVotes().WithProposalDeposits().QueryValidatorsByConsensusAddresses(addresses)
 			if err != nil {
 				errors := make([]error, 0, len(addresses))
 				for range addresses {
@@ -46,7 +46,7 @@ func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDat
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(addresses []string) ([]*models.Validator, []error) {
-			validators, err := validatorQuery.QueryValidatorsBySelfDelegationAddresses(addresses)
+			validators, err := validatorQuery.WithProposalVotes().WithProposalDeposits().QueryValidatorsBySelfDelegationAddresses(addresses)
 			if err != nil {
 				errors := make([]error, 0, len(addresses))
 				for range addresses {

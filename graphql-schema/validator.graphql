@@ -18,6 +18,8 @@ type Validator implements Node {
   votingPower: Float!
   expectedReturns: Float!
   uptime: Float!
+  participatedProposalCount: Int!
+  relativeTotalProposalCount: Int!
 }
 
 type ValidatorEdge {
