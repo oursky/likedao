@@ -17,6 +17,10 @@ import (
 func (r *queryResolver) Validators(ctx context.Context, input models.QueryValidatorsInput) (*models.Connection[models.Validator], error) {
 	validatorQuery := pkgContext.GetQueriesFromCtx(ctx).Validator
 
+	if input.Status != nil {
+		validatorQuery = validatorQuery.ScopeValidatorStatus(*input.Status)
+	}
+
 	res, err := validatorQuery.QueryPaginatedValidators(input.First, input.After, []string{})
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query validators: %v", err))

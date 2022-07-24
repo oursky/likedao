@@ -3,6 +3,7 @@ package queries
 import (
 	"context"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/oursky/likedao/pkg/config"
 	"github.com/oursky/likedao/pkg/models"
 	"github.com/pkg/errors"
@@ -10,6 +11,7 @@ import (
 )
 
 type IValidatorQuery interface {
+	ScopeValidatorStatus(filter models.ValidatorStatusFilter) IValidatorQuery
 	WithProposalDeposits() IValidatorQuery
 	WithProposalVotes() IValidatorQuery
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
@@ -25,6 +27,8 @@ type ValidatorQuery struct {
 
 	withProposalVotes    bool
 	withProposalDeposits bool
+
+	scopeValidatorStatus *models.ValidatorStatusFilter
 }
 
 func NewValidatorQuery(ctx context.Context, config config.Config, session *bun.DB) IValidatorQuery {
@@ -40,6 +44,12 @@ func (q *ValidatorQuery) WithProposalVotes() IValidatorQuery {
 func (q *ValidatorQuery) WithProposalDeposits() IValidatorQuery {
 	var newQuery = *q
 	newQuery.withProposalDeposits = true
+	return &newQuery
+}
+
+func (q *ValidatorQuery) ScopeValidatorStatus(status models.ValidatorStatusFilter) IValidatorQuery {
+	var newQuery = *q
+	newQuery.scopeValidatorStatus = &status
 	return &newQuery
 }
 
@@ -93,6 +103,23 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 	if q.withProposalDeposits {
 		query = query.Relation("Info.ProposalDeposits", func(sq *bun.SelectQuery) *bun.SelectQuery {
 			return sq.Order("proposal_deposit.height DESC")
+		})
+	}
+
+	if q.scopeValidatorStatus != nil {
+		query = query.WhereGroup(" AND ", func(group *bun.SelectQuery) *bun.SelectQuery {
+			if *q.scopeValidatorStatus == models.ValidatorStatusFilterActive {
+				return group.Where("status.status = ?", stakingtypes.Bonded).
+					Where("status.jailed IS ?", false)
+			}
+
+			if *q.scopeValidatorStatus == models.ValidatorStatusFilterInactive {
+				return group.Where("status.jailed IS ?", true).
+					WhereOr("status.status = ?", stakingtypes.Unbonding).
+					WhereOr("status.status = ?", stakingtypes.Unbonded)
+			}
+
+			return group
 		})
 	}
 
