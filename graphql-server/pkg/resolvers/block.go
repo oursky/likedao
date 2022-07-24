@@ -22,7 +22,7 @@ func (r *queryResolver) LatestBlock(ctx context.Context) (*models.Block, error) 
 }
 
 func (r *queryResolver) BlockByID(ctx context.Context, id models.NodeID) (*models.Block, error) {
-	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Block.Load(id.ID)
+	res, err := pkgContext.GetDataLoadersFromCtx(ctx).Block.LoadBlockByHash(id.ID)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query block: %v", err))
 	}
@@ -31,7 +31,7 @@ func (r *queryResolver) BlockByID(ctx context.Context, id models.NodeID) (*model
 
 func (r *queryResolver) BlocksByIDs(ctx context.Context, ids []models.NodeID) ([]*models.Block, error) {
 	blockHashes := models.ExtractObjectIDs(ids)
-	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Block.LoadAll(blockHashes)
+	res, errs := pkgContext.GetDataLoadersFromCtx(ctx).Block.LoadBlockByHashes(blockHashes)
 
 	for _, err := range errs {
 		if err != nil {
