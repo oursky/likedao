@@ -137,6 +137,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
     >
       <div
         className={cn(
+          "flex-shrink-0",
           "flex",
           "flex-col",
           "px-3",
