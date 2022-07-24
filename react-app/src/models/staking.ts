@@ -13,6 +13,11 @@ import { pubKeyToBech32 } from "../utils/address";
 import { convertTimestampToDate } from "../utils/datetime";
 import { BigNumberCoin } from "./coin";
 
+export interface YourStake {
+  delegation: Delegation;
+  balance: BigNumberCoin;
+  reward: BigNumberCoin;
+}
 export interface BigNumberValidatorCommission {
   commissionRates: {
     /** rate is the commission rate charged to delegators, as a fraction. */

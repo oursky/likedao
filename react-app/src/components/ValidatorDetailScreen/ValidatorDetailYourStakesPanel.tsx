@@ -8,7 +8,7 @@ import {
   convertBigNumberToFixedPointString,
   convertBigNumberToMillifiedIntegerString,
 } from "../../utils/number";
-import { YourStake } from "./ValidatorDetailScreenModel";
+import { YourStake } from "../../models/staking";
 
 interface ValidatorDetailYourStakesProps {
   isLoading: boolean;

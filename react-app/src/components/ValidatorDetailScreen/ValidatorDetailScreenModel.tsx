@@ -1,17 +1,10 @@
 import {
   BondStatus,
-  Delegation,
   Description,
 } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { ValidatorSigningInfo } from "cosmjs-types/cosmos/slashing/v1beta1/slashing";
 import { BigNumberCoin } from "../../models/coin";
-import { BigNumberValidatorCommission } from "../../models/validator";
-
-export interface YourStake {
-  delegation: Delegation;
-  balance: BigNumberCoin;
-  reward: BigNumberCoin;
-}
+import { BigNumberValidatorCommission, YourStake } from "../../models/staking";
 
 export interface Validator {
   operatorAddress: string;
