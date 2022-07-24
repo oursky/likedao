@@ -10,13 +10,15 @@ import { useQueryClient } from "../providers/QueryClientProvider";
 import { convertMinimalTokenToToken } from "../utils/coin";
 import { BigNumberCoin } from "../models/coin";
 import { translateAddress } from "../utils/address";
+import { BigNumberCoinDelegatorReward } from "../models/distribution";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 import { useStakingAPI } from "./stakingAPI";
 import { useBankAPI } from "./bankAPI";
-
 interface IDistributionAPI {
   signWithdrawDelegationRewardsTx(memo?: string): Promise<SignedTx>;
-  getTotalDelegationRewards(): Promise<BigNumberCoin>;
+  getAllDelegatorDelegationRewards(
+    delegatorAddress: string
+  ): Promise<BigNumberCoinDelegatorReward[]>;
   getTotalDelegationRewards(): Promise<BigNumberCoin>;
   getTotalCommission(): Promise<BigNumberCoin>;
   getAddressTotalDelegationRewards(address: string): Promise<BigNumberCoin>;
@@ -97,6 +99,34 @@ export const useDistributionAPI = (): IDistributionAPI => {
       amount: convertMinimalTokenToToken(rewardAmount),
     };
   }, [wallet, query]);
+
+  const getAllDelegatorDelegationRewards = useCallback(
+    async (delegatorAddress: string) => {
+      const rewards = await query.distribution.delegationTotalRewards(
+        delegatorAddress
+      );
+
+      const relatedRewards = rewards.rewards
+        .filter((r) => r.reward.some((d) => d.denom === CoinMinimalDenom))
+        .map<BigNumberCoinDelegatorReward>((r) => {
+          const relatedReward = r.reward.find(
+            (d) => d.denom === CoinMinimalDenom
+          );
+          return {
+            validatorAddress: r.validatorAddress,
+            reward: {
+              denom: CoinDenom,
+              amount: convertMinimalTokenToToken(
+                new BigNumber(relatedReward?.amount ?? 0).shiftedBy(-18)
+              ),
+            },
+          };
+        });
+
+      return relatedRewards;
+    },
+    [query]
+  );
 
   const getDelegationRewardsByValidator = useCallback(
     async (delegatorAddress: string, validatorAddress: string) => {
@@ -285,6 +315,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
+      getAllDelegatorDelegationRewards,
     }),
     [
       signWithdrawDelegationRewardsTx,
@@ -296,6 +327,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       getDelegationRewardsByValidators,
       getParams,
       getAPR,
+      getAllDelegatorDelegationRewards,
     ]
   );
 };
