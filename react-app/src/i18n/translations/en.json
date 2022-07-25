@@ -219,7 +219,6 @@
   "footer.getToken": "Get Token",
   "footer.likecoin": "© {year} Likecoin",
   "footer.needHelp": "Need help?",
-  "form.fields.currency.max": "~Max",
   "form.validation.address.invalidAddress": "Invalid address",
   "form.validation.address.invalidPrefix": "Invalid address prefix, please use address with prefix `{prefix}`",
   "form.validation.amount.greaterThan": "Amount must be greater than {value}",

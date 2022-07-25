@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import cn from "classnames";
-import AppButton from "../Buttons/AppButton";
 import {
   BaseFormField,
   BaseFormFieldProps,
@@ -25,7 +24,6 @@ interface CurrencyFormFieldProps extends BaseFormFieldProps {
   inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">;
   inputClassName?: string;
   currencyUnit?: string;
-  setValue?: (value: string | number) => void;
   registerReturn: UseFormRegisterReturn;
 }
 const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
@@ -35,16 +33,9 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
     errorMessage,
     inputProps,
     inputClassName,
-    setValue,
     size = "regular",
     ...rest
   } = props;
-
-  const setValueToMax = useCallback(() => {
-    if (inputProps?.max) {
-      setValue?.(inputProps.max);
-    }
-  }, [inputProps?.max, setValue]);
 
   return (
     <BaseFormField {...rest} size={size} errorMessage={errorMessage}>
@@ -85,14 +76,6 @@ const CurrencyFormField: React.FC<CurrencyFormFieldProps> = (props) => {
             </span>
           )}
         </div>
-        {inputProps?.max != null && (
-          <AppButton
-            messageID="form.fields.currency.max"
-            size="regular"
-            theme="secondary"
-            onClick={setValueToMax}
-          />
-        )}
       </div>
     </BaseFormField>
   );

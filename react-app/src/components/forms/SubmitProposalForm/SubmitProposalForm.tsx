@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import cn from "classnames";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
@@ -34,23 +34,13 @@ const SubmitProposalForm: React.FC<SubmitProposalFormProps> = (props) => {
 
   const {
     register,
-    setValue,
     handleSubmit,
-    clearErrors,
     formState: { errors },
   } = useForm<SubmitProposalFormValues>({
     mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues,
   });
-
-  const setAmount = useCallback(
-    (value: string | number) => {
-      clearErrors("amount");
-      setValue("amount", value.toString());
-    },
-    [setValue, clearErrors]
-  );
 
   const { registerOptions } = useSubmitProposalFormModel(availableTokens);
 
@@ -67,7 +57,6 @@ const SubmitProposalForm: React.FC<SubmitProposalFormProps> = (props) => {
           placeholder: "0",
           max: availableTokens.toFixed(),
         }}
-        setValue={setAmount}
         registerReturn={register("amount", registerOptions.amount)}
         errorMessage={errors.amount?.message}
       />
