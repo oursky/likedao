@@ -15,6 +15,7 @@ type IValidatorQuery interface {
 	QueryPaginatedValidators(first int, after int, includeAddresses []string) (*Paginated[models.Validator], error)
 	QueryValidatorsByConsensusAddresses(addresses []string) ([]*models.Validator, error)
 	QueryValidatorsBySelfDelegationAddresses(addresses []string) ([]*models.Validator, error)
+	QueryRelativeTotalProposalCounts(addresses []string) ([]*int, error)
 }
 
 type ValidatorQuery struct {
@@ -187,4 +188,49 @@ func (q *ValidatorQuery) QueryValidatorsBySelfDelegationAddresses(addresses []st
 
 	return result, nil
 
+}
+
+func (q *ValidatorQuery) QueryRelativeTotalProposalCounts(addresses []string) ([]*int, error) {
+	if len(addresses) == 0 {
+		return []*int{}, nil
+	}
+
+	var counts []models.DBRelativeTotalProposalCount
+	err := q.session.NewSelect().
+		Model((*models.Validator)(nil)).
+		Relation("SigningInfo", func(votingPowerQuery *bun.SelectQuery) *bun.SelectQuery {
+			return votingPowerQuery.Column("start_height")
+		}).
+		ColumnExpr("validator.consensus_address, (?) as proposal_count", q.session.
+			NewSelect().
+			Model((*models.Proposal)(nil)).
+			ColumnExpr("COUNT(id)").
+			Where("submit_time >= block.timestamp").
+			WhereOr("signing_info.start_height = 0")).
+		Join("LEFT JOIN block ON signing_info.start_height = block.height").
+		Where("validator.consensus_address IN (?)", bun.In(addresses)).
+		Scan(q.ctx, &counts)
+
+	fmt.Printf("%+v\n", counts)
+
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	result := make([]*int, 0, len(counts))
+	addressToCount := make(map[string]int, len(counts))
+	for _, proposalCount := range counts {
+		addressToCount[proposalCount.ConsensusAddress] = proposalCount.ProposalCount
+	}
+
+	for _, address := range addresses {
+		count, exists := addressToCount[address]
+		if exists {
+			result = append(result, &count)
+		} else {
+			result = append(result, nil)
+		}
+	}
+
+	return result, nil
 }

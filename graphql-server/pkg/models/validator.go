@@ -105,3 +105,8 @@ type ValidatorSigningInfo struct {
 
 	Uptime float64 `json:"uptime"`
 }
+
+type DBRelativeTotalProposalCount struct {
+	ConsensusAddress string `json:"consensus_address"`
+	ProposalCount    int    `json:"proposal_count"`
+}
