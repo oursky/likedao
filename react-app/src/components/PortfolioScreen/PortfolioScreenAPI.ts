@@ -72,7 +72,8 @@ export const usePortfolioQuery = (): {
         amount: BigNumber.sum(
           availableBalance.amount,
           stakedBalance.amount,
-          unstakingBalance.amount
+          unstakingBalance.amount,
+          reward.amount
         ),
         denom: availableBalance.denom,
       };
