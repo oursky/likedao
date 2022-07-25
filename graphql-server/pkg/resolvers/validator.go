@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	pkgContext "github.com/oursky/likedao/pkg/context"
 	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
@@ -169,6 +170,46 @@ func (r *validatorResolver) Details(ctx context.Context, obj *models.Validator) 
 	}
 
 	return &validator.Description.Details, nil
+}
+
+func (r *validatorResolver) Jailed(ctx context.Context, obj *models.Validator) (*bool, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if validator.Status == nil {
+		return nil, nil
+	}
+
+	return &validator.Status.Jailed, nil
+}
+
+func (r *validatorResolver) Status(ctx context.Context, obj *models.Validator) (*models.ValidatorBondingStatus, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if validator.Status == nil {
+		return nil, nil
+	}
+
+	var status models.ValidatorBondingStatus
+	switch validator.Status.Status {
+	case int(stakingtypes.Bonded):
+		status = models.ValidatorBondingStatusBonded
+	case int(stakingtypes.Unbonding):
+		status = models.ValidatorBondingStatusUnbonding
+	case int(stakingtypes.Unbonded):
+		status = models.ValidatorBondingStatusUnbonded
+	}
+
+	if status == "" {
+		return nil, nil
+	}
+
+	return &status, nil
 }
 
 func (r *validatorResolver) VotingPower(ctx context.Context, obj *models.Validator) (float64, error) {

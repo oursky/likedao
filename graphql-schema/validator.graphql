@@ -3,6 +3,12 @@ enum ValidatorStatusFilter {
   Inactive
 }
 
+enum ValidatorBondingStatus {
+  Bonded
+  Unbonded
+  Unbonding
+}
+
 type Validator implements Node {
   id: ID!
   consensusAddress: String!
@@ -14,6 +20,8 @@ type Validator implements Node {
   website: String
   securityContact: String
   details: String
+  jailed: Boolean
+  status: ValidatorBondingStatus
 
   votingPower: Float!
   expectedReturns: Float!

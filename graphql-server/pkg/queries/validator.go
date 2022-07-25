@@ -78,6 +78,7 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 				Column("validator_address", "start_height", "index_offset", "jailed_until", "tombstoned", "missed_blocks_counter", "height").
 				ColumnExpr("(1 - (missed_blocks_counter::decimal / ((?) - start_height::decimal))) as signing_info__uptime", latestBlockQuery)
 		}).
+		Relation("Status").
 		// To handle gql resolving when info is provided but validator isn't
 		Relation("Info.Validator")
 
