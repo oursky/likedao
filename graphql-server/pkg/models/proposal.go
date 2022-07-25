@@ -232,12 +232,12 @@ type ProposalVoteOptionCount struct {
 type ProposalTallyResult struct {
 	bun.BaseModel `bun:"table:proposal_tally_result"`
 
-	ProposalID int         `bun:"column:proposal_id,pk"`
-	Yes        *bunbig.Int `bun:"column:yes,notnull"`
-	No         *bunbig.Int `bun:"column:no,notnull"`
-	Abstain    *bunbig.Int `bun:"column:abstain,notnull"`
-	NoWithVeto *bunbig.Int `bun:"column:no_with_veto,notnull"`
-	Height     int64       `bun:"column:height,notnull"`
+	ProposalID int        `bun:"column:proposal_id,pk"`
+	Yes        bunbig.Int `bun:"column:yes,notnull"`
+	No         bunbig.Int `bun:"column:no,notnull"`
+	Abstain    bunbig.Int `bun:"column:abstain,notnull"`
+	NoWithVeto bunbig.Int `bun:"column:no_with_veto,notnull"`
+	Height     int64      `bun:"column:height,notnull"`
 }
 
 type ProposalTurnout struct {

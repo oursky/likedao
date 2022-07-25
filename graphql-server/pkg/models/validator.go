@@ -74,9 +74,9 @@ type ValidatorStatus struct {
 type ValidatorVotingPower struct {
 	bun.BaseModel `bun:"table:validator_voting_power"`
 
-	ConsensusAddress string      `bun:"column:validator_address,pk"`
-	VotingPower      *bunbig.Int `bun:"column:voting_power,notnull"`
-	Height           int64       `bun:"column:height,notnull"`
+	ConsensusAddress string     `bun:"column:validator_address,pk"`
+	VotingPower      bunbig.Int `bun:"column:voting_power,notnull"`
+	Height           int64      `bun:"column:height,notnull"`
 
 	RelativeVotingPower float64 `json:"relative_voting_power"`
 }
@@ -84,10 +84,10 @@ type ValidatorVotingPower struct {
 type ValidatorCommission struct {
 	bun.BaseModel `bun:"table:validator_commission"`
 
-	ConsensusAddress  string        `bun:"column:validator_address,pk"`
-	Commission        *bunbig.Float `bun:"column:commission,notnull"`
-	MinSelfDelegation *bunbig.Int   `bun:"column:min_self_delegation,notnull"`
-	Height            int64         `bun:"column:height,notnull"`
+	ConsensusAddress  string       `bun:"column:validator_address,pk"`
+	Commission        bunbig.Float `bun:"column:commission,notnull"`
+	MinSelfDelegation bunbig.Int   `bun:"column:min_self_delegation,notnull"`
+	Height            int64        `bun:"column:height,notnull"`
 
 	ExpectedReturns float64 `json:"expected_returns"`
 }

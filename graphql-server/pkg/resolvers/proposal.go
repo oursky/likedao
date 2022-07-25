@@ -344,30 +344,18 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 }
 
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.Yes == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.Yes), nil
 }
 
 func (r *proposalTallyResultResolver) No(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.No == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.No), nil
 }
 
 func (r *proposalTallyResultResolver) NoWithVeto(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.NoWithVeto == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.NoWithVeto), nil
 }
 
 func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.Abstain == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.Abstain), nil
 }
 
@@ -376,22 +364,22 @@ func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj
 	var votes = int64(0)
 
 	// FIXME: Improve this handling
-	if obj.Yes != nil && obj.Yes.ToInt64() > votes {
+	if obj.Yes.ToInt64() > votes {
 		*option = models.ProposalVoteOptionYes
 		votes = obj.Yes.ToInt64()
 	}
 
-	if obj.No != nil && obj.No.ToInt64() > votes {
+	if obj.No.ToInt64() > votes {
 		*option = models.ProposalVoteOptionNo
 		votes = obj.No.ToInt64()
 	}
 
-	if obj.NoWithVeto != nil && obj.NoWithVeto.ToInt64() > votes {
+	if obj.NoWithVeto.ToInt64() > votes {
 		*option = models.ProposalVoteOptionNoWithVeto
 		votes = obj.NoWithVeto.ToInt64()
 	}
 
-	if obj.Abstain != nil && obj.Abstain.ToInt64() > votes {
+	if obj.Abstain.ToInt64() > votes {
 		*option = models.ProposalVoteOptionAbstain
 	}
 
