@@ -119,6 +119,10 @@ type AuthenticationMessage struct {
 	Resources    []string  `json:"resources"`
 }
 
+type TokenValidationRequestData struct {
+	Address string `json:"address"`
+}
+
 func (m *AuthenticationMessage) ParseAbnf(message string) error {
 	tree := abnfparser.ParseString(message, abnf.AuthenticationMessage())
 
