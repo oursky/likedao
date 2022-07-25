@@ -48,7 +48,14 @@ export const useCosmosAPI = (): ICosmosAPI => {
         throw new Error("Wallet not connected");
       }
 
-      return wallet.provider.broadcastTx(tx);
+      const resTx = await wallet.provider.broadcastTx(tx);
+
+      // 0 is success, otherwise failed
+      if (resTx.code !== 0) {
+        throw new Error(resTx.rawLog);
+      }
+
+      return resTx;
     },
     [wallet]
   );
