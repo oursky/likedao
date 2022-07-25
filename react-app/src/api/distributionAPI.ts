@@ -42,9 +42,9 @@ const Bech32PrefixValAddr = Config.chainInfo.bech32Config.bech32PrefixValAddr;
 
 export const useDistributionAPI = (): IDistributionAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmosAPI();
-  const bank = useBankAPI();
-  const staking = useStakingAPI();
+  const cosmosAPI = useCosmosAPI();
+  const bankAPI = useBankAPI();
+  const stakingAPI = useStakingAPI();
   const { query } = useQueryClient();
 
   const signWithdrawDelegationRewardsTx = useCallback(
@@ -72,9 +72,9 @@ export const useDistributionAPI = (): IDistributionAPI => {
         })
       );
 
-      return cosmos.signTx(requests, memo);
+      return cosmosAPI.signTx(requests, memo);
     },
-    [cosmos, query, wallet]
+    [cosmosAPI, query, wallet]
   );
 
   const getTotalDelegationRewards = useCallback(async () => {
@@ -269,8 +269,8 @@ export const useDistributionAPI = (): IDistributionAPI => {
     const [params, inflation, pool, totalSupply] = await Promise.all([
       getParams(),
       query.mint.inflation(),
-      staking.getPool(),
-      bank.getTotalSupply(),
+      stakingAPI.getPool(),
+      bankAPI.getTotalSupply(),
     ]);
 
     const apr = totalSupply.amount
@@ -279,7 +279,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
       .div(pool.bondedTokens)
       .toNumber();
     return apr;
-  }, [bank, getParams, query.mint, staking]);
+  }, [bankAPI, getParams, query.mint, stakingAPI]);
 
   /**
    * Expected return for delegators if they stake this validator
@@ -290,8 +290,8 @@ export const useDistributionAPI = (): IDistributionAPI => {
     async (address: string) => {
       const [annualProvisions, pool, validator] = await Promise.all([
         query.mint.annualProvisions(),
-        staking.getPool(),
-        staking.getValidator(address),
+        stakingAPI.getPool(),
+        stakingAPI.getValidator(address),
       ]);
 
       const pctCommission = new BigNumber(1).minus(
@@ -304,15 +304,15 @@ export const useDistributionAPI = (): IDistributionAPI => {
 
       return expectedRewards.toNumber();
     },
-    [query.mint, staking]
+    [query.mint, stakingAPI]
   );
 
   const getBatchValidatorExpectedReturn = useCallback(
     async (addresses: string[]) => {
       const [annualProvisions, pool, validators] = await Promise.all([
         query.mint.annualProvisions(),
-        staking.getPool(),
-        staking.getValidators(addresses),
+        stakingAPI.getPool(),
+        stakingAPI.getValidators(addresses),
       ]);
       return validators.map((validator) => {
         const pctCommission = new BigNumber(1).minus(
@@ -325,7 +325,7 @@ export const useDistributionAPI = (): IDistributionAPI => {
         return expectedRewards.toNumber();
       });
     },
-    [query.mint, staking]
+    [query.mint, stakingAPI]
   );
 
   return useMemo(

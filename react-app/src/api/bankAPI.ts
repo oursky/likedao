@@ -27,7 +27,7 @@ const CoinMinimalDenom = Config.chainInfo.currency.coinMinimalDenom;
 
 export const useBankAPI = (): IBankAPI => {
   const wallet = useWallet();
-  const cosmos = useCosmosAPI();
+  const cosmosAPI = useCosmosAPI();
   const { query } = useQueryClient();
 
   const getAddressBalance = useCallback(
@@ -87,9 +87,9 @@ export const useBankAPI = (): IBankAPI => {
         ],
       });
 
-      return cosmos.signTx([request], memo);
+      return cosmosAPI.signTx([request], memo);
     },
-    [cosmos, getBalance, wallet]
+    [cosmosAPI, getBalance, wallet]
   );
 
   return useMemo(

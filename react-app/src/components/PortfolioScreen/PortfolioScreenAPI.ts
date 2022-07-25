@@ -24,7 +24,7 @@ export const usePortfolioQuery = (): {
   const wallet = useWallet();
   const bankAPI = useBankAPI();
   const stakingAPI = useStakingAPI();
-  const distribution = useDistributionAPI();
+  const distributionAPI = useDistributionAPI();
   const { query } = useQueryClient();
 
   const isValidAddress = useCallback(
@@ -53,8 +53,8 @@ export const usePortfolioQuery = (): {
         bankAPI.getAddressBalance(address),
         stakingAPI.getAddressStakedBalance(address),
         stakingAPI.getUnstakingAmount(address),
-        distribution.getAddressTotalCommission(address),
-        distribution.getAddressTotalDelegationRewards(address),
+        distributionAPI.getAddressTotalCommission(address),
+        distributionAPI.getAddressTotalDelegationRewards(address),
       ]);
 
       const balance = {
@@ -76,7 +76,7 @@ export const usePortfolioQuery = (): {
         address,
       };
     },
-    [bankAPI, stakingAPI, distribution]
+    [bankAPI, stakingAPI, distributionAPI]
   );
 
   const fetch = useCallback(
