@@ -148,8 +148,8 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       setAccountBalance(accountBalance);
       setAutoConnectWalletType(AutoConnectWalletType.Keplr);
       setWalletStatus(ConnectionStatus.Connected);
-      // Logout anyway to prevent the case where the logged in wallet has a different account than the authenticated address
-      await authAPI.logout();
+      // Validate the token in case the logged in wallet has a different account than the authenticated address
+      await authAPI.validate(account.address);
     } catch (err: unknown) {
       console.error("Failed to connect to Keplr = ", err);
       toast.error(translate("ConnectWallet.prompt.failed"));
@@ -190,8 +190,8 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       setAccountBalance(accountBalance);
       setAutoConnectWalletType(AutoConnectWalletType.WalletConnect);
       setWalletStatus(ConnectionStatus.Connected);
-      // Logout anyway to prevent the case where the logged in wallet has a different account than the authenticated address
-      await authAPI.logout();
+      // Validate the token in case the logged in wallet has a different account than the authenticated address
+      await authAPI.validate(account.address);
     } catch (err: unknown) {
       console.error("Failed to connect to WalletConnect = ", err);
       toast.error(translate("ConnectWallet.prompt.failed"));
