@@ -13,6 +13,8 @@ import { MessageID } from "../../i18n/LocaleModel";
 import ValidatorDetailScreenModel from "./ValidatorDetailScreenModel";
 
 interface ValidatorDetailDescriptionPanelProps {
+  onStake: () => void;
+  onUnstake: () => void;
   isLoading?: boolean;
   data: ValidatorDetailScreenModel | null;
 }
@@ -162,7 +164,8 @@ const Info = ({ className, data }: ValidatorDetailPureComponentProps) => {
 
 const ValidatorDetailDescriptionPanel: React.FC<
   ValidatorDetailDescriptionPanelProps
-> = ({ isLoading, data }) => {
+> = (props) => {
+  const { isLoading, data, onStake, onUnstake } = props;
   if (isLoading || data === null) {
     return (
       <Paper className={cn("flex", "justify-center", "items-center")}>
@@ -185,6 +188,7 @@ const ValidatorDetailDescriptionPanel: React.FC<
               theme="primary"
               size="regular"
               messageID="ValidatorDetailScreen.descriptionPanel.stake"
+              onClick={onStake}
             />
             <AppButton
               className="py-1.5 min-w-fit"
@@ -192,14 +196,9 @@ const ValidatorDetailDescriptionPanel: React.FC<
               theme="outlined"
               size="regular"
               messageID="ValidatorDetailScreen.descriptionPanel.unstake"
+              onClick={onUnstake}
             />
-            <AppButton
-              className="col-span-2 py-1.5 min-w-fit whitespace-nowrap sm:col-span-1"
-              type="button"
-              theme="outlined"
-              size="regular"
-              messageID="ValidatorDetailScreen.descriptionPanel.redelegateTo"
-            />
+            {/* TODO: Implement redelegate */}
           </div>
         </div>
       </div>

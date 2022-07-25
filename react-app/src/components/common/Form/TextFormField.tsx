@@ -19,7 +19,7 @@ function getInputClassNameBySize(size: FormFieldSize): string {
 }
 interface TextFormFieldProps extends BaseFormFieldProps {
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  registerReturn: UseFormRegisterReturn;
+  registerReturn?: UseFormRegisterReturn;
 }
 const TextFormField: React.FC<TextFormFieldProps> = (props) => {
   const {
@@ -33,6 +33,8 @@ const TextFormField: React.FC<TextFormFieldProps> = (props) => {
   return (
     <BaseFormField {...rest} size={size} errorMessage={errorMessage}>
       <input
+        {...registerReturn}
+        {...inputProps}
         className={cn(
           "w-full",
           "drop-shadow-sm",
@@ -40,10 +42,9 @@ const TextFormField: React.FC<TextFormFieldProps> = (props) => {
           "rounded-md",
           "focus:outline-none",
           errorMessage != null ? "border-red-700" : "border-gray-300",
-          getInputClassNameBySize(size)
+          getInputClassNameBySize(size),
+          inputProps?.className
         )}
-        {...registerReturn}
-        {...inputProps}
       />
     </BaseFormField>
   );

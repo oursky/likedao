@@ -39,7 +39,7 @@ const SubmitProposalForm: React.FC<SubmitProposalFormProps> = (props) => {
     clearErrors,
     formState: { errors },
   } = useForm<SubmitProposalFormValues>({
-    mode: "onTouched",
+    mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues,
   });

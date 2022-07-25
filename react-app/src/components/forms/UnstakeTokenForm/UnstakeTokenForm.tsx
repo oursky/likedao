@@ -6,21 +6,31 @@ import AppButton from "../../common/Buttons/AppButton";
 import Config from "../../../config/Config";
 import LocalizedText from "../../common/Localized/LocalizedText";
 import * as FormField from "../../common/Form";
+import { truncateAddress } from "../../../utils/address";
 import {
-  SendTokenFormValues,
-  useSendTokenFormModel,
-} from "./SendTokenFormModel";
+  UnstakeTokenFormValues,
+  useUnstakeTokenFormModel,
+} from "./UnstakeTokenFormModel";
 
-interface SendTokenFormProps {
+interface StakeTokenFormProps {
   className?: string;
+  validatorMoniker: string | null;
+  validatorAddress: string;
   availableTokens: BigNumber;
   onCancel: () => void;
-  onSubmit: (data: SendTokenFormValues) => void;
+  onSubmit: (data: UnstakeTokenFormValues) => void;
 }
 
-const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
+const StakeTokenForm: React.FC<StakeTokenFormProps> = (props) => {
   const chainInfo = Config.chainInfo;
-  const { className, availableTokens, onCancel, onSubmit } = props;
+  const {
+    className,
+    availableTokens,
+    validatorMoniker,
+    validatorAddress,
+    onCancel,
+    onSubmit,
+  } = props;
 
   const {
     register,
@@ -28,10 +38,12 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<SendTokenFormValues>({
+  } = useForm<UnstakeTokenFormValues>({
     mode: "onSubmit",
     reValidateMode: "onBlur",
-    defaultValues: undefined,
+    defaultValues: {
+      validator: validatorAddress,
+    },
   });
 
   const setAmount = useCallback(
@@ -42,7 +54,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
     [setValue, clearErrors]
   );
 
-  const { registerOptions } = useSendTokenFormModel(availableTokens);
+  const { registerOptions } = useUnstakeTokenFormModel(availableTokens);
 
   return (
     <form
@@ -51,12 +63,18 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <FormField.TextInput
-        label="SendTokenModal.fields.recipent"
-        registerReturn={register("recipent", registerOptions.recipent)}
-        errorMessage={errors.recipent?.message}
+        label="UnstakeTokenModal.fields.from"
+        inputProps={{
+          disabled: true,
+          readOnly: true,
+          className: "text-app-grey",
+          value: !validatorMoniker
+            ? truncateAddress(validatorAddress)
+            : `${validatorMoniker} - ${truncateAddress(validatorAddress)}`,
+        }}
       />
       <FormField.Currency
-        label="SendTokenModal.fields.amount"
+        label="UnstakeTokenModal.fields.amount"
         currencyUnit={chainInfo.currency.coinDenom}
         inputProps={{
           placeholder: "0",
@@ -76,7 +94,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
         )}
       >
         <LocalizedText
-          messageID="SendTokenModal.fields.amount.available"
+          messageID="UnstakeTokenModal.fields.amount.available"
           messageArgs={{
             amount: availableTokens.toFixed(),
             denom: chainInfo.currency.coinDenom,
@@ -85,7 +103,7 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
       </span>
 
       <FormField.TextInput
-        label="SendTokenModal.fields.memo"
+        label="UnstakeTokenModal.fields.memo"
         registerReturn={register("memo", registerOptions.memo)}
         errorMessage={errors.memo?.message}
       />
@@ -109,4 +127,4 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
   );
 };
 
-export default SendTokenForm;
+export default StakeTokenForm;
