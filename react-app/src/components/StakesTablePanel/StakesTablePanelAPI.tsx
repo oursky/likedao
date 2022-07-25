@@ -107,35 +107,27 @@ export const useStakesQuery = (): {
       return requestState;
     }
     return RequestStateLoaded(
-      // eslint-disable-next-line complexity
       requestState.data.sort((a, b) => {
+        const direction = order.direction === "asc" ? 1 : -1;
         switch (order.id) {
           case "name":
             return (
               a.validator.description.moniker.localeCompare(
                 b.validator.description.moniker
-              ) * (order.direction === "asc" ? 1 : -1)
+              ) * direction
             );
           case "staked":
             return (
-              a.balance.amount.minus(b.balance.amount).toNumber() *
-              (order.direction === "asc" ? 1 : -1)
+              a.balance.amount.minus(b.balance.amount).toNumber() * direction
             );
           case "rewards":
             return (
-              a.reward.amount.minus(b.reward.amount).toNumber() *
-              (order.direction === "asc" ? 1 : -1)
+              a.reward.amount.minus(b.reward.amount).toNumber() * direction
             );
           case "expectedReturns":
-            return (
-              (a.expectedReturn - b.expectedReturn) *
-              (order.direction === "asc" ? 1 : -1)
-            );
+            return (a.expectedReturn - b.expectedReturn) * direction;
           case "votingPower":
-            return (
-              (a.validator.votePower - b.validator.votePower) *
-              (order.direction === "asc" ? 1 : -1)
-            );
+            return (a.validator.votePower - b.validator.votePower) * direction;
           default:
             return 1;
         }
