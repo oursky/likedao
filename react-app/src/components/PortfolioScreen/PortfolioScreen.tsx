@@ -118,7 +118,8 @@ const PortfolioScreen: React.FC = () => {
 
   return (
     <div className={cn("flex", "flex-col")}>
-      {isRequestStateLoaded(portfolioRequestState) ? (
+      {isRequestStateLoaded(portfolioRequestState) &&
+      isRequestStateLoaded(stakesRequestState) ? (
         <PortfolioPanel
           portfolio={portfolioRequestState.data}
           isYourPortfolio={isYourPortfolio}
