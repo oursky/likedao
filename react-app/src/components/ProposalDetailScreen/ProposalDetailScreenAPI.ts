@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { formatDistance } from "date-fns";
+import { formatDistance, isAfter } from "date-fns";
 import {
   ProposalDetailScreenQuery,
   ProposalDetailScreenQueryQuery,
@@ -395,6 +395,7 @@ export function useProposalQuery(id: number | null): {
         if (!r.proposalByID) {
           return null;
         }
+        const now = new Date();
         const proposal = r.proposalByID;
         return {
           ...proposal,
@@ -412,9 +413,11 @@ export function useProposalQuery(id: number | null): {
           remainingVotingDuration:
             proposal.votingStartTime &&
             proposal.votingEndTime &&
-            formatDistance(new Date(proposal.votingEndTime), new Date(), {
-              locale: dateFnsLocale,
-            }),
+            isAfter(proposal.votingEndTime, now)
+              ? formatDistance(new Date(proposal.votingEndTime), now, {
+                  locale: dateFnsLocale,
+                })
+              : null,
           depositTotal: convertMinimalTokenToToken(
             proposal.depositTotal.find((t) => t.denom === CoinMinimalDenom)
               ?.amount ?? 0
