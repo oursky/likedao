@@ -4,6 +4,16 @@ import ReactPaginate from "react-paginate";
 import { Icon, IconType } from "../Icons/Icons";
 import LocalizedText from "../Localized/LocalizedText";
 
+interface ClickEvent {
+  index: number | null;
+  selected: number;
+  nextSelectedPage: number | undefined;
+  event: object;
+  isPrevious: boolean;
+  isNext: boolean;
+  isBreak: boolean;
+  isActive: boolean;
+}
 interface PageBasedPageControllerProps {
   offsetBased: false;
   totalPage: number;
@@ -74,6 +84,27 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
       props.onPageChange(selectedItem.selected + 1);
     },
     [props]
+  );
+
+  const onClick = useCallback(
+    (event: ClickEvent) => {
+      if (!event.isBreak) return true;
+
+      // Next break is clicked
+      if (event.nextSelectedPage === event.selected + 1) {
+        return Math.floor(
+          (totalPage - event.selected) / 2 + event.selected - 1
+        );
+      }
+
+      // Previous break is clicked
+      if (event.nextSelectedPage === event.selected - 1) {
+        return Math.floor((event.selected - 1) / 2);
+      }
+
+      return true;
+    },
+    [totalPage]
   );
 
   return (
@@ -167,6 +198,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
           disableInitialCallback={true}
           forcePage={currentPage}
           onPageChange={onPageChange}
+          onClick={onClick}
         />
         <div
           className={cn(
