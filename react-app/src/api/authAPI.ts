@@ -5,6 +5,7 @@ import Config from "../config/Config";
 interface IAuthAPI {
   getNonce(): Promise<string>;
   verify: (signDoc: StdSignDoc, signature: StdSignature) => Promise<void>;
+  validate: (address: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -33,6 +34,19 @@ export const useAuthAPI = (): IAuthAPI => {
     [endPoint]
   );
 
+  const validate = useCallback(
+    async (address: string) => {
+      await fetch(`${endPoint}/validate`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({
+          address,
+        }),
+      });
+    },
+    [endPoint]
+  );
+
   const logout = useCallback(async () => {
     await fetch(`${endPoint}/logout`, {
       method: "POST",
@@ -44,8 +58,9 @@ export const useAuthAPI = (): IAuthAPI => {
     () => ({
       getNonce,
       verify,
+      validate,
       logout,
     }),
-    [getNonce, verify, logout]
+    [getNonce, verify, validate, logout]
   );
 };
