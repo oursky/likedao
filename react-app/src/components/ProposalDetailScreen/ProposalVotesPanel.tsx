@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -15,6 +15,8 @@ import { useLocale } from "../../providers/AppLocaleProvider";
 import AppButton from "../common/Buttons/AppButton";
 import AppRoutes from "../../navigation/AppRoutes";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
+import { validateEmail } from "../../utils/regex";
+import Tooltip from "../common/Tooltip/Tooltip";
 import {
   Proposal,
   ProposalVote,
@@ -152,26 +154,54 @@ const RemindToVoteButton: React.FC<{
   proposal: Proposal;
   vote: ProposalVote;
 }> = ({ proposal, vote }) => {
+  const { translate } = useLocale();
+  const [containerRef, setContainerRef] = useState<HTMLElement | null>(null);
+  const [buttonRef, setButtonRef] = useState<HTMLElement | null>(null);
+
   if (
     vote.option != null ||
     vote.voter.__typename !== "Validator" ||
-    vote.voter.securityContact == null ||
     proposal.status !== ProposalStatus.VotingPeriod
   ) {
     return null;
   }
 
-  const email: string = vote.voter.securityContact;
+  const email = vote.voter.securityContact;
+  const validatedEmail: string | null =
+    email && validateEmail(email) ? email : null;
 
   return (
-    <AppButton
-      type="anchor"
-      theme="secondary"
-      size="regular"
-      className={cn("border", "border-app-grey")}
-      messageID="ProposalDetail.votes.remindToVote"
-      href={`mailto:${email}`}
-    />
+    <div
+      ref={setContainerRef}
+      className={cn("flex", "cursor-not-allowed", "justify-end")}
+    >
+      <AppButton
+        type="anchor"
+        theme="secondary"
+        size="regular"
+        ref={setButtonRef}
+        className={cn(
+          "border",
+          "border-app-grey",
+          validatedEmail == null
+            ? cn("bg-gray-300", "pointer-events-none")
+            : null
+        )}
+        messageID="ProposalDetail.votes.remindToVote"
+        href={validatedEmail != null ? `mailto:${validatedEmail}` : ""}
+      />
+      {validatedEmail == null && (
+        <Tooltip
+          parentElement={buttonRef}
+          triggerElement={containerRef}
+          content={translate("ProposalDetail.votes.voter.noSecurityContact")}
+          popperOptions={{
+            placement: "bottom-start",
+            modifiers: [{ name: "offset", options: { offset: [20, 10] } }],
+          }}
+        />
+      )}
+    </div>
   );
 };
 
