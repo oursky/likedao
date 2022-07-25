@@ -1,10 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import BigNumber from "bignumber.js";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { ConnectionStatus, useWallet } from "../../providers/WalletProvider";
 import { useStakingAPI } from "../../api/stakingAPI";
 import {
-  isRequestStateLoaded,
   RequestState,
   RequestStateError,
   RequestStateInitial,
@@ -12,31 +11,21 @@ import {
   RequestStateLoading,
 } from "../../models/RequestState";
 import { useDistributionAPI } from "../../api/distributionAPI";
-import { ColumnOrder } from "../SectionedTable/SectionedTable";
 import { useBankAPI } from "../../api/bankAPI";
-import PortfolioScreenModel, { Portfolio, Stake } from "./PortfolioScreenModel";
-
-type PortfolioScreenRequestState = RequestState<PortfolioScreenModel>;
+import { Portfolio } from "./PortfolioScreenModel";
 
 export const usePortfolioQuery = (): {
-  requestState: PortfolioScreenRequestState;
+  requestState: RequestState<Portfolio>;
   fetch: (address?: string) => Promise<void>;
-  stakesOrder: ColumnOrder;
-  setStakesOrder: (order: ColumnOrder) => void;
 } => {
   const [requestState, setRequestState] =
-    useState<PortfolioScreenRequestState>(RequestStateInitial);
+    useState<RequestState<Portfolio>>(RequestStateInitial);
 
   const wallet = useWallet();
   const bankAPI = useBankAPI();
   const stakingAPI = useStakingAPI();
   const distribution = useDistributionAPI();
   const { query } = useQueryClient();
-
-  const [stakesOrder, setStakesOrder] = useState({
-    id: "name",
-    direction: "asc" as ColumnOrder["direction"],
-  });
 
   const isValidAddress = useCallback(
     async (address: string) => {
@@ -90,38 +79,6 @@ export const usePortfolioQuery = (): {
     [bankAPI, stakingAPI, distribution]
   );
 
-  const fetchStakes = useCallback(
-    async (address: string) => {
-      // get stakes amount and validator address of each delegation
-      const delegations = await stakingAPI.getDelegatorStakes(address);
-
-      // get rewards of each delegations
-      const validatorAddresses = delegations.map(
-        (delegation) => delegation.delegation.validatorAddress
-      );
-
-      const [rewards, validators, expectedReturns] = await Promise.all([
-        distribution.getDelegationRewardsByValidators(
-          address,
-          validatorAddresses
-        ),
-        stakingAPI.getValidators(validatorAddresses),
-        distribution.getBatchValidatorExpectedReturn(validatorAddresses),
-      ]);
-
-      // merge stakes and delegation rewards into stake entries
-      const stakeEntries: Stake[] = delegations.map((delegation, i) => ({
-        ...delegation,
-        reward: rewards[i],
-        validator: validators[i],
-        expectedReturn: expectedReturns[i],
-      }));
-
-      return stakeEntries;
-    },
-    [distribution, stakingAPI]
-  );
-
   const fetch = useCallback(
     async (address?: string) => {
       setRequestState(RequestStateLoading);
@@ -132,15 +89,13 @@ export const usePortfolioQuery = (): {
             throw new Error("Invalid address");
           }
           const portfolio = await fetchAddressPortfolio(address);
-          const stakes = await fetchStakes(address);
-          setRequestState(RequestStateLoaded({ portfolio, stakes }));
+          setRequestState(RequestStateLoaded(portfolio));
         } else {
           if (wallet.status !== ConnectionStatus.Connected) {
             throw new Error("Wallet not connected.");
           }
           const portfolio = await fetchAddressPortfolio(wallet.account.address);
-          const stakes = await fetchStakes(wallet.account.address);
-          setRequestState(RequestStateLoaded({ portfolio, stakes }));
+          setRequestState(RequestStateLoaded(portfolio));
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -149,55 +104,11 @@ export const usePortfolioQuery = (): {
         console.error("Failed to handle fetch portfolio error =", err);
       }
     },
-    [fetchAddressPortfolio, fetchStakes, isValidAddress, wallet]
+    [fetchAddressPortfolio, isValidAddress, wallet]
   );
 
-  const requestStateSorted = useMemo(() => {
-    if (!isRequestStateLoaded(requestState)) {
-      return requestState;
-    }
-    return RequestStateLoaded({
-      ...requestState.data,
-      // eslint-disable-next-line complexity
-      stakes: requestState.data.stakes.sort((a, b) => {
-        switch (stakesOrder.id) {
-          case "name":
-            return (
-              a.validator.description.moniker.localeCompare(
-                b.validator.description.moniker
-              ) * (stakesOrder.direction === "asc" ? 1 : -1)
-            );
-          case "staked":
-            return (
-              a.balance.amount.minus(b.balance.amount).toNumber() *
-              (stakesOrder.direction === "asc" ? 1 : -1)
-            );
-          case "rewards":
-            return (
-              a.reward.amount.minus(b.reward.amount).toNumber() *
-              (stakesOrder.direction === "asc" ? 1 : -1)
-            );
-          case "expectedReturns":
-            return (
-              (a.expectedReturn - b.expectedReturn) *
-              (stakesOrder.direction === "asc" ? 1 : -1)
-            );
-          case "votingPower":
-            return (
-              (a.validator.votePower - b.validator.votePower) *
-              (stakesOrder.direction === "asc" ? 1 : -1)
-            );
-          default:
-            return 1;
-        }
-      }),
-    });
-  }, [stakesOrder.direction, stakesOrder.id, requestState]);
-
   return {
-    requestState: requestStateSorted,
+    requestState,
     fetch,
-    stakesOrder,
-    setStakesOrder,
   };
 };

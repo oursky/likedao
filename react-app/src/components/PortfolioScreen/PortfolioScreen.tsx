@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   isRequestStateError,
   isRequestStateLoaded,
+  isRequestStateLoading,
 } from "../../models/RequestState";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { useLocale } from "../../providers/AppLocaleProvider";
@@ -15,20 +16,24 @@ import ProposalHistory, {
   PROPOSAL_HISTORY_PAGE_SIZE,
 } from "../ProposalHistory/ProposalHistory";
 import { useProposalHistory } from "../ProposalHistory/ProposalHistoryAPI";
+import { useStakesQuery } from "../StakesTablePanel/StakesTablePanelAPI";
+import StakesTablePanel from "../StakesTablePanel/StakesTablePanel";
 import { usePortfolioQuery } from "./PortfolioScreenAPI";
 import PortfolioPanel from "./PortfolioPanel";
-import StakesPanel from "./StakesPanel";
 
 const PortfolioScreen: React.FC = () => {
   const { address: addressFromUrl } = useParams();
   const navigate = useNavigate();
 
+  const { requestState: portfolioRequestState, fetch: fetchPortfolio } =
+    usePortfolioQuery();
+
   const {
-    requestState: portfolioRequestState,
-    fetch: fetchPortfolio,
-    stakesOrder,
-    setStakesOrder,
-  } = usePortfolioQuery();
+    requestState: stakesRequestState,
+    fetch: fetchStakes,
+    order: stakesOrder,
+    setOrder: setStakesOrder,
+  } = useStakesQuery();
 
   const {
     selectedTab,
@@ -67,6 +72,13 @@ const PortfolioScreen: React.FC = () => {
           );
         }
       }
+      if (isRequestStateError(stakesRequestState)) {
+        if (stakesRequestState.error.message === "Invalid address") {
+          navigate(AppRoutes.ErrorInvalidAddress);
+        } else {
+          toast.error(translate("PortfolioScreen.stakes.requestState.error"));
+        }
+      }
       if (isRequestStateError(proposalHistoryRequestState)) {
         toast.error(
           translate("PortfolioScreen.proposalHistory.requestState.error")
@@ -78,6 +90,7 @@ const PortfolioScreen: React.FC = () => {
     navigate,
     portfolioRequestState,
     proposalHistoryRequestState,
+    stakesRequestState,
     translate,
     wallet,
   ]);
@@ -86,8 +99,10 @@ const PortfolioScreen: React.FC = () => {
     if (address) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchPortfolio(address);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      fetchStakes(address);
     }
-  }, [address, fetchPortfolio]);
+  }, [address, fetchPortfolio, fetchStakes]);
 
   useEffect(() => {
     if (address) {
@@ -103,9 +118,10 @@ const PortfolioScreen: React.FC = () => {
 
   return (
     <div className={cn("flex", "flex-col")}>
-      {isRequestStateLoaded(portfolioRequestState) ? (
+      {isRequestStateLoaded(portfolioRequestState) &&
+      isRequestStateLoaded(stakesRequestState) ? (
         <PortfolioPanel
-          portfolio={portfolioRequestState.data.portfolio}
+          portfolio={portfolioRequestState.data}
           isYourPortfolio={isYourPortfolio}
         />
       ) : (
@@ -114,11 +130,11 @@ const PortfolioScreen: React.FC = () => {
         </Paper>
       )}
 
-      <StakesPanel
-        isLoading={!isRequestStateLoaded(portfolioRequestState)}
+      <StakesTablePanel
+        isLoading={isRequestStateLoading(stakesRequestState)}
         stakes={
-          isRequestStateLoaded(portfolioRequestState)
-            ? portfolioRequestState.data.stakes
+          isRequestStateLoaded(stakesRequestState)
+            ? stakesRequestState.data
             : null
         }
         isYourPortfolio={isYourPortfolio}
@@ -127,7 +143,8 @@ const PortfolioScreen: React.FC = () => {
       />
 
       {isRequestStateLoaded(proposalHistoryRequestState) &&
-      isRequestStateLoaded(portfolioRequestState) ? (
+      isRequestStateLoaded(portfolioRequestState) &&
+      isRequestStateLoaded(stakesRequestState) ? (
         <ProposalHistory
           data={proposalHistoryRequestState.data}
           selectedTab={selectedTab}
