@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import cn from "classnames";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
@@ -25,9 +25,7 @@ const DepositProposalForm: React.FC<DepositProposalFormProps> = (props) => {
 
   const {
     register,
-    setValue,
     handleSubmit,
-    clearErrors,
     formState: { errors },
   } = useForm<DepositProposalFormValues>({
     mode: "onSubmit",
@@ -36,14 +34,6 @@ const DepositProposalForm: React.FC<DepositProposalFormProps> = (props) => {
       proposalId,
     },
   });
-
-  const setAmount = useCallback(
-    (value: string | number) => {
-      clearErrors("amount");
-      setValue("amount", value.toString());
-    },
-    [setValue, clearErrors]
-  );
 
   const { registerOptions } = useDepositProposalFromModel(availableTokens);
 
@@ -60,7 +50,6 @@ const DepositProposalForm: React.FC<DepositProposalFormProps> = (props) => {
           placeholder: "0",
           max: availableTokens.toFixed(),
         }}
-        setValue={setAmount}
         registerReturn={register("amount", registerOptions.amount)}
         errorMessage={errors.amount?.message}
       />

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import cn from "classnames";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
@@ -24,23 +24,13 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
 
   const {
     register,
-    setValue,
     handleSubmit,
-    clearErrors,
     formState: { errors },
   } = useForm<SendTokenFormValues>({
     mode: "onSubmit",
     reValidateMode: "onBlur",
     defaultValues: undefined,
   });
-
-  const setAmount = useCallback(
-    (value: string | number) => {
-      clearErrors("amount");
-      setValue("amount", value.toString());
-    },
-    [setValue, clearErrors]
-  );
 
   const { registerOptions } = useSendTokenFormModel(availableTokens);
 
@@ -62,7 +52,6 @@ const SendTokenForm: React.FC<SendTokenFormProps> = (props) => {
           placeholder: "0",
           max: availableTokens.toFixed(),
         }}
-        setValue={setAmount}
         registerReturn={register("amount", registerOptions.amount)}
         errorMessage={errors.amount?.message}
       />
