@@ -105,7 +105,13 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
         <ColorBar data={voteData} />
       </div>
 
-      <div className={cn("flex", "flex-row", "justify-between")}>
+      <div
+        className={cn(
+          "flex",
+          "flex-row",
+          reactionItems.length !== 0 ? "justify-between" : "justify-end"
+        )}
+      >
         <ReactionList items={reactionItems} />
         <AppButton
           className={cn("self-end")}

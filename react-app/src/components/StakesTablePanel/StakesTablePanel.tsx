@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import cn from "classnames";
 import { Link } from "react-router-dom";
 import Paper from "../common/Paper/Paper";
@@ -8,14 +8,7 @@ import {
   convertBigNumberToFixedPointString,
   convertBigNumberToMillifiedIntegerString,
 } from "../../utils/number";
-import Table, {
-  ColumnOrder,
-  ColumnSortContext,
-  SortableColumnHeader,
-  TableCell,
-  TableHead,
-  TableRow,
-} from "../common/Table/Table";
+import * as Table from "../common/Table";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import AppRoutes from "../../navigation/AppRoutes";
 import { Stake } from "../PortfolioScreen/PortfolioScreenModel";
@@ -24,8 +17,8 @@ interface StakesTablePanelProps {
   isLoading: boolean;
   stakes: Stake[] | null;
   isYourPortfolio: boolean;
-  order: ColumnOrder;
-  setOrder: (order: ColumnOrder) => void;
+  order: Table.ColumnOrder;
+  setOrder: (order: Table.ColumnOrder) => void;
 }
 
 const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
@@ -35,11 +28,6 @@ const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
   order,
   setOrder,
 }) => {
-  const columnSortContextValue = useMemo(
-    () => ({ order, setOrder }),
-    [order, setOrder]
-  );
-
   if (isLoading) {
     return (
       <Paper className={cn("flex", "justify-center", "items-center")}>
@@ -53,7 +41,7 @@ const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
   }
 
   return (
-    <Paper>
+    <Paper className={cn("flex", "flex-col")}>
       <div className={cn("flex", "mb-9")}>
         <Icon
           className={cn("fill-app-black", "mr-3")}
@@ -74,99 +62,125 @@ const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
         </h2>
       </div>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <ColumnSortContext.Provider value={columnSortContextValue}>
-              <SortableColumnHeader
-                id="name"
-                titleId="StakesPanel.name"
-                sortable={true}
-                className="uppercase bg-gray-50 border-b border-gray-200"
+      <Table.Table items={stakes} sortOrder={order} onSort={setOrder}>
+        <Table.Column<Stake>
+          id="name"
+          titleId="StakesPanel.name"
+          sortable={true}
+        >
+          {(item) => (
+            <div className={cn("flex", "items-center")}>
+              <div
+                className={cn(
+                  "flex-shrink-0",
+                  "w-9",
+                  "h-9",
+                  "leading-none",
+                  "rounded-full",
+                  "bg-blue-700",
+                  "flex-shrink-0"
+                )}
               />
-              <SortableColumnHeader
-                id="staked"
-                titleId="StakesPanel.staked"
-                sortable={true}
-                className="uppercase bg-gray-50 border-b border-gray-200"
-              />
-              <SortableColumnHeader
-                id="rewards"
-                titleId="StakesPanel.rewards"
-                sortable={true}
-                className="uppercase bg-gray-50 border-b border-gray-200"
-              />
-              <SortableColumnHeader
-                id="expectedReturns"
-                titleId="StakesPanel.expectedReturns"
-                sortable={true}
-                className="uppercase bg-gray-50 border-b border-gray-200"
-              />
-              <SortableColumnHeader
-                id="votingPower"
-                titleId="StakesPanel.votingPower"
-                sortable={true}
-                className="uppercase bg-gray-50 border-b border-gray-200"
-              />
-            </ColumnSortContext.Provider>
-          </TableRow>
-        </TableHead>
-
-        <tbody>
-          {stakes.map((stake) => (
-            <TableRow key={stake.delegation.validatorAddress}>
-              <TableCell className="flex items-center py-4">
-                <div
-                  className={cn(
-                    "w-9",
-                    "h-9",
-                    "leading-none",
-                    "rounded-full",
-                    "bg-blue-700",
-                    "flex-shrink-0"
-                  )}
-                />
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-app-green">
-                    <Link
-                      to={AppRoutes.ValidatorDetail.replace(
-                        ":address",
-                        stake.validator.operatorAddress
-                      )}
-                    >
-                      {stake.validator.description.moniker}
-                    </Link>
-                  </h3>
-                  <p
-                    className={cn(
-                      "text-xs",
-                      "font-medium",
-                      "leading-[14px]",
-                      "text-app-vote-color-yes"
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-app-green">
+                  <Link
+                    to={AppRoutes.ValidatorDetail.replace(
+                      ":address",
+                      item.validator.operatorAddress
                     )}
                   >
-                    <LocalizedText messageID="StakesPanel.active" />
-                  </p>
-                </div>
-              </TableCell>
-              <TableCell>
-                {convertBigNumberToMillifiedIntegerString(stake.balance.amount)}
-              </TableCell>
-              <TableCell>
-                {!stake.reward.amount.lt(1)
-                  ? convertBigNumberToMillifiedIntegerString(
-                      stake.reward.amount
-                    )
-                  : convertBigNumberToFixedPointString(stake.reward.amount, 9)}
-              </TableCell>
-              <TableCell>{(stake.expectedReturn * 100).toFixed(2)}%</TableCell>
-              <TableCell>
-                {(stake.validator.votePower * 100).toFixed(2)}%
-              </TableCell>
-            </TableRow>
-          ))}
-        </tbody>
-      </Table>
+                    {item.validator.description.moniker}
+                  </Link>
+                </h3>
+                <p
+                  className={cn(
+                    "text-xs",
+                    "font-medium",
+                    "leading-[14px]",
+                    "text-app-vote-color-yes"
+                  )}
+                >
+                  <LocalizedText messageID="StakesPanel.active" />
+                </p>
+              </div>
+            </div>
+          )}
+        </Table.Column>
+        <Table.Column<Stake>
+          id="staked"
+          titleId="StakesPanel.staked"
+          sortable={true}
+        >
+          {(item) => (
+            <span
+              className={cn(
+                "text-sm",
+                "leading-5",
+                "font-normal",
+                "text-gray-500"
+              )}
+            >
+              {convertBigNumberToMillifiedIntegerString(item.balance.amount)}
+            </span>
+          )}
+        </Table.Column>
+        <Table.Column<Stake>
+          id="rewards"
+          titleId="StakesPanel.rewards"
+          sortable={true}
+        >
+          {(item) => (
+            <span
+              className={cn(
+                "text-sm",
+                "leading-5",
+                "font-normal",
+                "text-gray-500"
+              )}
+            >
+              {!item.reward.amount.lt(1)
+                ? convertBigNumberToMillifiedIntegerString(item.reward.amount)
+                : convertBigNumberToFixedPointString(item.reward.amount, 9)}
+            </span>
+          )}
+        </Table.Column>
+        <Table.Column<Stake>
+          id="expectedReturns"
+          titleId="StakesPanel.expectedReturns"
+          sortable={true}
+        >
+          {(item) => (
+            <span
+              className={cn(
+                "text-sm",
+                "leading-5",
+                "font-normal",
+                "text-gray-500"
+              )}
+            >
+              {(item.expectedReturn * 100).toFixed(2)}%
+            </span>
+          )}
+        </Table.Column>
+        <Table.Column<Stake>
+          id="votingPower"
+          titleId="StakesPanel.votingPower"
+          sortable={true}
+        >
+          {(item) => (
+            <span
+              className={cn(
+                "text-sm",
+                "leading-5",
+                "font-normal",
+                "text-gray-500"
+              )}
+            >
+              {(item.validator.votePower * 100).toFixed(2)}%
+            </span>
+          )}
+        </Table.Column>
+      </Table.Table>
     </Paper>
   );
 };

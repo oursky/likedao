@@ -11,14 +11,14 @@ import {
 } from "../../models/RequestState";
 import { useQueryClient } from "../../providers/QueryClientProvider";
 import { useWallet, ConnectionStatus } from "../../providers/WalletProvider";
-import { ColumnOrder } from "../common/Table/Table";
+import * as Table from "../common/Table";
 import { Stake } from "./StakesTablePanelModel";
 
 export const useStakesQuery = (): {
   requestState: RequestState<Stake[]>;
   fetch: (address?: string) => Promise<void>;
-  order: ColumnOrder;
-  setOrder: (order: ColumnOrder) => void;
+  order: Table.ColumnOrder;
+  setOrder: (order: Table.ColumnOrder) => void;
 } => {
   const [requestState, setRequestState] =
     useState<RequestState<Stake[]>>(RequestStateInitial);
@@ -30,7 +30,7 @@ export const useStakesQuery = (): {
 
   const [order, setOrder] = useState({
     id: "name",
-    direction: "asc" as ColumnOrder["direction"],
+    direction: "asc" as Table.ColumnOrder["direction"],
   });
 
   const isValidAddress = useCallback(

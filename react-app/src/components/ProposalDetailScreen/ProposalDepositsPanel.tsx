@@ -3,7 +3,6 @@ import cn from "classnames";
 import { Link, useOutletContext, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import BigNumber from "bignumber.js";
-import * as SectionedTable from "../SectionedTable/SectionedTable";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
   isRequestStateError,
@@ -16,6 +15,7 @@ import ColorBar from "../common/ColorBar/ColorBar";
 import Config from "../../config/Config";
 import { useGovAPI } from "../../api/govAPI";
 import AppRoutes from "../../navigation/AppRoutes";
+import * as Table from "../common/Table";
 import {
   Proposal,
   ProposalDeposit,
@@ -149,7 +149,7 @@ const ProposalDepositsPanel: React.FC = () => {
       sortBy && sortDirection
         ? {
             id: sortBy as ProposalDepositSortableColumn,
-            direction: sortDirection as SectionedTable.ColumnOrder["direction"],
+            direction: sortDirection as Table.ColumnOrder["direction"],
           }
         : undefined;
 
@@ -174,7 +174,7 @@ const ProposalDepositsPanel: React.FC = () => {
   );
 
   const setSortOrder = useCallback(
-    (order: SectionedTable.ColumnOrder) => {
+    (order: Table.ColumnOrder) => {
       setSearchParams({
         sortBy: order.id,
         sortDirection: order.direction,
@@ -183,24 +183,23 @@ const ProposalDepositsPanel: React.FC = () => {
     [setSearchParams]
   );
 
-  const tableSections =
-    useMemo((): SectionedTable.SectionItem<ProposalDeposit>[] => {
-      if (!isRequestStateLoaded(requestState)) {
-        return [];
-      }
-      return [
-        {
-          titleId: "ProposalDetail.deposits.delegatedValidators",
-          className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
-          items: requestState.data.pinnedDeposits,
-        },
-        {
-          titleId: "ProposalDetail.deposits.others",
-          className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
-          items: requestState.data.deposits,
-        },
-      ];
-    }, [requestState]);
+  const tableSections = useMemo((): Table.SectionItem<ProposalDeposit>[] => {
+    if (!isRequestStateLoaded(requestState)) {
+      return [];
+    }
+    return [
+      {
+        titleId: "ProposalDetail.deposits.delegatedValidators",
+        className: cn("uppercase", "bg-app-secondarygreen", "text-app-green"),
+        items: requestState.data.pinnedDeposits,
+      },
+      {
+        titleId: "ProposalDetail.deposits.others",
+        className: cn("uppercase", "bg-app-gold", "text-app-darkgrey"),
+        items: requestState.data.deposits,
+      },
+    ];
+  }, [requestState]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -240,28 +239,28 @@ const ProposalDepositsPanel: React.FC = () => {
         totalDepositAmount={proposal.depositTotal}
         requiredDepositAmount={minimumDeposit}
       />
-      <SectionedTable.Table
+      <Table.SectionedTable
         sections={tableSections}
         isLoading={!isRequestStateLoaded(requestState)}
         emptyMessageID="ProposalDetail.deposits.empty"
         sortOrder={sortOrder}
         onSort={setSortOrder}
       >
-        <SectionedTable.Column<ProposalDeposit>
+        <Table.Column<ProposalDeposit>
           id={ProposalDepositSortableColumn.Depositor}
           titleId="ProposalDetail.deposits.depositor"
           sortable={true}
         >
           {(item) => <ProposalDepositor depositor={item.depositor} />}
-        </SectionedTable.Column>
-        <SectionedTable.Column<ProposalDeposit>
+        </Table.Column>
+        <Table.Column<ProposalDeposit>
           id={ProposalDepositSortableColumn.Amount}
           titleId="ProposalDetail.deposits.amount"
           sortable={true}
         >
           {(item) => <ProposalDepositAmount deposit={item.amount} />}
-        </SectionedTable.Column>
-      </SectionedTable.Table>
+        </Table.Column>
+      </Table.SectionedTable>
       <PageContoller
         offsetBased={true}
         pageSize={PROPOSAL_DEPOSIT_PAGE_SIZE}
