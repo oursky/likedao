@@ -4,13 +4,13 @@ import {
   Delegation,
   DelegationResponse,
   Pool,
+  Validator as RPCValidator,
 } from "cosmjs-types/cosmos/staking/v1beta1/staking";
 import { ConnectionStatus, useWallet } from "../providers/WalletProvider";
 import Config from "../config/Config";
 import {
   newDelegateMessage,
   newUndelegateMessage,
-  ValidatorRPC,
 } from "../models/cosmos/staking";
 import {
   convertMinimalTokenToToken,
@@ -18,8 +18,7 @@ import {
 } from "../utils/coin";
 import { useQueryClient } from "../providers/QueryClientProvider";
 import { BigNumberCoin } from "../models/coin";
-import { pubKeyToBech32, translateAddress } from "../utils/address";
-import { convertTimestampToDate } from "../utils/datetime";
+import { BigNumberDelegation } from "../models/staking";
 import { SignedTx, useCosmosAPI } from "./cosmosAPI";
 import { useBankAPI } from "./bankAPI";
 
@@ -37,16 +36,14 @@ interface IStakingAPI {
   getStakedBalance(): Promise<BigNumberCoin>;
   getAddressStakedBalance(address: string): Promise<BigNumberCoin>;
   getUnstakingAmount(account: string): Promise<BigNumberCoin>;
-  getDelegatorStakes(
-    account: string
-  ): Promise<{ delegation: Delegation; balance: BigNumberCoin }[]>;
+  getDelegatorStakes(account: string): Promise<BigNumberDelegation[]>;
   getPool(): Promise<Pool>;
   getDelegation(
     delegatorAddress: string,
     validatorAddress: string
-  ): Promise<{ delegation: Delegation; balance: BigNumberCoin } | null>;
-  getValidator(address: string): Promise<ValidatorRPC>;
-  getValidators(addresses: string[]): Promise<ValidatorRPC[]>;
+  ): Promise<BigNumberDelegation | null>;
+  getValidator(address: string): Promise<RPCValidator>;
+  getValidators(addresses: string[]): Promise<RPCValidator[]>;
 }
 
 const CoinDenom = Config.chainInfo.currency.coinDenom;
@@ -284,89 +281,14 @@ export const useStakingAPI = (): IStakingAPI => {
         throw new Error(`validator with address ${address} not found`);
       }
 
-      const consensusPubkey = validator.consensusPubkey;
-      if (!consensusPubkey) {
-        throw new Error("Validator consensus public key not found");
-      }
-      const consensusPubAddr = pubKeyToBech32(
-        consensusPubkey,
-        Config.chainInfo.bech32Config.bech32PrefixConsAddr
-      );
-
-      const commissionRaw = validator.commission;
-
-      const commissionUpdateTime = commissionRaw?.updateTime
-        ? convertTimestampToDate(commissionRaw.updateTime)
-        : null;
-
-      const commission = {
-        commissionRates: {
-          // Default cosmos decimal places is 18
-          rate: new BigNumber(
-            commissionRaw?.commissionRates?.rate ?? 0
-          ).shiftedBy(-18),
-          maxRate: new BigNumber(
-            commissionRaw?.commissionRates?.maxRate ?? 0
-          ).shiftedBy(-18),
-          maxChangeRate: new BigNumber(
-            commissionRaw?.commissionRates?.maxChangeRate ?? 0
-          ).shiftedBy(-18),
-        },
-        updateTime: commissionUpdateTime,
-      };
-
-      const tokens = {
-        amount: new BigNumber(validator.tokens),
-        denom: CoinMinimalDenom,
-      };
-
-      const unbondingTime = validator.unbondingTime
-        ? new Date(validator.unbondingTime.seconds.toNumber())
-        : null;
-
-      const minSelfDelegation = {
-        amount: new BigNumber(validator.minSelfDelegation),
-        denom: CoinMinimalDenom,
-      };
-
-      const selfDelegationAddress = translateAddress(
-        validator.operatorAddress,
-        Config.chainInfo.bech32Config.bech32PrefixAccAddr
-      );
-
-      const selfDelegation = (
-        await getDelegation(selfDelegationAddress, validator.operatorAddress)
-      )?.balance;
-
-      const pool = await getPool();
-      const votePower = tokens.amount.div(pool.bondedTokens).toNumber();
-
-      return {
-        ...validator,
-        consensusPubAddr,
-        commission,
-        tokens: {
-          amount: convertMinimalTokenToToken(tokens.amount),
-          denom: Config.chainInfo.currency.coinDenom,
-        },
-        unbondingTime,
-        selfDelegationAddress,
-        minSelfDelegation,
-        selfDelegation: selfDelegation
-          ? {
-              amount: selfDelegation.amount,
-              denom: Config.chainInfo.currency.coinDenom,
-            }
-          : null,
-        votePower,
-      } as ValidatorRPC;
+      return validator;
     },
-    [getDelegation, getPool, query.staking]
+    [query.staking]
   );
 
   const getValidators = useCallback(
     async (addresses: string[]) => {
-      const validatorPromises: Promise<ValidatorRPC>[] = [];
+      const validatorPromises: Promise<RPCValidator>[] = [];
       for (const address of addresses) {
         validatorPromises.push(getValidator(address));
       }

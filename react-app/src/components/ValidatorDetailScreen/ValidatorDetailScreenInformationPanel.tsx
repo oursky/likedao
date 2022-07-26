@@ -52,11 +52,9 @@ const ValidatorDetailScreenInformationPanel: React.FC<
   const {
     uptime,
     signingInfo: { startHeight },
-    validator: {
-      commission: { commissionRates, updateTime: commissionUpdateTime },
-      operatorAddress,
-    },
-  } = data;
+    commission: { commissionRates, updateTime: commissionUpdateTime },
+    operatorAddress,
+  } = data.validator;
 
   return (
     <Paper>

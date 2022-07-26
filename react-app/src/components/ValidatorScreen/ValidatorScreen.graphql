@@ -1,0 +1,39 @@
+fragment ValidatorScreenValidator on Validator {
+  id
+  operatorAddress
+  moniker
+  avatarUrl
+  jailed
+  status
+
+  votingPower
+  expectedReturns
+  uptime
+  participatedProposalCount
+  relativeTotalProposalCount
+}
+
+query ValidatorScreenQuery(
+  $first: Int!
+  $after: Int!
+  $status: ValidatorStatusFilter
+  $searchTerm: String
+  $order: ValidatorSort
+) {
+  validators(
+    input: {
+      first: $first
+      after: $after
+      status: $status
+      searchTerm: $searchTerm
+      order: $order
+    }
+  ) {
+    totalCount
+    edges {
+      node {
+        ...ValidatorScreenValidator
+      }
+    }
+  }
+}
