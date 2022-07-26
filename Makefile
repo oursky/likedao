@@ -2,16 +2,10 @@ GIT_SHA ?= $(shell git rev-parse --short=8 HEAD)
 BUILD_TAG ?= git-$(GIT_SHA)
 DOCKER_REGISTRY ?= ghcr.io/oursky
 
-SIGNATURE_SECRET := $(shell openssl rand -hex 64)
-.PHONY: secret
-secret:
-	cp -p .env .env.$$(date +%Y%m%d%H%M%S).bak || true
-	cp .env.example .env
-	sed -i '' -e "s/__SIGNATURE_SECRET__/$(SIGNATURE_SECRET)/g" ".env"
-
 .PHONY: setup
-setup: secret
+setup:
 	make -C react-app setup
+	make -C graphql-server setup
 	make codegen
 	make -C bdjuno setup
 	docker-compose build

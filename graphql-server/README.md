@@ -16,11 +16,11 @@ docker-compose up
 
 ## Development
 
-## GraphQL Playground
+### GraphQL Playground
 
 By default docker will start the server with GIN_MODE=debug, visit http://localhost:8080/graphql
 
-## Update GraphQL Schema
+### Update GraphQL Schema
 
 1. Apply changes to [existing schemas](../graphql-schema/)
 2. Update the codegen configuration if needed
@@ -31,34 +31,34 @@ By default docker will start the server with GIN_MODE=debug, visit http://localh
 4. Implement resolver in the [resolvers](./pkg/resolvers/) folder
 5. Write tests if needed
 
-## Data Paths
+### Data Paths
 
 ```
 Gin -> GraphQL Handler -> Resolver -> Data Loader -> Query -> DB
 Gin -> GraphQL Handler -> Resolver -> Mutator -> DB
 ```
 
-## Migrations
+### Migrations
 
-### Create migration
+#### Create migration
 
 ```
 make migration-new NAME=migration-name
 ```
 
-### Up
+#### Up
 
 ```
 make migration-up
 ```
 
-### Down
+#### Down
 
 ```
 make migration-down
 ```
 
-### Status
+#### Status
 
 ```
 make migration-status
