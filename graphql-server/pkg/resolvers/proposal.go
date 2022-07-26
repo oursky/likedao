@@ -127,7 +127,7 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 		validatorOffset = 0
 	}
 
-	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalVotes(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalVotes().QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
 	}
@@ -138,7 +138,15 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 		validator := validators.Items[i]
 		// There should only be at most one vote when scoped
 		if validator.Info != nil && len(validator.Info.ProposalVotes) != 0 {
-			result = append(result, *validator.Info.ProposalVotes[0])
+			for _, vote := range validator.Info.ProposalVotes {
+				if vote == nil {
+					continue
+				}
+				if vote.ProposalID == obj.ID {
+					result = append(result, *vote)
+					break
+				}
+			}
 		} else {
 			result = append(result, models.ProposalVote{
 				ProposalID:   obj.ID,
@@ -222,7 +230,7 @@ func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, i
 		validatorOffset = 0
 	}
 
-	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits(obj.ID).QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
+	validators, err := pkgContext.GetQueriesFromCtx(ctx).Validator.WithProposalDeposits().QueryPaginatedValidators(validatorLimit, validatorOffset, input.PinnedValidators)
 	if err != nil {
 		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to load validators: %v", err))
 	}
@@ -231,7 +239,15 @@ func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, i
 	for i := range validators.Items {
 		validator := validators.Items[i]
 		if validator.Info != nil && len(validator.Info.ProposalDeposits) != 0 {
-			result = append(result, *validator.Info.ProposalDeposits[0])
+			for _, deposit := range validator.Info.ProposalDeposits {
+				if deposit == nil {
+					continue
+				}
+				if deposit.ProposalID == obj.ID {
+					result = append(result, *deposit)
+					break
+				}
+			}
 		} else {
 			result = append(result, models.ProposalDeposit{
 				ProposalID:       obj.ID,
@@ -328,30 +344,18 @@ func (r *proposalDepositResolver) Depositor(ctx context.Context, obj *models.Pro
 }
 
 func (r *proposalTallyResultResolver) Yes(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.Yes == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.Yes), nil
 }
 
 func (r *proposalTallyResultResolver) No(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.No == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.No), nil
 }
 
 func (r *proposalTallyResultResolver) NoWithVeto(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.NoWithVeto == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.NoWithVeto), nil
 }
 
 func (r *proposalTallyResultResolver) Abstain(ctx context.Context, obj *models.ProposalTallyResult) (models.BigInt, error) {
-	if obj.Abstain == nil {
-		return models.NewBigInt(0), nil
-	}
 	return models.NewBigIntFromBunBigInt(obj.Abstain), nil
 }
 
@@ -360,22 +364,22 @@ func (r *proposalTallyResultResolver) OutstandingOption(ctx context.Context, obj
 	var votes = int64(0)
 
 	// FIXME: Improve this handling
-	if obj.Yes != nil && obj.Yes.ToInt64() > votes {
+	if obj.Yes.ToInt64() > votes {
 		*option = models.ProposalVoteOptionYes
 		votes = obj.Yes.ToInt64()
 	}
 
-	if obj.No != nil && obj.No.ToInt64() > votes {
+	if obj.No.ToInt64() > votes {
 		*option = models.ProposalVoteOptionNo
 		votes = obj.No.ToInt64()
 	}
 
-	if obj.NoWithVeto != nil && obj.NoWithVeto.ToInt64() > votes {
+	if obj.NoWithVeto.ToInt64() > votes {
 		*option = models.ProposalVoteOptionNoWithVeto
 		votes = obj.NoWithVeto.ToInt64()
 	}
 
-	if obj.Abstain != nil && obj.Abstain.ToInt64() > votes {
+	if obj.Abstain.ToInt64() > votes {
 		*option = models.ProposalVoteOptionAbstain
 	}
 

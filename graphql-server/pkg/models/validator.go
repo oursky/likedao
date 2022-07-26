@@ -1,6 +1,11 @@
 package models
 
-import "github.com/uptrace/bun"
+import (
+	"time"
+
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/extra/bunbig"
+)
 
 type Validator struct {
 	bun.BaseModel `bun:"table:validator"`
@@ -10,6 +15,10 @@ type Validator struct {
 
 	Description *ValidatorDescription `bun:"rel:has-one,join:consensus_address=validator_address"`
 	Info        *ValidatorInfo        `bun:"rel:has-one,join:consensus_address=consensus_address"`
+	Status      *ValidatorStatus      `bun:"rel:has-one,join:consensus_address=validator_address"`
+	VotingPower *ValidatorVotingPower `bun:"rel:has-one,join:consensus_address=validator_address"`
+	Commission  *ValidatorCommission  `bun:"rel:has-one,join:consensus_address=validator_address"`
+	SigningInfo *ValidatorSigningInfo `bun:"rel:has-one,join:consensus_address=validator_address"`
 }
 
 func (p Validator) IsNode()              {}
@@ -18,6 +27,9 @@ func (p Validator) IsProposalDepositor() {}
 func (p Validator) NodeID() NodeID {
 	return GetNodeID(p)
 }
+
+type ValidatorConnection = Connection[Validator]
+type ValidatorEdge = Edge[Validator]
 
 type ValidatorDescription struct {
 	bun.BaseModel `bun:"table:validator_description"`
@@ -47,4 +59,54 @@ type ValidatorInfo struct {
 	Validator        *Validator         `bun:"rel:belongs-to,join:consensus_address=consensus_address"`
 	ProposalVotes    []*ProposalVote    `bun:"rel:has-many,join:self_delegate_address=voter_address"`
 	ProposalDeposits []*ProposalDeposit `bun:"rel:has-many,join:self_delegate_address=depositor_address"`
+}
+
+type ValidatorStatus struct {
+	bun.BaseModel `bun:"table:validator_status"`
+
+	ConsensusAddress string `bun:"column:validator_address,pk"`
+	Status           int    `bun:"column:status,notnull"`
+	Jailed           bool   `bun:"column:jailed,notnull"`
+	Tombstoned       bool   `bun:"column:tombstoned,notnull"`
+	Height           int64  `bun:"column:height,notnull"`
+}
+
+type ValidatorVotingPower struct {
+	bun.BaseModel `bun:"table:validator_voting_power"`
+
+	ConsensusAddress string     `bun:"column:validator_address,pk"`
+	VotingPower      bunbig.Int `bun:"column:voting_power,notnull"`
+	Height           int64      `bun:"column:height,notnull"`
+
+	RelativeVotingPower float64 `json:"relative_voting_power"`
+}
+
+type ValidatorCommission struct {
+	bun.BaseModel `bun:"table:validator_commission"`
+
+	ConsensusAddress  string       `bun:"column:validator_address,pk"`
+	Commission        bunbig.Float `bun:"column:commission,notnull"`
+	MinSelfDelegation bunbig.Int   `bun:"column:min_self_delegation,notnull"`
+	Height            int64        `bun:"column:height,notnull"`
+
+	ExpectedReturns float64 `json:"expected_returns"`
+}
+
+type ValidatorSigningInfo struct {
+	bun.BaseModel `bun:"table:validator_signing_info"`
+
+	ConsensusAddress    string    `bun:"column:validator_address,pk"`
+	StartHeight         int64     `bun:"column:start_height,notnull"`
+	IndexOffset         int64     `bun:"column:index_offset,notnull"`
+	JailedUntil         time.Time `bun:"column:jailed_until,notnull"`
+	Tombstoned          bool      `bun:"column:tombstoned,notnull"`
+	MissedBlocksCounter int64     `bun:"column:missed_blocks_counter,notnull"`
+	Height              int64     `bun:"column:height,notnull"`
+
+	Uptime float64 `json:"uptime"`
+}
+
+type DBRelativeTotalProposalCount struct {
+	ConsensusAddress string `json:"consensus_address"`
+	ProposalCount    int    `json:"proposal_count"`
 }

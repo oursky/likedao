@@ -9,14 +9,20 @@ import (
 type ValidatorDataloader interface {
 	LoadValidatorWithInfoByConsensusAddress(address string) (*models.Validator, error)
 	LoadValidatorWithInfoBySelfDelegationAddress(address string) (*models.Validator, error)
+	LoadRelativeTotalProposalCountByConsensusAddress(address string) (*int, error)
 }
 type ValidatorLoader interface {
 	Load(address string) (*models.Validator, error)
 }
 
+type ProposalCountLoader interface {
+	Load(address string) (*int, error)
+}
+
 type IValidatorDataloader struct {
-	validatorConsensusAddressLoader      ValidatorLoader
-	validatorSelfDelegationAddressLoader ValidatorLoader
+	validatorConsensusAddressLoader                  ValidatorLoader
+	validatorSelfDelegationAddressLoader             ValidatorLoader
+	relativeTotalProposalCountConsensusAddressLoader ProposalCountLoader
 }
 
 func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDataloader {
@@ -24,7 +30,7 @@ func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDat
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(addresses []string) ([]*models.Validator, []error) {
-			validators, err := validatorQuery.QueryValidatorsByConsensusAddresses(addresses)
+			validators, err := validatorQuery.WithProposalVotes().WithProposalDeposits().QueryValidatorsByConsensusAddresses(addresses)
 			if err != nil {
 				errors := make([]error, 0, len(addresses))
 				for range addresses {
@@ -40,7 +46,7 @@ func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDat
 		MaxBatch: DefaultMaxBatch,
 		Wait:     DefaultWait,
 		Fetch: func(addresses []string) ([]*models.Validator, []error) {
-			validators, err := validatorQuery.QueryValidatorsBySelfDelegationAddresses(addresses)
+			validators, err := validatorQuery.WithProposalVotes().WithProposalDeposits().QueryValidatorsBySelfDelegationAddresses(addresses)
 			if err != nil {
 				errors := make([]error, 0, len(addresses))
 				for range addresses {
@@ -52,9 +58,26 @@ func NewValidatorDataloader(validatorQuery queries.IValidatorQuery) ValidatorDat
 		},
 	})
 
+	relativeTotalProposalCountConsensusAddressLoader := godataloader.NewDataLoader(godataloader.DataLoaderConfig[string, *int]{
+		MaxBatch: DefaultMaxBatch,
+		Wait:     DefaultWait,
+		Fetch: func(addresses []string) ([]*int, []error) {
+			counts, err := validatorQuery.QueryRelativeTotalProposalCounts(addresses)
+			if err != nil {
+				errors := make([]error, 0, len(addresses))
+				for range addresses {
+					errors = append(errors, err)
+				}
+				return nil, errors
+			}
+			return counts, nil
+		},
+	})
+
 	return &IValidatorDataloader{
-		validatorConsensusAddressLoader:      validatorConsensusAddressLoader,
-		validatorSelfDelegationAddressLoader: validatorSelfDelegationAddressLoader,
+		validatorConsensusAddressLoader:                  validatorConsensusAddressLoader,
+		validatorSelfDelegationAddressLoader:             validatorSelfDelegationAddressLoader,
+		relativeTotalProposalCountConsensusAddressLoader: relativeTotalProposalCountConsensusAddressLoader,
 	}
 }
 
@@ -64,4 +87,8 @@ func (d *IValidatorDataloader) LoadValidatorWithInfoByConsensusAddress(address s
 
 func (d *IValidatorDataloader) LoadValidatorWithInfoBySelfDelegationAddress(address string) (*models.Validator, error) {
 	return d.validatorSelfDelegationAddressLoader.Load(address)
+}
+
+func (d *IValidatorDataloader) LoadRelativeTotalProposalCountByConsensusAddress(address string) (*int, error) {
+	return d.relativeTotalProposalCountConsensusAddressLoader.Load(address)
 }

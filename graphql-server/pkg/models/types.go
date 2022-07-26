@@ -13,7 +13,7 @@ import (
 type BigInt string
 type BigFloat string
 
-func NewBigIntFromBunBigInt(b *bunbig.Int) BigInt {
+func NewBigIntFromBunBigInt(b bunbig.Int) BigInt {
 	return BigInt(b.String())
 }
 

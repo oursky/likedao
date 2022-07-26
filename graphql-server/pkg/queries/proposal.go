@@ -443,13 +443,13 @@ func (q *ProposalQuery) QueryProposalVoteCountByAddress(address string) (*models
 	for _, voteCount := range res {
 		switch voteCount.Option {
 		case models.ProposalVoteOptionYes:
-			distribution.Yes = &voteCount.Count
+			distribution.Yes = voteCount.Count
 		case models.ProposalVoteOptionNo:
-			distribution.No = &voteCount.Count
+			distribution.No = voteCount.Count
 		case models.ProposalVoteOptionAbstain:
-			distribution.Abstain = &voteCount.Count
+			distribution.Abstain = voteCount.Count
 		case models.ProposalVoteOptionNoWithVeto:
-			distribution.NoWithVeto = &voteCount.Count
+			distribution.NoWithVeto = voteCount.Count
 		default:
 			return nil, servererrors.InternalError.NewError(q.ctx, "invalid vote option encountered")
 		}

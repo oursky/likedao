@@ -5,11 +5,47 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	pkgContext "github.com/oursky/likedao/pkg/context"
+	servererrors "github.com/oursky/likedao/pkg/errors"
 	graphql1 "github.com/oursky/likedao/pkg/generated/graphql"
 	"github.com/oursky/likedao/pkg/models"
 )
+
+func (r *queryResolver) Validators(ctx context.Context, input models.QueryValidatorsInput) (*models.Connection[models.Validator], error) {
+	validatorQuery := pkgContext.GetQueriesFromCtx(ctx).Validator
+
+	if input.Status != nil {
+		validatorQuery = validatorQuery.ScopeValidatorStatus(*input.Status)
+	}
+
+	if input.Order != nil {
+		validatorQuery = validatorQuery.ValidatorOrderBy(*input.Order)
+	}
+
+	res, err := validatorQuery.QueryPaginatedValidators(input.First, input.After, []string{})
+	if err != nil {
+		return nil, servererrors.QueryError.NewError(ctx, fmt.Sprintf("failed to query validators: %v", err))
+	}
+
+	validatorCursorMap := make(map[string]string)
+	for _, validator := range res.Items {
+		cursorString := validator.ConsensusAddress
+		validatorCursorMap[validator.NodeID().String()] = cursorString
+	}
+
+	conn := models.NewConnection(res.Items, func(model models.Validator) string {
+		return validatorCursorMap[model.NodeID().String()]
+	})
+
+	conn.TotalCount = res.PaginationInfo.TotalCount
+	conn.PageInfo.HasNextPage = res.PaginationInfo.HasNext
+	conn.PageInfo.HasPreviousPage = res.PaginationInfo.HasPrevious
+
+	return &conn, nil
+}
 
 func (r *validatorResolver) OperatorAddress(ctx context.Context, obj *models.Validator) (*string, error) {
 	// Using dataloader here as we cannot assume the incoming validator has the info and description loaded
@@ -142,6 +178,111 @@ func (r *validatorResolver) Details(ctx context.Context, obj *models.Validator) 
 	}
 
 	return &validator.Description.Details, nil
+}
+
+func (r *validatorResolver) Jailed(ctx context.Context, obj *models.Validator) (*bool, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if validator.Status == nil {
+		return nil, nil
+	}
+
+	return &validator.Status.Jailed, nil
+}
+
+func (r *validatorResolver) Status(ctx context.Context, obj *models.Validator) (*models.ValidatorBondingStatus, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if validator.Status == nil {
+		return nil, nil
+	}
+
+	var status models.ValidatorBondingStatus
+	switch validator.Status.Status {
+	case int(stakingtypes.Bonded):
+		status = models.ValidatorBondingStatusBonded
+	case int(stakingtypes.Unbonding):
+		status = models.ValidatorBondingStatusUnbonding
+	case int(stakingtypes.Unbonded):
+		status = models.ValidatorBondingStatusUnbonded
+	}
+
+	if status == "" {
+		return nil, nil
+	}
+
+	return &status, nil
+}
+
+func (r *validatorResolver) VotingPower(ctx context.Context, obj *models.Validator) (float64, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.VotingPower == nil {
+		return 0, nil
+	}
+
+	return validator.VotingPower.RelativeVotingPower, nil
+}
+
+func (r *validatorResolver) ExpectedReturns(ctx context.Context, obj *models.Validator) (float64, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.Commission == nil {
+		return 0, nil
+	}
+
+	return validator.Commission.ExpectedReturns, nil
+}
+
+func (r *validatorResolver) Uptime(ctx context.Context, obj *models.Validator) (float64, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.SigningInfo == nil {
+		return 0, nil
+	}
+
+	return validator.SigningInfo.Uptime, nil
+}
+
+func (r *validatorResolver) ParticipatedProposalCount(ctx context.Context, obj *models.Validator) (int, error) {
+	validator, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadValidatorWithInfoByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if validator.Info == nil {
+		return 0, nil
+	}
+
+	return len(validator.Info.ProposalVotes), nil
+}
+
+func (r *validatorResolver) RelativeTotalProposalCount(ctx context.Context, obj *models.Validator) (int, error) {
+	count, err := pkgContext.GetDataLoadersFromCtx(ctx).Validator.LoadRelativeTotalProposalCountByConsensusAddress(obj.ConsensusAddress)
+	if err != nil {
+		return 0, err
+	}
+
+	if count == nil {
+		return 0, err
+	}
+
+	return *count, nil
 }
 
 // Validator returns graphql1.ValidatorResolver implementation.

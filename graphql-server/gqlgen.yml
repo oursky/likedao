@@ -130,3 +130,7 @@ models:
     fields:
       id:
         fieldName: NodeID
+  ValidatorConnection:
+    model: github.com/oursky/likedao/pkg/models.ValidatorConnection
+  ValidatorEdge:
+    model: github.com/oursky/likedao/pkg/models.ValidatorEdge
