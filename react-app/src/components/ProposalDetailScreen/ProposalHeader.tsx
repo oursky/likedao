@@ -53,6 +53,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     remainingVotingDuration,
     depositTotal,
     turnout,
+    status,
   } = proposal;
 
   const totalDepositString = useMemo(() => {
@@ -81,26 +82,26 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
       <div className={cn("col-span-2", "flex", "flex-col", "items-center")}>
         <LocalizedText messageID="ProposalDetail.votingPeriod" />
 
-        {votingStartTime && votingEndTime ? (
-          <>
-            <p className={cn("mb-1", "text-sm", "text-center")}>
-              <LocalizedText
-                messageID="ProposalDetail.votingDateRange"
-                messageArgs={{
-                  from: <UTCDatetime date={votingStartTime} />,
-                  to: <UTCDatetime date={votingEndTime} />,
-                }}
-              />
-            </p>
-            <Badge color="likecoin-yellow">
-              <LocalizedText
-                messageID="ProposalDetail.votingDurationRemaining"
-                messageArgs={{ duration: remainingVotingDuration }}
-              />
-            </Badge>
-          </>
-        ) : (
-          <p className={cn("mb-1", "text-sm", "text-center")}>-</p>
+        <p className={cn("mb-1", "text-sm", "text-center")}>
+          {votingStartTime && votingEndTime ? (
+            <LocalizedText
+              messageID="ProposalDetail.votingDateRange"
+              messageArgs={{
+                from: <UTCDatetime date={votingStartTime} />,
+                to: <UTCDatetime date={votingEndTime} />,
+              }}
+            />
+          ) : (
+            "-"
+          )}
+        </p>
+        {remainingVotingDuration && status === ProposalStatus.VotingPeriod && (
+          <Badge color="likecoin-yellow">
+            <LocalizedText
+              messageID="ProposalDetail.votingDurationRemaining"
+              messageArgs={{ duration: remainingVotingDuration }}
+            />
+          </Badge>
         )}
       </div>
       <div className={cn("flex", "flex-col", "items-center", "grow")}>
