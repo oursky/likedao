@@ -397,24 +397,27 @@ export function useProposalQuery(id: number | null): {
         }
         const now = new Date();
         const proposal = r.proposalByID;
+        const votingStartTime = proposal.votingStartTime
+          ? new Date(proposal.votingStartTime)
+          : null;
+        const votingEndTime = proposal.votingEndTime
+          ? new Date(proposal.votingEndTime)
+          : null;
+        const depositEndTime = proposal.depositEndTime
+          ? new Date(proposal.depositEndTime)
+          : null;
+
         return {
           ...proposal,
-          votingEndTime: proposal.votingEndTime
-            ? new Date(proposal.votingEndTime)
-            : null,
-          votingStartTime: proposal.votingStartTime
-            ? new Date(proposal.votingStartTime)
-            : null,
-          depositEndTime: proposal.depositEndTime
-            ? new Date(proposal.depositEndTime)
-            : null,
+
+          votingStartTime: votingStartTime,
+          votingEndTime: votingEndTime,
+          depositEndTime: depositEndTime,
           submitTime: new Date(proposal.submitTime),
           turnout: proposal.turnout ?? null,
           remainingVotingDuration:
-            proposal.votingStartTime &&
-            proposal.votingEndTime &&
-            isAfter(proposal.votingEndTime, now)
-              ? formatDistance(new Date(proposal.votingEndTime), now, {
+            votingStartTime && votingEndTime && isAfter(votingEndTime, now)
+              ? formatDistance(votingEndTime, now, {
                   locale: dateFnsLocale,
                 })
               : null,
