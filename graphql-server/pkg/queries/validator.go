@@ -266,8 +266,6 @@ func (q *ValidatorQuery) QueryRelativeTotalProposalCounts(addresses []string) ([
 		Where("validator.consensus_address IN (?)", bun.In(addresses)).
 		Scan(q.ctx, &counts)
 
-	fmt.Printf("%+v\n", counts)
-
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
