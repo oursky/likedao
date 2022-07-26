@@ -74,7 +74,7 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 			totalVotingPowerQuery := q.session.NewSelect().Model((*models.ValidatorVotingPower)(nil)).ColumnExpr("SUM(voting_power)::BIGINT as total_voting_power")
 			return votingPowerQuery.
 				Column("validator_address", "voting_power", "height").
-				ColumnExpr("(voting_power::decimal / (?)) as voting_power__relative_voting_power", totalVotingPowerQuery)
+				ColumnExpr("COALESCE((voting_power::decimal / (?)), 0) as voting_power__relative_voting_power", totalVotingPowerQuery)
 		}).
 		Relation("Commission", func(commissionQuery *bun.SelectQuery) *bun.SelectQuery {
 			// Calculate expected returns = (1 - commission_rate) * (inflation * supply) / bonded_tokens
@@ -89,14 +89,14 @@ func (q *ValidatorQuery) NewQuery(model interface{}, includeAddresses []string) 
 
 			return commissionQuery.
 				Column("validator_address", "commission", "min_self_delegation", "height").
-				ColumnExpr("(((1 - commission::decimal) * ((?) * (?))) / (?)::numeric) as commission__expected_returns", inflationQuery, nativeSupplyQuery, bondedPoolQuery)
+				ColumnExpr("COALESCE((((1 - commission::decimal) * ((?) * (?))) / (?)::numeric), 0) as commission__expected_returns", inflationQuery, nativeSupplyQuery, bondedPoolQuery)
 		}).
 		Relation("SigningInfo", func(signingInfoQuery *bun.SelectQuery) *bun.SelectQuery {
 			// Calculate uptime = (1 - signing_info.missed_blocks / (latest_block.height - signing_info.start_height))
 			latestBlockQuery := q.session.NewSelect().Model((*models.Block)(nil)).Order("timestamp DESC").Column("height").Limit(1)
 			return signingInfoQuery.
 				Column("validator_address", "start_height", "index_offset", "jailed_until", "tombstoned", "missed_blocks_counter", "height").
-				ColumnExpr("(1 - (missed_blocks_counter::decimal / ((?) - start_height::decimal))) as signing_info__uptime", latestBlockQuery)
+				ColumnExpr("COALESCE((1 - (missed_blocks_counter::decimal / ((?) - start_height::decimal))), 0) as signing_info__uptime", latestBlockQuery)
 		}).
 		Relation("Status").
 		// To handle gql resolving when info is provided but validator isn't
