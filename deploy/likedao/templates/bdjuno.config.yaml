@@ -40,6 +40,7 @@ data:
         parse_genesis: true
         start_height: {{ .Values.bdjuno.config.parsing.startHeight }}
         average_block_time: {{ .Values.bdjuno.config.parsing.averageBlockTime }}
+        genesis_file_path: /bdjuno/.bdjuno/genesis.json
     database:
         name: {{ .Values.bdjuno.config.database.name }}
         host: {{ .Values.bdjuno.config.database.host }}
