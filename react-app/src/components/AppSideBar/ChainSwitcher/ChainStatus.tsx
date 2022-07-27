@@ -48,6 +48,8 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
           "flex",
           "flex-col",
           "text-left",
+          "leading-none",
+          "desktop:leading-5",
           "desktop:gap-x-2",
           "desktop:flex-row"
         )}
@@ -55,7 +57,6 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
         <span
           className={cn(
             "text-xs",
-            "leading-5",
             "font-normal",
             "text-ellipsis",
             "overflow-hidden",
@@ -66,14 +67,7 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
         >
           {chainId}
         </span>
-        <span
-          className={cn(
-            "text-xs",
-            "leading-5",
-            "font-normal",
-            "text-app-green"
-          )}
-        >
+        <span className={cn("text-xs", "font-normal", "text-app-green")}>
           {displayedHeight ?? (
             <LocalizedText messageID="ChainStatus.connecting" />
           )}
