@@ -28,10 +28,10 @@ const IconButton: React.FC<IconButtonProps> = (props) => {
     [onClick_]
   );
   return (
-    <>
+    <div className={cn("flex", "items-center", "justify-center", className)}>
       <button
         type="button"
-        className={cn("p-2", "hover:bg-gray-100", "rounded-full", className)}
+        className={cn("p-2", "hover:bg-gray-100", "rounded-full")}
         onClick={onClick}
         ref={setRefEle}
         {...rest}
@@ -45,7 +45,7 @@ const IconButton: React.FC<IconButtonProps> = (props) => {
           popperOptions={{ placement: "bottom" }}
         />
       )}
-    </>
+    </div>
   );
 };
 
