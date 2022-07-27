@@ -3,7 +3,7 @@ import cn from "classnames";
 import { MessageID } from "../../i18n/LocaleModel";
 import LocalizedText from "../common/Localized/LocalizedText";
 import {
-  convertBigNumberToLocalizedIntegerString,
+  convertBigNumberToLocalizedString,
   convertBigNumberToMillifiedIntegerString,
   convertBigNumberToFixedPointString,
 } from "../../utils/number";
@@ -99,7 +99,7 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
                 "text-app-darkgrey"
               )}
             >
-              {convertBigNumberToLocalizedIntegerString(
+              {convertBigNumberToLocalizedString(
                 communityStatus.communityPool.amount
               )}
             </span>

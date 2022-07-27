@@ -8,7 +8,7 @@ import AppButton from "../common/Buttons/AppButton";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { truncateAddress } from "../../utils/address";
 import UTCDatetime from "../common/DateTime/UTCDatetime";
-import { convertBigNumberToLocalizedIntegerString } from "../../utils/number";
+import { convertBigNumberToLocalizedString } from "../../utils/number";
 import Config from "../../config/Config";
 import { getProposalTypeMessage } from "../proposals/utils";
 import { ReactionList, ReactionPicker } from "../reactions";
@@ -60,7 +60,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
     if (depositTotal.lt(1)) {
       return depositTotal.toFixed(3);
     }
-    return convertBigNumberToLocalizedIntegerString(depositTotal);
+    return convertBigNumberToLocalizedString(depositTotal);
   }, [depositTotal]);
 
   return (
