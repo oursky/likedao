@@ -33,13 +33,13 @@ const ProfilePicture: React.FC<{
           "rounded-full",
           "w-[120px]",
           "h-[120px]",
-          "sm:w-[180px]",
-          "sm:h-[180px]"
+          "desktop:w-[180px]",
+          "desktop:h-[180px]"
         )}
       >
         <Icon
           icon={IconType.Account}
-          className={cn("w-11", "h-11", "sm:w-16", "sm:h-16")}
+          className={cn("w-11", "h-11", "desktop:w-16", "desktop:h-16")}
         />
       </div>
     </div>
@@ -106,12 +106,14 @@ const PortfolioPanel: React.FC<PortfolioPanelProps> = ({
         className={cn(
           "mt-11",
           "mb-6",
-          "sm:flex",
-          "sm:min-w-0",
+          "desktop:flex",
+          "desktop:min-w-0",
           "overflow-x-auto"
         )}
       >
-        <ProfilePicture className={cn("mb-9", "sm:mb-0", "sm:mr-9")} />
+        <ProfilePicture
+          className={cn("mb-9", "desktop:mb-0", "desktop:mr-9")}
+        />
 
         <div className={cn("flex", "flex-col", "items-start", "w-full")}>
           <p className={cn("text-xl", "leading-6", "font-medium", "mb-3")}>

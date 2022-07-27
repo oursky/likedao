@@ -115,7 +115,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
           "items-center",
           "justify-between",
           "px-4",
-          "sm:px-0",
+          "desktop:px-0",
           "overflow-x-auto"
         )}
       >
@@ -126,7 +126,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
             "flex-1",
             "flex",
             "justify-start",
-            "sm:justify-end"
+            "desktop:justify-end"
           )}
         >
           {canGoPrevious && (
@@ -147,7 +147,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
               onClick={onPreviousClick}
             >
               <Icon icon={IconType.ArrowNarrowLeft} width={20} height={20} />
-              <span className={cn("ml-3", "hidden", "sm:inline-block")}>
+              <span className={cn("ml-3", "hidden", "desktop:inline-block")}>
                 <LocalizedText messageID="PaginationController.previous" />
               </span>
             </button>
@@ -207,7 +207,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
             "flex-1",
             "flex",
             "justify-end",
-            "sm:justify-start"
+            "desktop:justify-start"
           )}
         >
           {canGoNext && (
@@ -228,7 +228,7 @@ const PageContoller: React.FC<PageControllerProps> = (props) => {
               disabled={!canGoNext}
               onClick={onNextClick}
             >
-              <span className={cn("mr-3", "hidden", "sm:inline-block")}>
+              <span className={cn("mr-3", "hidden", "desktop:inline-block")}>
                 <LocalizedText messageID="PaginationController.next" />
               </span>
               <Icon icon={IconType.ArrowNarrowRight} width={20} height={20} />

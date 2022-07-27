@@ -48,8 +48,8 @@ const ChainStatus: React.FC<ChainStatusProps> = (props) => {
           "flex",
           "flex-col",
           "text-left",
-          "sm:gap-x-2",
-          "sm:flex-row"
+          "desktop:gap-x-2",
+          "desktop:flex-row"
         )}
       >
         <span

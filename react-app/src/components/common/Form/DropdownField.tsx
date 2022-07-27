@@ -114,7 +114,7 @@ const DropdownFormField: <T extends FieldValues>(
           "inline-block",
           "text-left",
           "w-full",
-          "sm:max-w-xs"
+          "desktop:max-w-xs"
         )}
         onBlur={onBlur}
       >

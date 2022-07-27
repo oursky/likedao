@@ -7,7 +7,7 @@ import Config from "../../config/Config";
 
 const Footer: React.FC = () => {
   return (
-    <div className={cn("mx-3", "mt-10", "sm:mt-8", "mb-8")}>
+    <div className={cn("mx-3", "mt-10", "desktop:mt-8", "mb-8")}>
       <Divider />
       <div
         className={cn(
@@ -17,12 +17,12 @@ const Footer: React.FC = () => {
           "leading-5",
           "font-normal",
           "text-gray-500",
-          "sm:flex",
-          "sm:items-center",
-          "sm:mt-5"
+          "desktop:flex",
+          "desktop:items-center",
+          "desktop:mt-5"
         )}
       >
-        <p className={cn("sm:grow", "sm:text-left")}>
+        <p className={cn("desktop:grow", "desktop:text-left")}>
           <LocalizedText
             messageID="footer.likecoin"
             messageArgs={{ year: new Date().getFullYear() }}
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
         <p
           className={cn(
             "mt-6",
-            "sm:mt-0",
+            "desktop:mt-0",
             Config.footerLinks.tokenLinks.length <= 0 && "hidden"
           )}
         >
@@ -43,7 +43,7 @@ const Footer: React.FC = () => {
             "justify-center",
             "items-center",
             "my-3",
-            "sm:px-3"
+            "desktop:px-3"
           )}
         >
           {Config.footerLinks.tokenLinks.map((token) => (
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
               "justify-center",
               "items-center",
               "my-3",
-              "sm:px-3"
+              "desktop:px-3"
             )}
           >
             <p className={cn("pr-3")}>

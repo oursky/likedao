@@ -31,13 +31,13 @@ function getFormFieldClassNameClassNameByDirection(
           "grid",
           "auto-rows-min",
           "gap-y-2",
-          "sm:grid-cols-4",
-          "sm:gap-y-1",
-          "sm:gap-x-4",
-          "sm:items-center"
+          "desktop:grid-cols-4",
+          "desktop:gap-y-1",
+          "desktop:gap-x-4",
+          "desktop:items-center"
         ),
         inputClassName: cn("col-span-3"),
-        errorClassName: cn("sm:col-start-2", "sm:col-span-3"),
+        errorClassName: cn("desktop:col-start-2", "desktop:col-span-3"),
       };
     case "vertical":
       return {
