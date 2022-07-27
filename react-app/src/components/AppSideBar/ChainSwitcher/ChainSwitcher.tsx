@@ -45,7 +45,7 @@ const ChainSwitcher: React.FC<ChainSwitcherProps> = (props) => {
       >
         <Menu.Items
           className={cn(
-            "absolute mt-2 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg right-0 sm:left-0 sm:right-auto"
+            "absolute mt-2 w-56 divide-y divide-gray-100 rounded-md bg-white shadow-lg right-0 desktop:left-0 desktop:right-auto"
           )}
         >
           <div className={cn("flex", "flex-col", "py-1")}>

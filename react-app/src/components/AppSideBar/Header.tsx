@@ -20,10 +20,10 @@ const Header: React.FC<HeaderProps> = (props) => {
         "flex-row",
         "gap-x-4",
         "items-center",
-        "sm:items-start",
-        "sm:flex-col",
-        "sm:gap-y-4",
-        "sm:gap-x-0"
+        "desktop:items-start",
+        "desktop:flex-col",
+        "desktop:gap-y-4",
+        "desktop:gap-x-0"
       )}
     >
       <LikeLogo height={48} width={48} />

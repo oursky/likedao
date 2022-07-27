@@ -71,7 +71,13 @@ const GovernanceInfoPanel: React.FC = () => {
         </h2>
       </div>
       <div
-        className={cn("flex", "flex-col", "sm:flex-row", "gap-3", "sm:gap-16")}
+        className={cn(
+          "flex",
+          "flex-col",
+          "desktop:flex-row",
+          "gap-3",
+          "desktop:gap-16"
+        )}
       >
         <InfoField
           labelMessageID="GovernanceInfoPanel.minDeposit"

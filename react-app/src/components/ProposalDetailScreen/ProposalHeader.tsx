@@ -70,8 +70,8 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         "grid",
         "grid-rows-2",
         "grid-cols-2",
-        "sm:grid-rows-1",
-        "sm:grid-cols-4",
+        "desktop:grid-rows-1",
+        "desktop:grid-cols-4",
         "text-sm",
         "leading-5",
         "font-medium",
@@ -227,9 +227,9 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
         "flex",
         "flex-col",
         "gap-y-4",
-        "sm:flex-row",
-        "sm:justify-between",
-        "sm:justify-center"
+        "desktop:flex-row",
+        "desktop:justify-between",
+        "desktop:justify-center"
       )}
     >
       <div

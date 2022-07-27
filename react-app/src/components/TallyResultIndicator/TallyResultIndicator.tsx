@@ -121,9 +121,9 @@ const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
           "flex",
           "flex-col",
           "gap-y-1",
-          "sm:gap-y-0",
-          "sm:flex-row",
-          "sm:gap-x-4"
+          "desktop:gap-y-0",
+          "desktop:flex-row",
+          "desktop:gap-x-4"
         )}
       >
         <span className={cn("text-xs", "leading-5", "font-bold", "text-black")}>
@@ -177,9 +177,9 @@ const TallyResultIndicator: React.FC<TallyResultIndicatorProps> = (props) => {
           "grid-rows-2",
           "grid-cols-2",
           "gap-y-2.5",
-          "sm:gap-y-0",
-          "sm:grid-cols-4",
-          "sm:grid-rows-1"
+          "desktop:gap-y-0",
+          "desktop:grid-cols-4",
+          "desktop:grid-rows-1"
         )}
       >
         <VoteDetail

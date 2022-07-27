@@ -44,12 +44,12 @@ const MenuPanel: React.FC<{
     <div
       className={cn(
         !isMenuActive && "hidden",
-        "sm:flex",
+        "desktop:flex",
         "flex-col",
         className
       )}
     >
-      <Divider className={cn("hidden", "sm:block")} />
+      <Divider />
       <AppNavigationMenu
         activeRoute={location.pathname}
         className={cn("py-6")}
@@ -125,13 +125,12 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
         "flex",
         "flex-col",
         "gap-x-4",
-        "gap-y-6",
         "justify-center",
-        "sm:justify-start",
-        "sm:gap-y-4",
-        "sm:flex-row",
+        "desktop:justify-start",
+        "desktop:gap-y-4",
+        "desktop:flex-row",
         "relative",
-        "sm:w-full",
+        "desktop:w-full",
         "w-screen"
       )}
     >
@@ -142,15 +141,15 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           "flex-col",
           "px-3",
           "pt-3",
-          "sm:p-0",
-          "sm:w-72",
+          "desktop:p-0",
+          "desktop:w-72",
           "w-screen",
-          "sm:static",
-          "sm:bg-transparent",
+          "desktop:static",
+          "desktop:bg-transparent",
           isMenuOpen && cn("h-screen", "fixed", "top-0", "z-50", "bg-default")
         )}
       >
-        <div className={cn("flex", "flex-row", "order-1", "sm:flex-col")}>
+        <div className={cn("flex", "flex-row", "order-1", "desktop:flex-col")}>
           <Header
             chainStatus={chainStatus}
             latestBlockHeight={latestBlockHeight}
@@ -158,7 +157,7 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           <IconButton
             icon={isMenuOpen ? IconType.X : IconType.Menu}
             size={24}
-            className={cn("sm:hidden")}
+            className={cn("desktop:hidden")}
             onClick={toggleMobileMenuMenu}
           />
         </div>
@@ -175,13 +174,13 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
                 "order-3",
                 "flex-col",
                 "gap-y-6",
-                "sm:flex",
+                "desktop:flex",
                 !isMenuOpen && "hidden"
               )}
             >
               <Divider />
               <UserInfoPanel
-                className={cn("mt-6", "sm:mt-0")}
+                className={cn("mt-6", "desktop:mt-0")}
                 userInfo={userInfo}
                 onClickSend={transaction.openSendTokenModal}
                 onClickReceive={transaction.openReceiveTokenModal}
@@ -193,12 +192,12 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
               address={userInfo?.address ?? ""}
               className={cn(
                 "order-4",
-                "sm:order-2",
-                "sm:flex",
-                "sm:items-center",
+                "desktop:order-2",
+                "desktop:flex",
+                "desktop:items-center",
                 "mt-5",
-                "sm:mt-0",
-                "sm:mb-7",
+                "desktop:mt-0",
+                "desktop:mb-7",
                 !isMenuOpen && "hidden"
               )}
               onDisconnect={wallet.disconnect}
@@ -214,11 +213,10 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
           closeMobileMenu={onMenuClose}
         />
       </div>
-      <div className={cn("grow", "px-3", "min-w-0", "sm:px-0")}>
+      <div className={cn("grow", "px-3", "min-w-0", "desktop:px-0")}>
         {!hideCommunityStatusHeader && (
-          <div className="flex justify-end mb-6">
+          <div className={cn("hidden", "desktop:flex", "justify-end", "mb-6")}>
             <CommunityStatusHeader
-              className="hidden sm:flex"
               isLoading={!isRequestStateLoaded(communityStatusRequestState)}
               communityStatus={
                 isRequestStateLoaded(communityStatusRequestState)

@@ -37,13 +37,13 @@ const ProfilePicture = ({ className }: ValidatorDetailPureComponentProps) => (
   <div
     className={cn(
       "flex justify-center items-center bg-app-secondarygreen rounded-xl w-[60px] h-[60px]",
-      "sm:rounded-[36px] sm:w-[180px] sm:h-[180px] sm:min-w-[180px]",
+      "desktop:rounded-[36px] desktop:w-[180px] desktop:h-[180px] desktop:min-w-[180px]",
       className
     )}
   >
     <Icon
       icon={IconType.Validator}
-      className="w-6 h-6 fill-app-green sm:w-[67px] sm:h-[67px]"
+      className="w-6 h-6 fill-app-green desktop:w-[67px] desktop:h-[67px]"
     />
   </div>
 );
@@ -81,7 +81,7 @@ const DataField = ({
 }) => (
   <div
     className={cn(
-      "flex flex-col justify-between mr-6 sm:min-w-[100px]",
+      "flex flex-col justify-between mr-6 desktop:min-w-[100px]",
       className
     )}
   >
@@ -151,7 +151,7 @@ const Info = ({ className, data }: ValidatorDetailPureComponentProps) => {
         denom={Config.chainInfo.currency.coinDenom}
       />
 
-      <div className="flex gap-y-3 justify-between mt-3 sm:justify-start">
+      <div className="flex gap-y-3 justify-between mt-3 desktop:justify-start">
         <DataField messageID="ValidatorDetailScreen.descriptionPanel.votingPower">
           {(votingPower * 100).toFixed(2)}%
         </DataField>
@@ -164,7 +164,7 @@ const Info = ({ className, data }: ValidatorDetailPureComponentProps) => {
             : 0}
         </DataField>
         <DataField
-          className="hidden sm:flex"
+          className="hidden desktop:flex"
           messageID="ValidatorDetailScreen.descriptionPanel.commissionRate"
         >
           {(commissionRates.rate.toNumber() * 100).toFixed(2)}%
@@ -189,11 +189,11 @@ const ValidatorDetailDescriptionPanel: React.FC<
   return (
     <Paper>
       <Title className="mb-4" />
-      <div className="flex flex-col py-6 sm:overflow-x-auto sm:flex-row">
-        <ProfilePicture className="mb-9 sm:mr-9" data={data} />
+      <div className="flex flex-col py-6 desktop:overflow-x-auto desktop:flex-row">
+        <ProfilePicture className="mb-9 desktop:mr-9" data={data} />
         <div className="w-full">
           <Info data={data} />
-          <div className="grid grid-cols-2 gap-3 items-center mt-6 w-full sm:grid-cols-3 sm:w-max">
+          <div className="grid grid-cols-2 gap-3 items-center mt-6 w-full desktop:grid-cols-3 desktop:w-max">
             <AppButton
               className="py-1.5 min-w-fit"
               type="button"

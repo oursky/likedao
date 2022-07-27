@@ -62,8 +62,8 @@ export const CommunityStatusRegular: React.FC<CommunityStatusRegularProps> = (
         "flex",
         "flex-col",
         "gap-y-3",
-        "sm:gap-x-3",
-        "sm:flex-row",
+        "desktop:gap-x-3",
+        "desktop:flex-row",
         "flex-wrap",
         className
       )}
