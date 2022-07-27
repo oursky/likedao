@@ -152,3 +152,40 @@ func LogoutHandler() gin.HandlerFunc {
 		c.Status(200)
 	}
 }
+
+//nolint:errcheck
+func ValidateHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var body models.TokenValidationRequestData
+		if err := c.BindJSON(&body); err != nil {
+			c.AbortWithError(400, fmt.Errorf("address is empty or invalid: %s", err))
+			return
+		}
+
+		sessionToken, err := GetSignedCookie(c, SessionCookieName)
+		if err != nil {
+			c.AbortWithError(400, fmt.Errorf("session token is either missing or invalid: %s", err))
+			return
+		}
+
+		sessionTokenData := new(models.ExpirableValue)
+		if err := sessionTokenData.ParseString(sessionToken); err != nil {
+			c.AbortWithError(400, fmt.Errorf("session token is either missing or invalid: %s", err))
+			return
+		}
+
+		if sessionTokenData.IsExpired() {
+			RemoveSignedCookie(c, SessionCookieName, "/")
+			c.AbortWithError(401, fmt.Errorf("session token has expired"))
+			return
+		}
+
+		if sessionTokenData.Value != body.Address {
+			RemoveSignedCookie(c, SessionCookieName, "/")
+			c.AbortWithError(401, fmt.Errorf("session token does not match the address"))
+			return
+		}
+
+		c.Status(200)
+	}
+}
