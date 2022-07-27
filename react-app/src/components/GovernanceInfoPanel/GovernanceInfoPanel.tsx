@@ -76,7 +76,7 @@ const GovernanceInfoPanel: React.FC = () => {
           "flex-col",
           "desktop:flex-row",
           "gap-3",
-          "desktop:gap-16"
+          "justify-between"
         )}
       >
         <InfoField
