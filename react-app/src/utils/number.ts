@@ -9,10 +9,8 @@ export function convertBigNumberToFixedPointString(
   return amount.toFixed(decimalPlaces, 1); // 1 means round down
 }
 
-export function convertBigNumberToLocalizedIntegerString(
-  amount: BigNumber
-): string {
-  return amount.integerValue().toNumber().toLocaleString();
+export function convertBigNumberToLocalizedString(amount: BigNumber): string {
+  return amount.toNumber().toLocaleString();
 }
 
 export function convertBigNumberToMillifiedIntegerString(

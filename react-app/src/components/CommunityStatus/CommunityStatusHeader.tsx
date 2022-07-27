@@ -4,7 +4,7 @@ import LocalizedText from "../common/Localized/LocalizedText";
 import Config from "../../config/Config";
 import {
   convertBigNumberToFixedPointString,
-  convertBigNumberToLocalizedIntegerString,
+  convertBigNumberToLocalizedString,
 } from "../../utils/number";
 import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import { CommunityStatusProps } from "./CommunityStatus";
@@ -42,7 +42,7 @@ export const CommunityStatusHeader: React.FC<CommunityStatusHeaderProps> = (
                 "text-black"
               )}
             >
-              {convertBigNumberToLocalizedIntegerString(
+              {convertBigNumberToLocalizedString(
                 communityStatus.communityPool.amount
               )}
               <span className={cn("ml-1")}>{chainInfo.currency.coinDenom}</span>

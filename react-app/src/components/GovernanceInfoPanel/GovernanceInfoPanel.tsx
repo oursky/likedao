@@ -8,7 +8,7 @@ import LoadingSpinner from "../common/LoadingSpinner/LoadingSpinner";
 import LocalizedText from "../common/Localized/LocalizedText";
 import { Icon, IconType } from "../common/Icons/Icons";
 import {
-  convertBigNumberToFixedPointString,
+  convertBigNumberToLocalizedString,
   formatDecimalToPercentage,
 } from "../../utils/number";
 import { MessageID } from "../../i18n/LocaleModel";
@@ -81,7 +81,7 @@ const GovernanceInfoPanel: React.FC = () => {
       >
         <InfoField
           labelMessageID="GovernanceInfoPanel.minDeposit"
-          value={`${convertBigNumberToFixedPointString(
+          value={`${convertBigNumberToLocalizedString(
             minDeposit.amount
           )} ${minDeposit.denom.toUpperCase()}`}
         />
