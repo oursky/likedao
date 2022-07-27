@@ -17,7 +17,7 @@
   "ConnectWallet.connectModal.keplrWallet": "Keplr Wallet",
   "ConnectWallet.connectModal.noWallet": "Continue without address",
   "ConnectWallet.connectModal.title": "Welcome 👋",
-  "ConnectWallet.connectModal.walletConnect": "WallectConnect",
+  "ConnectWallet.connectModal.walletConnect": "WalletConnect",
   "ConnectWallet.connecting": "Connecting to wallet...",
   "ConnectWallet.disconnected.connect": "Connect to wallet",
   "ConnectWallet.disconnected.description": "Connect wallet to get started",
