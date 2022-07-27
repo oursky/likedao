@@ -72,8 +72,8 @@ bdjuno:
     loggingLevel: debug
     chain:
       bech32Prefix:
-        - cosmos
         - like
+        - cosmos
       additionalModules:
     rpc:
       clientName: juno

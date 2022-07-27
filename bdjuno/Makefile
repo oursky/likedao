@@ -2,7 +2,7 @@ GENESIS_URL?=https://raw.githubusercontent.com/likecoin/mainnet/master/genesis.j
 
 .PHONY: init
 init: 
-	git submodule update --init --recursive
+	git submodule update --init --recursive --remote
 
 .PHONY: setup
 setup: init

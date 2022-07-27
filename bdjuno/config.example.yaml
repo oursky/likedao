@@ -1,7 +1,7 @@
 chain:
   bech32_prefix:
-    - cosmos
     - like
+    - cosmos
   modules:
     - modules
     - messages
@@ -30,6 +30,7 @@ parsing:
   parse_genesis: true
   start_height: 1
   average_block_time: 5s
+  genesis_file_path: /bdjuno/.bdjuno/genesis.json
 database:
   name: bdjuno
   host: bdjuno-db
