@@ -56,9 +56,9 @@ type ValidatorInfo struct {
 	MaxRate             string `bun:"column:max_rate,notnull"`
 	Height              int64  `bun:"column:height,notnull"`
 
-	Validator        *Validator         `bun:"rel:belongs-to,join:consensus_address=consensus_address"`
-	ProposalVotes    []*ProposalVote    `bun:"rel:has-many,join:self_delegate_address=voter_address"`
-	ProposalDeposits []*ProposalDeposit `bun:"rel:has-many,join:self_delegate_address=depositor_address"`
+	Validator        *Validator        `bun:"rel:belongs-to,join:consensus_address=consensus_address"`
+	ProposalVotes    []ProposalVote    `bun:"rel:has-many,join:self_delegate_address=voter_address"`
+	ProposalDeposits []ProposalDeposit `bun:"rel:has-many,join:self_delegate_address=depositor_address"`
 }
 
 type ValidatorStatus struct {

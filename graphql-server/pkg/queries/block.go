@@ -46,6 +46,10 @@ func (q *BlockQuery) QueryBlockByHash(hash string) (*models.Block, error) {
 }
 
 func (q *BlockQuery) QueryBlocksByHashes(hashes []string) ([]*models.Block, error) {
+	if len(hashes) == 0 {
+		return []*models.Block{}, nil
+	}
+
 	blocks := make([]models.Block, 0)
 	uppercasedHashes := make([]string, 0, len(hashes))
 	for _, hash := range hashes {
@@ -74,6 +78,10 @@ func (q *BlockQuery) QueryBlocksByHashes(hashes []string) ([]*models.Block, erro
 }
 
 func (q *BlockQuery) QueryBlocksByHeights(heights []int64) ([]*models.Block, error) {
+	if len(heights) == 0 {
+		return []*models.Block{}, nil
+	}
+
 	blocks := make([]models.Block, 0)
 	if err := q.session.NewSelect().Model(&blocks).Where("height IN (?)", bun.In(heights)).Scan(q.ctx); err != nil {
 		return nil, errors.WithStack(err)

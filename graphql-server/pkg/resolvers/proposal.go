@@ -139,11 +139,8 @@ func (r *proposalResolver) Votes(ctx context.Context, obj *models.Proposal, inpu
 		// There should only be at most one vote when scoped
 		if validator.Info != nil && len(validator.Info.ProposalVotes) != 0 {
 			for _, vote := range validator.Info.ProposalVotes {
-				if vote == nil {
-					continue
-				}
 				if vote.ProposalID == obj.ID {
-					result = append(result, *vote)
+					result = append(result, vote)
 					break
 				}
 			}
@@ -240,11 +237,8 @@ func (r *proposalResolver) Deposits(ctx context.Context, obj *models.Proposal, i
 		validator := validators.Items[i]
 		if validator.Info != nil && len(validator.Info.ProposalDeposits) != 0 {
 			for _, deposit := range validator.Info.ProposalDeposits {
-				if deposit == nil {
-					continue
-				}
 				if deposit.ProposalID == obj.ID {
-					result = append(result, *deposit)
+					result = append(result, deposit)
 					break
 				}
 			}
