@@ -82,7 +82,7 @@ const OverviewScreen: React.FC = () => {
         isLoading={isScreenLoading}
         communityStatus={screenData?.communityStatus ?? null}
       />
-      <ActiveProposalsPanel proposals={screenData?.proposals ?? []} />
+      <GovernanceInfoPanel />
       <StakesTablePanel
         isLoading={isRequestStateLoading(stakesRequestState)}
         stakes={
@@ -94,7 +94,7 @@ const OverviewScreen: React.FC = () => {
         order={stakesOrder}
         setOrder={setStakesOrder}
       />
-      <GovernanceInfoPanel />
+      <ActiveProposalsPanel proposals={screenData?.proposals ?? []} />
     </div>
   );
 };
