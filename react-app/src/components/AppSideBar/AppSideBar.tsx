@@ -49,7 +49,7 @@ const MenuPanel: React.FC<{
         className
       )}
     >
-      <Divider className={cn("hidden", "desktop:block")} />
+      <Divider />
       <AppNavigationMenu
         activeRoute={location.pathname}
         className={cn("py-6")}
@@ -125,7 +125,6 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
         "flex",
         "flex-col",
         "gap-x-4",
-        "gap-y-6",
         "justify-center",
         "desktop:justify-start",
         "desktop:gap-y-4",
@@ -216,9 +215,8 @@ const AppSideBar: React.FC<AppSideBarProps> = ({
       </div>
       <div className={cn("grow", "px-3", "min-w-0", "desktop:px-0")}>
         {!hideCommunityStatusHeader && (
-          <div className="flex justify-end mb-6">
+          <div className={cn("hidden", "desktop:flex", "justify-end", "mb-6")}>
             <CommunityStatusHeader
-              className="hidden desktop:flex"
               isLoading={!isRequestStateLoaded(communityStatusRequestState)}
               communityStatus={
                 isRequestStateLoaded(communityStatusRequestState)
