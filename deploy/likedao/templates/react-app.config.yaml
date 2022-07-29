@@ -46,6 +46,7 @@ data:
         {{- end}}
       ],
       footerLinks: {
+        githubLink: {{ .Values.reactApp.githubLink | quote }},
         tokenLinks: [
           {{- range .Values.reactApp.footerLinks.tokenLinks }}
             {{- with .}}

@@ -33,6 +33,7 @@ reactApp:
     - chainId: likecoin-mainnet-2
       link: http://localhost:3000
   footerLinks:
+    githubLink: https://github.com/likecoin/likedao
     tokenLinks:
       - name: osmosis
         link: https://app.osmosis.zone/?from=ATOM&to=LIKE
