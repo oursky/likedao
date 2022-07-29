@@ -28,15 +28,7 @@ window.appConfig = {
     tokenLinks: [
       {
         name: "osmosis",
-        link: "https://app.osmosis.zone/?from=ATOM&to=LIKE",
-      },
-      {
-        name: "liquid",
-        link: "https://app.liquid.com/exchange/LIKEUSDT",
-      },
-      {
-        name: "emeris",
-        link: "https://app.emeris.com/welcome",
+        link: "https://app.osmosis.zone/?from=OSMO&to=LIK",
       },
     ],
     contactSupport:
