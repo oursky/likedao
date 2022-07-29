@@ -16,6 +16,7 @@ import { ProposalType } from "../../models/cosmos/gov";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import AppRoutes from "../../navigation/AppRoutes";
 import GovernanceInfoPanel from "../GovernanceInfoPanel/GovernanceInfoPanel";
+import TransactionError from "../common/TransactionError/TransactionError";
 
 const CreateProposalScreen: React.FC = () => {
   const wallet = useWallet();
@@ -88,8 +89,8 @@ const CreateProposalScreen: React.FC = () => {
 
         return;
       } catch (e: unknown) {
-        console.error("Error signing send token tx", e);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={e} />);
+        console.error("Error signing create proposal tx", e);
         setIsSubmissionModalActive(false);
       }
     },

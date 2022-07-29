@@ -244,5 +244,6 @@
   "reactions.whatever": "Whatever",
   "transaction.broadcasting": "Broadcasting transaction...",
   "transaction.failure": "Transaction failed",
+  "transaction.failure.systemLog": "System message: \"{error}\"",
   "transaction.success": "Transaction broadcasted"
 }
