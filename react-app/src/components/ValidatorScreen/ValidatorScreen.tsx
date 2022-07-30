@@ -33,16 +33,16 @@ type ValidatorTabItem = IFilterTabItem<FilterKey>;
 
 const defaultTabItems: ValidatorTabItem[] = [
   {
-    label: "ValidatorScreen.filters.all",
-    value: "all",
-  },
-  {
     label: "ValidatorScreen.filters.active",
     value: "active",
   },
   {
     label: "ValidatorScreen.filters.inactive",
     value: "inactive",
+  },
+  {
+    label: "ValidatorScreen.filters.all",
+    value: "all",
   },
 ];
 
