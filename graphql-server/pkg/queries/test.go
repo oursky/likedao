@@ -33,7 +33,11 @@ func (q *TestQuery) QueryTestByID(id string) (*models.Test, error) {
 }
 
 func (q *TestQuery) QueryTestsByIDs(ids []string) ([]*models.Test, error) {
-	tests := make([]*models.Test, 0, len(ids))
+	if len(ids) == 0 {
+		return []*models.Test{}, nil
+	}
+
+	tests := make([]models.Test, 0)
 	if err := q.session.NewSelect().Model(&tests).Where("id IN (?)", bun.In(ids)).Scan(q.ctx); err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -41,7 +45,7 @@ func (q *TestQuery) QueryTestsByIDs(ids []string) ([]*models.Test, error) {
 	result := make([]*models.Test, 0, len(tests))
 	idToTest := make(map[string]models.Test, len(tests))
 	for _, test := range tests {
-		idToTest[test.ID] = *test
+		idToTest[test.ID] = test
 	}
 
 	for _, id := range ids {

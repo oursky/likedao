@@ -247,7 +247,11 @@ func (q *ProposalQuery) QueryPaginatedProposalDeposits(proposalID int, first int
 }
 
 func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.ProposalTallyResult, error) {
-	tallyResults := make([]*models.ProposalTallyResult, 0, len(ids))
+	if len(ids) == 0 {
+		return []*models.ProposalTallyResult{}, nil
+	}
+
+	tallyResults := make([]models.ProposalTallyResult, 0)
 	if err := q.session.NewSelect().Model(&tallyResults).Where("proposal_id IN (?)", bun.In(ids)).Scan(q.ctx); err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -255,7 +259,7 @@ func (q *ProposalQuery) QueryProposalTallyResults(ids []int) ([]*models.Proposal
 	result := make([]*models.ProposalTallyResult, 0, len(tallyResults))
 	idToTallyResult := make(map[int]models.ProposalTallyResult, len(tallyResults))
 	for _, tallyResult := range tallyResults {
-		idToTallyResult[tallyResult.ProposalID] = *tallyResult
+		idToTallyResult[tallyResult.ProposalID] = tallyResult
 	}
 
 	for _, id := range ids {
@@ -274,7 +278,8 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 	if len(ids) == 0 {
 		return []*models.Proposal{}, nil
 	}
-	proposals := make([]*models.Proposal, len(ids))
+
+	proposals := make([]models.Proposal, 0)
 	err := q.NewQuery().Where("id IN (?)", bun.In(ids)).Scan(q.ctx, &proposals)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -284,7 +289,7 @@ func (q *ProposalQuery) QueryProposalByIDs(ids []string) ([]*models.Proposal, er
 	result := make([]*models.Proposal, 0, len(proposals))
 	idToProposal := make(map[string]models.Proposal, len(proposals))
 	for _, proposal := range proposals {
-		idToProposal[proposal.NodeID().ID] = *proposal
+		idToProposal[proposal.NodeID().ID] = proposal
 	}
 
 	for _, id := range ids {
@@ -318,6 +323,10 @@ func (q *ProposalQuery) QueryProposalDepositTotal(id int) ([]types.DbDecCoin, er
 }
 
 func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error) {
+	if len(ids) == 0 {
+		return []*float64{}, nil
+	}
+
 	var turnouts []models.ProposalTurnout
 	err := q.session.NewSelect().
 		Model((*models.ProposalTallyResult)(nil)).
@@ -360,9 +369,9 @@ func (q *ProposalQuery) QueryTurnoutByProposalIDs(ids []int) ([]*float64, error)
 
 func (q *ProposalQuery) QueryProposalVotes(keys []models.ProposalVoteKey) ([]*models.ProposalVote, error) {
 	if len(keys) == 0 {
-		return nil, nil
+		return []*models.ProposalVote{}, nil
 	}
-	var votes []*models.ProposalVote
+	var votes []models.ProposalVote
 	err := q.session.NewSelect().
 		With("keys", q.session.NewValues(&keys).WithOrder()).
 		Model(&votes).
@@ -376,7 +385,7 @@ func (q *ProposalQuery) QueryProposalVotes(keys []models.ProposalVoteKey) ([]*mo
 	result := make([]*models.ProposalVote, 0, len(votes))
 	keyToVote := make(map[models.ProposalVoteKey]models.ProposalVote, len(votes))
 	for _, vote := range votes {
-		keyToVote[models.ProposalVoteKey{ProposalID: vote.ProposalID, Address: vote.VoterAddress}] = *vote
+		keyToVote[models.ProposalVoteKey{ProposalID: vote.ProposalID, Address: vote.VoterAddress}] = vote
 	}
 
 	for _, key := range keys {
@@ -393,9 +402,9 @@ func (q *ProposalQuery) QueryProposalVotes(keys []models.ProposalVoteKey) ([]*mo
 
 func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) ([]*models.ProposalDeposit, error) {
 	if len(keys) == 0 {
-		return nil, nil
+		return []*models.ProposalDeposit{}, nil
 	}
-	var deposits []*models.ProposalDeposit
+	var deposits []models.ProposalDeposit
 	err := q.session.NewSelect().
 		With("keys", q.session.NewValues(&keys).WithOrder()).
 		Model(&deposits).
@@ -410,7 +419,7 @@ func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) 
 	result := make([]*models.ProposalDeposit, 0, len(deposits))
 	keyToVote := make(map[models.ProposalDepositKey]models.ProposalDeposit, len(deposits))
 	for _, deposit := range deposits {
-		keyToVote[models.ProposalDepositKey{ProposalID: deposit.ProposalID, Address: deposit.DepositorAddress}] = *deposit
+		keyToVote[models.ProposalDepositKey{ProposalID: deposit.ProposalID, Address: deposit.DepositorAddress}] = deposit
 	}
 
 	for _, key := range keys {
@@ -426,7 +435,7 @@ func (q *ProposalQuery) QueryProposalDeposits(keys []models.ProposalDepositKey) 
 }
 
 func (q *ProposalQuery) QueryProposalVoteCountByAddress(address string) (*models.ProposalTallyResult, error) {
-	res := make([]*models.ProposalVoteOptionCount, 4)
+	res := make([]models.ProposalVoteOptionCount, 4)
 	err := q.session.NewSelect().
 		Model((*models.ProposalVote)(nil)).
 		Column("option").
