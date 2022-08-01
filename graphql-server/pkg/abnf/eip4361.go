@@ -19,7 +19,7 @@ const (
 
 // https://eips.ethereum.org/EIPS/eip-4361
 
-// domain %s" wants you to sign in with your Likecoin account:" LF
+// domain %s" wants you to sign in with your LikeCoin account:" LF
 // address LF
 // LF
 // [ statement LF ]
@@ -36,7 +36,7 @@ const (
 // resources ]
 func AuthenticationMessage() abnf.Rule {
 	return abnf.C(
-		abnf.K(Authority(), AuthorityFQDN), abnf.SP(), abnf.VS("wants you to sign in with your Likecoin account:"), abnf.LF(),
+		abnf.K(Authority(), AuthorityFQDN), abnf.SP(), abnf.VS("wants you to sign in with your LikeCoin account:"), abnf.LF(),
 		abnf.K(_address(), AddressFQDN), abnf.LF(),
 		abnf.LF(),
 		abnf.O(abnf.C(abnf.K(_statement(), StatementFQDN), abnf.LF())),

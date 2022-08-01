@@ -33,13 +33,10 @@ reactApp:
     - chainId: likecoin-mainnet-2
       link: http://localhost:3000
   footerLinks:
+    githubLink: https://github.com/likecoin/likedao
     tokenLinks:
       - name: osmosis
-        link: https://app.osmosis.zone/?from=ATOM&to=LIKE
-      - name: liquid
-        link: https://app.liquid.com/exchange/LIKEUSDT
-      - name: emeris
-        link: https://app.emeris.com/welcome
+        link: https://app.osmosis.zone/?from=OSMO&to=LIKE
     contactSupport: https://go.crisp.chat/chat/embed/?website_id=5c009125-5863-4059-ba65-43f177ca33f7
   bech32Config:
     bech32PrefixAccAddr: like

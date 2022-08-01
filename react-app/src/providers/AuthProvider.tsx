@@ -13,7 +13,7 @@ function makeSignInWithCosmosMessage(
 ): string {
   const now = new Date();
   return (
-    `${url.host} wants you to sign in with your Likecoin account:\n` +
+    `${url.host} wants you to sign in with your LikeCoin account:\n` +
     `${address}\n\n\n\n` +
     `URI: ${url.origin}\n` +
     `Version: 1\n` +

@@ -24,18 +24,11 @@ window.appConfig = {
   authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
   footerLinks: {
+    githubLink: "https://github.com/likecoin/likedao",
     tokenLinks: [
       {
         name: "osmosis",
-        link: "https://app.osmosis.zone/?from=ATOM&to=LIKE",
-      },
-      {
-        name: "liquid",
-        link: "https://app.liquid.com/exchange/LIKEUSDT",
-      },
-      {
-        name: "emeris",
-        link: "https://app.emeris.com/welcome",
+        link: "https://app.osmosis.zone/?from=OSMO&to=LIK",
       },
     ],
     contactSupport:

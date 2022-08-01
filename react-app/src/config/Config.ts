@@ -30,6 +30,7 @@ export interface ChainInfo {
 }
 
 interface FooterLinks {
+  githubLink: string;
   tokenLinks: TokenLink[];
   contactSupport?: string;
 }
@@ -74,6 +75,7 @@ const defaultConfig: IConfig = {
   authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
   footerLinks: {
+    githubLink: "https://github.com/likecoin/likedao",
     tokenLinks: [
       {
         name: "osmosis",
