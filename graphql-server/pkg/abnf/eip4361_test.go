@@ -13,12 +13,12 @@ func Test_EIP4361Message(t *testing.T) {
 		authority := "likedao.com"
 		address := "like1cq425wdjy0lg6zswt38j06kepq782mxzsuveua"
 		uri := "https://likedao.com"
-		chainID := "likecoin-mainnet-2"
+		chainID := "LikeCoin-mainnet-2"
 		nonce := "12345678"
 		issuedAt := "2006-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -64,7 +64,7 @@ func Test_EIP4361Message(t *testing.T) {
 	})
 
 	t.Run("Official EIP Sample Message", func(t *testing.T) {
-		message := "service.org wants you to sign in with your Likecoin account:\n" +
+		message := "service.org wants you to sign in with your LikeCoin account:\n" +
 			"like1cq425wdjy0lg6zswt38j06kepq782mxzsuveua\n" +
 			"\n" +
 			"I accept the ServiceOrg Terms of Service: https://service.org/tos\n" +
@@ -93,7 +93,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -117,7 +117,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -141,7 +141,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -165,7 +165,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -189,7 +189,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -213,7 +213,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "20200-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
@@ -237,7 +237,7 @@ func Test_EIP4361Message(t *testing.T) {
 		issuedAt := "2020-01-02T15:04:05Z"
 
 		message := fmt.Sprintf(
-			"%s wants you to sign in with your Likecoin account:\n"+
+			"%s wants you to sign in with your LikeCoin account:\n"+
 				"%s\n"+
 				"\n\n\n"+
 				"URI: %s\n"+
