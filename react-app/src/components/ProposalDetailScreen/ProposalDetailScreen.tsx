@@ -22,6 +22,7 @@ import { useCosmosAPI } from "../../api/cosmosAPI";
 import { useGovAPI } from "../../api/govAPI";
 import { DepositProposalFormValues } from "../forms/DepositProposalForm/DepositProposalFormModel";
 import DepositProposalModal from "../TransactionModals/DepositProposalModal";
+import TransactionError from "../common/TransactionError/TransactionError";
 import ProposalHeader from "./ProposalHeader";
 import ProposalDescription from "./ProposalDescription";
 import { useProposalQuery } from "./ProposalDetailScreenAPI";
@@ -146,7 +147,7 @@ const ProposalDetailScreen: React.FC = () => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },
@@ -174,7 +175,7 @@ const ProposalDetailScreen: React.FC = () => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },

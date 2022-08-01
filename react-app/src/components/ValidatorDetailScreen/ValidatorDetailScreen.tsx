@@ -20,6 +20,7 @@ import UnstakeTokenModal from "../TransactionModals/UnstakeTokenModal";
 import { useStakingAPI } from "../../api/stakingAPI";
 import { useLocale } from "../../providers/AppLocaleProvider";
 import { useCosmosAPI } from "../../api/cosmosAPI";
+import TransactionError from "../common/TransactionError/TransactionError";
 import ValidatorDetailDescriptionPanel from "./ValidatorDetailDescriptionPanel";
 import ValidatorDetailYourStakes from "./ValidatorDetailYourStakesPanel";
 import { useValidatorQuery } from "./ValidatorDetailScreenAPI";
@@ -113,7 +114,7 @@ const ValidatorDetailScreen: React.FC = () => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing delegate token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },
@@ -141,7 +142,7 @@ const ValidatorDetailScreen: React.FC = () => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing delegate token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },

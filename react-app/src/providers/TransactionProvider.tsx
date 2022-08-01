@@ -9,6 +9,7 @@ import UserAddressModal from "../components/UserAddressModal/UserAddressModal";
 import { CollectRewardsFormValues } from "../components/forms/CollectRewardsForm/CollectRewardsFormModel";
 import { useDistributionAPI } from "../api/distributionAPI";
 import CollectRewardsModal from "../components/TransactionModals/CollectRewardsModal";
+import TransactionError from "../components/common/TransactionError/TransactionError";
 import { useLocale } from "./AppLocaleProvider";
 import { ConnectionStatus, useWallet } from "./WalletProvider";
 
@@ -91,7 +92,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },
@@ -117,7 +118,7 @@ const TransactionProvider: React.FC<TransactionProviderProps> = (props) => {
         await wallet.refreshAccount();
       } catch (err: unknown) {
         console.error("Error signing send token tx", err);
-        toast.error(translate("transaction.failure"));
+        toast.error(<TransactionError error={err} />);
         closeModals();
       }
     },
