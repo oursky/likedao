@@ -45,6 +45,7 @@ export interface IConfig {
     endpoint: string;
   };
   authEndpoint: string;
+  googleAnalyticsId: string | null;
   chainLinks: ChainLink[];
   footerLinks: FooterLinks;
 }
@@ -74,6 +75,7 @@ const defaultConfig: IConfig = {
   },
   authEndpoint: "http://localhost:8080/auth",
   chainLinks: [],
+  googleAnalyticsId: null,
   footerLinks: {
     githubLink: "https://github.com/likecoin/likedao",
     tokenLinks: [

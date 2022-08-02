@@ -13,15 +13,17 @@ export interface ArbitrarySigner {
 
 export class BaseWallet {
   protected chainInfo: ChainInfo;
-
+  public type: string;
   public offlineSigner: OfflineSigner;
   public provider: WalletProvider;
 
   constructor(
+    type: string,
     chainInfo: ChainInfo,
     offlineSigner: OfflineSigner,
     provider: WalletProvider
   ) {
+    this.type = type;
     this.offlineSigner = offlineSigner;
     this.chainInfo = chainInfo;
     this.provider = provider;

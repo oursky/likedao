@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AccountData } from "@cosmjs/proto-signing";
 import { toast } from "react-toastify";
+import * as ReactGA from "react-ga";
 import { KeplrWallet } from "../clients/keplrClient";
 import {
   BaseWallet,
@@ -118,6 +119,11 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
           );
         })
         .finally(() => {
+          ReactGA.event({
+            category: "Wallet",
+            action: "Disconnect",
+            label: activeWallet.type,
+          });
           setActiveWallet(null);
           setAutoConnectWalletType(null);
         });
@@ -148,6 +154,12 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       setAccountBalance(accountBalance);
       setAutoConnectWalletType(AutoConnectWalletType.Keplr);
       setWalletStatus(ConnectionStatus.Connected);
+
+      ReactGA.event({
+        category: "Wallet",
+        action: "Connect",
+        label: wallet.type,
+      });
       // Validate the token in case the logged in wallet has a different account than the authenticated address
       await authAPI.validate(account.address);
     } catch (err: unknown) {
@@ -190,6 +202,12 @@ const WalletProvider: React.FC<WalletProviderProps> = (props) => {
       setAccountBalance(accountBalance);
       setAutoConnectWalletType(AutoConnectWalletType.WalletConnect);
       setWalletStatus(ConnectionStatus.Connected);
+
+      ReactGA.event({
+        category: "Wallet",
+        action: "Connect",
+        label: wallet.type,
+      });
       // Validate the token in case the logged in wallet has a different account than the authenticated address
       await authAPI.validate(account.address);
     } catch (err: unknown) {

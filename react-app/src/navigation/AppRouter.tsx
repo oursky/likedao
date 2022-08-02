@@ -12,51 +12,54 @@ import AppScaffold from "../components/AppScaffold/AppScaffold";
 import ProposalDetailRouter from "../components/ProposalDetailScreen/ProposalDetailRouter";
 import ValidatorDetailScreen from "../components/ValidatorDetailScreen/ValidatorDetailScreen";
 import ValidatorScreen from "../components/ValidatorScreen/ValidatorScreen";
+import AnalyticsProvider from "../providers/AnalyticsProvider";
 import AppRoutes from "./AppRoutes";
 
 const AppRouter: React.FC = () => {
   const wallet = useWallet();
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<AppScaffold />}>
-          <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
-          <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
-          <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
-          <Route path={AppRoutes.Validators} element={<ValidatorScreen />} />
-          <Route
-            path={AppRoutes.NewProposal}
-            element={<CreateProposalScreen />}
-          />
-          <Route
-            path={`${AppRoutes.ProposalDetail}/*`}
-            element={<ProposalDetailRouter />}
-          />
-          <Route
-            path={`${AppRoutes.ValidatorDetail}/*`}
-            element={<ValidatorDetailScreen />}
-          />
-          <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
-          <Route
-            path={AppRoutes.OtherPortfolio}
-            element={<PortfolioScreen />}
-          />
-        </Route>
+      <AnalyticsProvider>
+        <Routes>
+          <Route element={<AppScaffold />}>
+            <Route path={AppRoutes.Overview} element={<OverviewScreen />} />
+            <Route path={AppRoutes.Dummy} element={<DummyScreen />} />
+            <Route path={AppRoutes.Proposals} element={<ProposalScreen />} />
+            <Route path={AppRoutes.Validators} element={<ValidatorScreen />} />
+            <Route
+              path={AppRoutes.NewProposal}
+              element={<CreateProposalScreen />}
+            />
+            <Route
+              path={`${AppRoutes.ProposalDetail}/*`}
+              element={<ProposalDetailRouter />}
+            />
+            <Route
+              path={`${AppRoutes.ValidatorDetail}/*`}
+              element={<ValidatorDetailScreen />}
+            />
+            <Route path={AppRoutes.Portfolio} element={<PortfolioScreen />} />
+            <Route
+              path={AppRoutes.OtherPortfolio}
+              element={<PortfolioScreen />}
+            />
+          </Route>
 
-        <Route
-          path={AppRoutes.NotFound}
-          element={<ErrorView type={ErrorType.NotFound} />}
-        />
-        <Route
-          path={AppRoutes.ErrorInvalidAddress}
-          element={<ErrorView type={ErrorType.InvalidAddress} />}
-        />
-        <Route path="*" element={<Navigate to={AppRoutes.NotFound} />} />
-      </Routes>
+          <Route
+            path={AppRoutes.NotFound}
+            element={<ErrorView type={ErrorType.NotFound} />}
+          />
+          <Route
+            path={AppRoutes.ErrorInvalidAddress}
+            element={<ErrorView type={ErrorType.InvalidAddress} />}
+          />
+          <Route path="*" element={<Navigate to={AppRoutes.NotFound} />} />
+        </Routes>
 
-      {wallet.status === ConnectionStatus.Connecting && (
-        <WalletConnectingScreen />
-      )}
+        {wallet.status === ConnectionStatus.Connecting && (
+          <WalletConnectingScreen />
+        )}
+      </AnalyticsProvider>
     </BrowserRouter>
   );
 };

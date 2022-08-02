@@ -22,6 +22,7 @@ window.appConfig = {
     endpoint: "http://localhost:8080/graphql",
   },
   authEndpoint: "http://localhost:8080/auth",
+  googleAnalyticsId: null,
   chainLinks: [],
   footerLinks: {
     githubLink: "https://github.com/likecoin/likedao",

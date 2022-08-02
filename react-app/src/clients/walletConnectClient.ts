@@ -32,7 +32,7 @@ export class WalletConnectWallet extends BaseWallet {
     provider: WalletProvider,
     connector: WalletConnect
   ) {
-    super(chainInfo, offlineSigner, provider);
+    super("walletConnect", chainInfo, offlineSigner, provider);
     this.connector = connector;
   }
 
