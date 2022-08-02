@@ -406,6 +406,7 @@ export function useProposalQuery(id: number | null): {
         const depositEndTime = proposal.depositEndTime
           ? new Date(proposal.depositEndTime)
           : null;
+        const submitTime = new Date(proposal.submitTime);
 
         return {
           ...proposal,
@@ -413,7 +414,7 @@ export function useProposalQuery(id: number | null): {
           votingStartTime: votingStartTime,
           votingEndTime: votingEndTime,
           depositEndTime: depositEndTime,
-          submitTime: new Date(proposal.submitTime),
+          submitTime: submitTime,
           turnout: proposal.turnout ?? null,
           remainingVotingDuration:
             votingStartTime && votingEndTime && isAfter(votingEndTime, now)
@@ -421,6 +422,13 @@ export function useProposalQuery(id: number | null): {
                   locale: dateFnsLocale,
                 })
               : null,
+          remainingDepositDuration:
+            depositEndTime && isAfter(depositEndTime, now)
+              ? formatDistance(depositEndTime, now, {
+                  locale: dateFnsLocale,
+                })
+              : null,
+
           depositTotal: convertMinimalTokenToToken(
             proposal.depositTotal.find((t) => t.denom === CoinMinimalDenom)
               ?.amount ?? 0

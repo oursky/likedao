@@ -39,6 +39,8 @@ export interface Proposal
    */
   remainingVotingDuration: string | null;
 
+  remainingDepositDuration: string | null;
+
   reactions: ReactionItem[];
 
   depositTotal: BigNumber;
