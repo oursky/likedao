@@ -46,15 +46,78 @@ const ProposalTitle: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   );
 };
 
-const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
+const ProposalPeriod: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
   const {
-    votingStartTime,
-    votingEndTime,
-    remainingVotingDuration,
-    depositTotal,
-    turnout,
+    depositEndTime,
+    submitTime,
+    remainingDepositDuration,
     status,
+    votingEndTime,
+    votingStartTime,
+    remainingVotingDuration,
   } = proposal;
+
+  if (status === ProposalStatus.DepositPeriod) {
+    return (
+      <div className={cn("col-span-2", "flex", "flex-col", "items-center")}>
+        <LocalizedText messageID="ProposalDetail.depositPeriod" />
+
+        <p className={cn("mb-1", "text-sm", "text-center")}>
+          {depositEndTime ? (
+            <LocalizedText
+              messageID="ProposalDetail.dateRange"
+              messageArgs={{
+                from: <UTCDatetime date={submitTime} />,
+                to: <UTCDatetime date={depositEndTime} />,
+              }}
+            />
+          ) : (
+            "-"
+          )}
+        </p>
+        {remainingDepositDuration && (
+          <Badge color="likecoin-yellow">
+            <LocalizedText
+              messageID="ProposalDetail.durationRemaining"
+              messageArgs={{ duration: remainingDepositDuration }}
+            />
+          </Badge>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("col-span-2", "flex", "flex-col", "items-center")}>
+      <LocalizedText messageID="ProposalDetail.votingPeriod" />
+
+      <p className={cn("mb-1", "text-sm", "text-center")}>
+        {votingStartTime && votingEndTime ? (
+          <LocalizedText
+            messageID="ProposalDetail.dateRange"
+            messageArgs={{
+              from: <UTCDatetime date={votingStartTime} />,
+              to: <UTCDatetime date={votingEndTime} />,
+            }}
+          />
+        ) : (
+          "-"
+        )}
+      </p>
+      {remainingVotingDuration && (
+        <Badge color="likecoin-yellow">
+          <LocalizedText
+            messageID="ProposalDetail.durationRemaining"
+            messageArgs={{ duration: remainingVotingDuration }}
+          />
+        </Badge>
+      )}
+    </div>
+  );
+};
+
+const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
+  const { depositTotal, turnout } = proposal;
 
   const totalDepositString = useMemo(() => {
     if (depositTotal.lt(1)) {
@@ -79,31 +142,7 @@ const ProposalStatistics: React.FC<{ proposal: Proposal }> = ({ proposal }) => {
         "gap-y-5"
       )}
     >
-      <div className={cn("col-span-2", "flex", "flex-col", "items-center")}>
-        <LocalizedText messageID="ProposalDetail.votingPeriod" />
-
-        <p className={cn("mb-1", "text-sm", "text-center")}>
-          {votingStartTime && votingEndTime ? (
-            <LocalizedText
-              messageID="ProposalDetail.votingDateRange"
-              messageArgs={{
-                from: <UTCDatetime date={votingStartTime} />,
-                to: <UTCDatetime date={votingEndTime} />,
-              }}
-            />
-          ) : (
-            "-"
-          )}
-        </p>
-        {remainingVotingDuration && status === ProposalStatus.VotingPeriod && (
-          <Badge color="likecoin-yellow">
-            <LocalizedText
-              messageID="ProposalDetail.votingDurationRemaining"
-              messageArgs={{ duration: remainingVotingDuration }}
-            />
-          </Badge>
-        )}
-      </div>
+      <ProposalPeriod proposal={proposal} />
       <div className={cn("flex", "flex-col", "items-center", "grow")}>
         <LocalizedText messageID="ProposalDetail.deposit" />
         <p>{`${totalDepositString} ${CoinDenom}`}</p>
@@ -169,7 +208,7 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
   );
 };
 
-enum ProposalPeriod {
+enum ProposalPeriodType {
   Voting = "voting",
   Deposit = "deposit",
 }
@@ -200,7 +239,7 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
       proposal.depositEndTime &&
       isBefore(now, proposal.depositEndTime)
     ) {
-      return ProposalPeriod.Deposit;
+      return ProposalPeriodType.Deposit;
     }
 
     if (
@@ -214,7 +253,7 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
           end: proposal.votingEndTime,
         })
       ) {
-        return ProposalPeriod.Voting;
+        return ProposalPeriodType.Voting;
       }
     }
 
@@ -255,12 +294,12 @@ const ProposalActionArea: React.FC<ProposalActionAreaProps> = (props) => {
           theme="primary"
           className={cn("text-base", "leading-6", "font-medium", "px-6")}
           messageID={
-            proposalPeriod === ProposalPeriod.Voting
+            proposalPeriod === ProposalPeriodType.Voting
               ? "ProposalDetail.voteNow"
               : "ProposalDetail.deposit"
           }
           onClick={
-            proposalPeriod === ProposalPeriod.Voting
+            proposalPeriod === ProposalPeriodType.Voting
               ? onVoteClick
               : onDepositClick
           }
