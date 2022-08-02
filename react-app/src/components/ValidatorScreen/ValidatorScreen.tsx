@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import cn from "classnames";
 import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import Avatar from "react-avatar";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
 import FilterTabs, { IFilterTabItem } from "../Tabs/FilterTabs";
@@ -233,22 +234,17 @@ const ValidatorScreen: React.FC = () => {
                   !item.jailed && item.status === ValidatorBondingStatus.Bonded;
                 return (
                   <div className={cn("flex", "flex-row")}>
-                    <div
-                      className={cn(
-                        "flex-shrink-0",
-                        "w-9",
-                        "h-9",
-                        "leading-none",
-                        "rounded-full",
-                        "bg-blue-700",
-                        "bg-cover"
-                      )}
-                      style={{
-                        backgroundImage:
-                          item.avatarUrl != null
-                            ? `url(${item.avatarUrl})`
-                            : undefined,
-                      }}
+                    <Avatar
+                      name={item.moniker ?? item.operatorAddress ?? ""}
+                      // Hide the initials, we need them as seed to generate random color
+                      className={cn("!text-transparent")}
+                      size="36px"
+                      round={true}
+                      src={
+                        item.avatarUrl != null
+                          ? `url(${item.avatarUrl})`
+                          : undefined
+                      }
                     />
                     <div className="ml-3">
                       <h3 className="text-sm font-medium text-app-green">

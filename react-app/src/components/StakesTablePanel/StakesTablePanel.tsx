@@ -1,6 +1,7 @@
 import React from "react";
 import cn from "classnames";
 import { Link } from "react-router-dom";
+import Avatar from "react-avatar";
 import Paper from "../common/Paper/Paper";
 import { Icon, IconType } from "../common/Icons/Icons";
 import LocalizedText from "../common/Localized/LocalizedText";
@@ -70,16 +71,16 @@ const StakesTablePanel: React.FC<StakesTablePanelProps> = ({
         >
           {(item) => (
             <div className={cn("flex", "items-center")}>
-              <div
-                className={cn(
-                  "flex-shrink-0",
-                  "w-9",
-                  "h-9",
-                  "leading-none",
-                  "rounded-full",
-                  "bg-blue-700",
-                  "flex-shrink-0"
-                )}
+              <Avatar
+                name={
+                  item.validator.description?.moniker ??
+                  item.validator.operatorAddress
+                }
+                // Hide the initials, we need them as seed to generate random color
+                className={cn("!text-transparent")}
+                size="36px"
+                round={true}
+                // TODO: Handle avatar
               />
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-app-green">
