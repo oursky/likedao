@@ -5,9 +5,17 @@ import {
   newSignDataMessage,
   SignDataMessageResponse,
 } from "../models/cosmos/tx";
-import { ArbitrarySigner, BaseWallet } from "./baseWallet";
+import { ArbitrarySigner, BaseWallet, WalletProvider } from "./baseWallet";
 
 export class KeplrWallet extends BaseWallet {
+  private constructor(
+    chainInfo: ChainInfo,
+    offlineSigner: OfflineSigner,
+    provider: WalletProvider
+  ) {
+    super("keplr", chainInfo, offlineSigner, provider);
+  }
+
   static async connect(chainInfo: ChainInfo): Promise<KeplrWallet> {
     const keplrClient = window.keplr;
 
