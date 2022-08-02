@@ -3,6 +3,7 @@ import cn from "classnames";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import BigNumber from "bignumber.js";
+import * as ReactGA from "react-ga";
 import AppRoutes from "../../navigation/AppRoutes";
 import Paper from "../common/Paper/Paper";
 import {
@@ -71,6 +72,13 @@ const ProposalDetailScreen: React.FC = () => {
         return;
       }
 
+      ReactGA.event({
+        category: "Reaction",
+        action: "Set on proposal",
+        value: proposalId!,
+        label: type,
+      });
+
       try {
         await reactionAPI.setReaction(
           ReactionTargetType.Proposal,
@@ -82,7 +90,7 @@ const ProposalDetailScreen: React.FC = () => {
         toast.error(translate("ProposalDetail.setReaction.failure"));
       }
     },
-    [requestState, reactionAPI, wallet, translate]
+    [requestState, wallet, proposalId, reactionAPI, translate]
   );
 
   const onUnsetReaction = useCallback(async (): Promise<void> => {
@@ -95,6 +103,12 @@ const ProposalDetailScreen: React.FC = () => {
       return;
     }
 
+    ReactGA.event({
+      category: "Reaction",
+      action: "Unset on proposal",
+      value: proposalId!,
+    });
+
     try {
       await reactionAPI.unsetReaction(
         ReactionTargetType.Proposal,
@@ -104,7 +118,7 @@ const ProposalDetailScreen: React.FC = () => {
       console.error("Error while setting reaction", e);
       toast.error(translate("ProposalDetail.setReaction.failure"));
     }
-  }, [requestState, reactionAPI, wallet, translate]);
+  }, [requestState, reactionAPI, proposalId, wallet, translate]);
 
   const handleOpenVoteModal = useCallback(() => {
     if (wallet.status !== ConnectionStatus.Connected) {
