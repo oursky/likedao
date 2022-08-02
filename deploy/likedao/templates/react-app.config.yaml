@@ -35,6 +35,11 @@ data:
         endpoint: {{ .Values.reactApp.graphqlEndpoint | quote }},
       },
       authEndpoint: {{ .Values.reactApp.authEndpoint | quote }},
+      {{ if .Values.reactApp.googleAnalyticsId }}
+      googleAnalyticsId: {{ .Values.reactApp.googleAnalyticsId | quote }},
+      {{ else }}
+      googleAnalyticsId: null,
+      {{ end }}
       chainLinks: [
         {{- range .Values.reactApp.chainLinks }}
           {{- with .}}
