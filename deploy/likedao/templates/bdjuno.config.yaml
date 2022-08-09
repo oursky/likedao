@@ -48,6 +48,7 @@ data:
         user: {{ .Values.bdjuno.config.database.user }}
         password: {{ .Values.bdjuno.config.database.password }}
         schema: {{ .Values.bdjuno.config.database.schema }}
+        ssl_mode: {{ .Values.bdjuno.config.database.ssl_mode }}
         max_open_connections: {{ .Values.bdjuno.config.database.maxConnections }}
         max_idle_connections: {{ .Values.bdjuno.config.database.maxConnections }}
         partition_size: {{ .Values.bdjuno.config.database.partitionSize }}
