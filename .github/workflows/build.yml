@@ -2,9 +2,7 @@ name: Build Images and Deploy
 on:
   push:
     branches:
-      - master
       - staging
-      # - production TODO: Review if this is needed
 env:
   DOCKER_VERSION: 20.10.14
   DEPLOYMENT_WEBHOOK: ${{ secrets.DEPLOYMENT_WEBHOOK }}
