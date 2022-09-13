@@ -1,4 +1,4 @@
-FROM golang:bullseye as builder
+FROM golang:1.18.6-bullseye as builder
 
 WORKDIR /usr/src/app
 COPY ./graphql-server/go.mod ./graphql-server/go.sum ./graphql-server/Makefile ./

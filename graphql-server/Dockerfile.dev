@@ -1,4 +1,4 @@
-FROM golang:bullseye
+FROM golang:1.18.6-bullseye
 
 WORKDIR /usr/src/app
 RUN go install github.com/githubnemo/CompileDaemon@latest
