@@ -35,7 +35,7 @@ type Proposal implements Node {
   proposalId: Int!
   title: String!
   description: String!
-  type: ProposalType!
+  type: String!
   submitTime: DateTime!
   depositEndTime: DateTime
   "Sum of all deposit in chain's coin denom (non chain's coin denom deposits excluded)"
