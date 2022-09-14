@@ -160,6 +160,8 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
 }) => {
   const { type, proposerAddress, submitTime } = proposal;
 
+  const typeNameId = getProposalTypeMessage(type);
+
   return (
     <div
       className={cn(
@@ -175,7 +177,7 @@ const ProposalTypeAndProposer: React.FC<{ proposal: Proposal }> = ({
         <LocalizedText messageID="ProposalDetail.proposalType" />
       </p>
       <p className={cn("text-sm", "mb-4")}>
-        <LocalizedText messageID={getProposalTypeMessage(type)} />
+        {typeNameId !== null ? <LocalizedText messageID={typeNameId} /> : type}
       </p>
       <p className={cn("text-sm", "text-app-lightgreen", "mb-1")}>
         <LocalizedText messageID="ProposalDetail.publishedBy" />

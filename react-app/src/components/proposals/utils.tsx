@@ -27,7 +27,7 @@ export function getProposalStatusBadgeConfig(
   }
 }
 
-export function getProposalTypeMessage(type: ProposalType): MessageID {
+export function getProposalTypeMessage(type: string): MessageID | null {
   switch (type) {
     case ProposalType.Text:
       return "ProposalScreen.proposalType.text";
@@ -40,7 +40,7 @@ export function getProposalTypeMessage(type: ProposalType): MessageID {
     case ProposalType.CancelSoftwareUpgrade:
       return "ProposalScreen.proposalType.cancelSoftwareUpgrade";
     default:
-      throw new Error("Unknown proposal type");
+      return null;
   }
 }
 

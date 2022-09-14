@@ -20,14 +20,14 @@ func (r *proposalResolver) ProposalID(ctx context.Context, obj *models.Proposal)
 	return obj.ID, nil
 }
 
-func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (models.ProposalType, error) {
+func (r *proposalResolver) Type(ctx context.Context, obj *models.Proposal) (string, error) {
 	proposalType := new(models.ProposalType)
 	err := proposalType.UnmarshalGQL(obj.ProposalType)
 	if err != nil {
-		return "", nil
+		return obj.ProposalType, nil
 	}
 
-	return *proposalType, nil
+	return proposalType.String(), nil
 }
 
 func (r *proposalResolver) DepositTotal(ctx context.Context, obj *models.Proposal) ([]types.DbDecCoin, error) {

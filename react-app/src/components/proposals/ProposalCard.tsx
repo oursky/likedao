@@ -50,6 +50,11 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
     });
   }, [proposal]);
 
+  const proposalTypeNameId = useMemo(
+    () => getProposalTypeMessage(proposal.type),
+    [proposal]
+  );
+
   return (
     <div
       className={cn(
@@ -86,7 +91,11 @@ const ProposalCard: React.FC<ProposalCardProps> = (props) => {
             "text-app-darkgrey"
           )}
         >
-          <LocalizedText messageID={getProposalTypeMessage(proposal.type)} />
+          {proposalTypeNameId !== null ? (
+            <LocalizedText messageID={proposalTypeNameId} />
+          ) : (
+            proposal.type
+          )}
         </span>
         <h1
           className={cn(
