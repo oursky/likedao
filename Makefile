@@ -38,7 +38,7 @@ docker-build-graphql-server:
 docker-build-bdjuno:
 	docker build \
 		-t $(DOCKER_REGISTRY)/likedao-bdjuno:$(BUILD_TAG) \
-		-f bdjuno/bdjuno/Dockerfile \
+		-f Dockerfile-bdjuno \
 		bdjuno/bdjuno
 
 .PHONY: docker-build
